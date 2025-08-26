@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translator (Final Working Version)</title>
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f9; color: #333; display: flex;
+            justify-content: center; align-items: center; min-height: 100vh;
+            margin: 0; padding: 20px; box-sizing: border-box;
+        }
+        .translator-container {
+            background-color: #ffffff; padding: 30px 40px; border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); width: 100%; max-width: 650px;
+        }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 10px; }
+        p { text-align: center; color: #7f8c8d; margin-bottom: 30px; }
+        textarea {
+            width: 100%; height: 150px; padding: 15px; border-radius: 8px;
+            border: 1px solid #dfe6e9; font-size: 16px; resize: vertical;
+            box-sizing: border-box; margin-bottom: 20px;
+        }
+        .controls {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            gap: 20px; flex-wrap: wrap; margin-bottom: 20px;
+        }
+        .language-selector { flex: 1; min-width: 200px; }
+        label { font-weight: 500; display: block; margin-bottom: 5px; }
+        
+        .select-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        select {
+            width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #dfe6e9;
+            background-color: #fff; font-size: 16px; cursor: pointer; flex-grow: 1;
+        }
+        .speak-btn {
+            cursor: pointer; font-size: 24px;
+            color: #7f8c8d; transition: color 0.2s;
+            flex-shrink: 0;
+        }
+        .speak-btn:hover { color: #3498db; }
+
+        #translate-btn {
+            background-color: #27ae60; color: #ffffff; border: none; padding: 12px 25px;
+            font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer;
+            transition: background-color 0.3s ease; width: 100%; margin-top: 10px;
+        }
+        #translate-btn:hover { background-color: #229954; }
+        .output-container { margin-top: 20px; }
+        .output-header { display: flex; justify-content: space-between; align-items: center; }
+        h2 {
+            color: #2c3e50; border-bottom: 1px solid #ecf0f1;
+            padding-bottom: 10px; margin-bottom: 20px; flex-grow: 1;
+        }
+        .output-box {
+            background-color: #ecf0f1; padding: 20px; border-radius: 8px;
+            min-height: 100px; font-size: 16px; color: #34495e;
+            white-space: pre-wrap; word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="translator-container">
+        <h1>All languages Translator</h1>
+        <p>A stable tool to translate and listen to text in any language.</p>
+        <div class="textarea-container">
+            <textarea id="text-input" placeholder="Enter text to translate..."></textarea>
+        </div>
+        <div class="controls">
+            <div class="language-selector">
+                <label for="source-lang">Translate From:</label>
+                <div class="select-container">
+                    <select id="source-lang"></select>
+                    <span class="speak-btn" id="source-speak-btn">🔊</span>
+                </div>
+            </div>
+            <div class="language-selector">
+                <label for="target-lang">Translate To:</label>
+                <div class="select-container">
+                    <select id="target-lang"></select>
+                    <span class="speak-btn" id="target-speak-btn">🔊</span>
+                </div>
+            </div>
+        </div>
+        <button id="translate-btn">Translate</button>
+
+        <div class="ad-placeholder" style="margin-top: 20px; text-align: center; min-height:50px;">
+            <!-- AdMob App ID: ca-app-pub-2419838799751102~8618394379 -->
+            <!-- AdMob Ad Unit ID: ca-app-pub-2419838799751102/2453307241 -->
+            <!-- ZAROORI: Asli ads dikhane ke liye AdSense se "Display ad" ka poora code nikal kar is sample code ki jagah paste karna hoga -->
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-2419838799751102"
+                 data-ad-slot="1234567890"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+
+        <div class="output-container">
+            <div class="output-header">
+                <h2>Translated Text</h2>
+            </div>
+            <div id="translated-output" class="output-box">
+                Your translation will appear here...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sourceLangSelect = document.getElementById('source-lang');
+            const targetLangSelect = document.getElementById('target-lang');
+            const textInput = document.getElementById('text-input');
+            const translateBtn = document.getElementById('translate-btn');
+            const translatedOutput = document.getElementById('translated-output');
+            const sourceSpeakBtn = document.getElementById('source-speak-btn');
+            const targetSpeakBtn = document.getElementById('target-speak-btn');
+
+            let voices = [];
+            const synth = window.speechSynthesis;
+
+            const languages = { "af": "Afrikaans", "sq": "Albanian", "am": "Amharic", "ar": "Arabic", "hy": "Armenian", "az": "Azerbaijani", "eu": "Basque", "be": "Belarusian", "bn": "Bengali", "bs": "Bosnian", "bg": "Bulgarian", "ca": "Catalan", "ceb": "Cebuano", "ny": "Chichewa", "zh-CN": "Chinese (Simplified)", "zh-TW": "Chinese (Traditional)", "co": "Corsican", "hr": "Croatian", "cs": "Czech", "da": "Danish", "nl": "Dutch", "en": "English", "eo": "Esperanto", "et": "Estonian", "tl": "Filipino", "fi": "Finnish", "fr": "French", "fy": "Frisian", "gl": "Galician", "ka": "Georgian", "de": "German", "el": "Greek", "gu": "Gujarati", "ht": "Haitian Creole", "ha": "Hausa", "haw": "Hawaiian", "iw": "Hebrew", "hi": "Hindi", "hmn": "Hmong", "hu": "Hungarian", "is": "Icelandic", "ig": "Igbo", "id": "Indonesian", "ga": "Irish", "it": "Italian", "ja": "Japanese", "jw": "Javanese", "kn": "Kannada", "kk": "Kazakh", "km": "Khmer", "ko": "Korean", "ku": "Kurdish (Kurmanji)", "ky": "Kyrgyz", "lo": "Lao", "la": "Latin", "lv": "Latvian", "lt": "Lithuanian", "lb": "Luxembourgish", "mk": "Macedonian", "mg": "Malagasy", "ms": "Malay", "ml": "Malayalam", "mt": "Maltese", "mi": "Maori", "mr": "Marathi", "mn": "Mongolian", "my": "Myanmar (Burmese)", "ne": "Nepali", "no": "Norwegian", "ps": "Pashto", "fa": "Persian", "pl": "Polish", "pt": "Portuguese", "pa": "Punjabi", "ro": "Romanian", "ru": "Russian", "sm": "Samoan", "gd": "Scots Gaelic", "sr": "Serbian", "st": "Sesotho", "sn": "Shona", "sd": "Sindhi", "si": "Sinhala", "sk": "Slovak", "sl": "Slovenian", "so": "Somali", "es": "Spanish", "su": "Sundanese", "sw": "Swahili", "sv": "Swedish", "tg": "Tajik", "ta": "Tamil", "te": "Telugu", "th": "Thai", "tr": "Turkish", "uk": "Ukrainian", "ur": "Urdu", "uz": "Uzbek", "vi": "Vietnamese", "cy": "Welsh", "xh": "Xhosa", "yi": "Yiddish", "yo": "Yoruba", "zu": "Zulu" };
+
+            function populateLanguages() {
+                for (const code in languages) {
+                    const option = document.createElement('option');
+                    option.value = code;
+                    option.textContent = languages[code];
+                    sourceLangSelect.appendChild(option.cloneNode(true));
+                    targetLangSelect.appendChild(option);
+                }
+                sourceLangSelect.value = "en";
+                targetLangSelect.value = "ur";
+            }
+            
+            function getVoices() {
+                voices = synth.getVoices();
+            }
+            if (synth.onvoiceschanged !== undefined) {
+                synth.onvoiceschanged = getVoices;
+            }
+            getVoices();
+
+            function speakText(text, language) {
+                if (!synth) return;
+                if (synth.speaking) {
+                    synth.cancel();
+                }
+                if (!text || text.trim() === "") return;
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                const voice = voices.find(v => v.lang.startsWith(language));
+
+                if (voice) {
+                    utterance.voice = voice;
+                } else {
+                    alert(A voice for '${languages[language]}' is not installed on your device. Please install it from your phone's Text-to-speech settings.);
+                    return;
+                }
+                
+                utterance.onerror = (event) => console.error('SpeechSynthesisUtterance error', event);
+                synth.speak(utterance);
+            }
+
+            async function translateText() {
+                const textToTranslate = textInput.value;
+                const sourceLanguage = sourceLangSelect.value;
+                const targetLanguage = targetLangSelect.value;
+                if (!textToTranslate.trim()) return;
+
+                translatedOutput.textContent = 'Translating...';
+                translateBtn.disabled = true;
+
+                const langPair = ${sourceLanguage}|${targetLanguage};
+                const apiUrl = https://api.mymemory.translated.net/get?q=${encodeURIComponent(textToTranslate)}&langpair=${langPair};
+                try {
+                    const response = await fetch(apiUrl);
+                    if (!response.ok) throw new Error('Network response was not ok.');
+                    const data = await response.json();
+                    if (data.responseStatus !== 200) { throw new Error(data.responseDetails); }
+                    translatedOutput.textContent = data.responseData.translatedText;
+                } catch (error) {
+                    console.error('Error during translation:', error);
+                    translatedOutput.textContent = Error: ${error.message};
+                } finally {
+                    translateBtn.disabled = false;
+                }
+            }
+
+            sourceSpeakBtn.addEventListener('click', () => { speakText(textInput.value, sourceLangSelect.value); });
+            
+            targetSpeakBtn.addEventListener('click', () => {
+                const placeholderTexts = ["Your translation will appear here...", "Translating..."];
+                const textToSpeak = translatedOutput.textContent;
+                if (textToSpeak && !placeholderTexts.includes(textToSpeak) && !textToSpeak.startsWith("Error:")) {
+                    speakText(textToSpeak, targetLangSelect.value);
+                }
+            });
+            
+            populateLanguages();
+            translateBtn.addEventListener('click', translateText);
+        });
+    </script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2419838799751102" crossorigin="anonymous"></script>
+
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Translator (Final Stable Version)</title>
+    <title>Translator (Final Professional Version)</title>
 
     <style>
         body {
@@ -24,21 +24,28 @@
             box-sizing: border-box; margin-bottom: 20px;
         }
         .controls {
-            display: flex; justify-content: space-between; align-items: center;
+            display: flex; justify-content: space-between; align-items: flex-start;
             gap: 20px; flex-wrap: wrap; margin-bottom: 20px;
         }
         .language-selector { flex: 1; min-width: 200px; }
         label { font-weight: 500; display: block; margin-bottom: 5px; }
+        .select-container {
+            display: flex; align-items: center; gap: 10px;
+        }
         select {
             width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #dfe6e9;
-            background-color: #fff; font-size: 16px; cursor: pointer;
+            background-color: #fff; font-size: 16px; cursor: pointer; flex-grow: 1;
         }
+        .speak-btn {
+            cursor: pointer; font-size: 24px; color: #7f8c8d; transition: color 0.2s;
+            flex-shrink: 0;
+        }
+        .speak-btn:hover { color: #3498db; }
         #translate-btn {
             background-color: #27ae60; color: #ffffff; border: none; padding: 12px 25px;
             font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer;
             transition: background-color 0.3s ease; width: 100%; margin-top: 10px;
         }
-        #translate-btn:hover { background-color: #229954; }
         .output-container { margin-top: 20px; }
         .output-header { display: flex; justify-content: space-between; align-items: center; }
         h2 {
@@ -50,11 +57,6 @@
             min-height: 100px; font-size: 16px; color: #34495e;
             white-space: pre-wrap; word-wrap: break-word;
         }
-        .speak-btn {
-            cursor: pointer; font-size: 22px; margin-left: 10px;
-            color: #7f8c8d; transition: color 0.2s;
-        }
-        .speak-btn:hover { color: #3498db; }
     </style>
 </head>
 <body>
@@ -67,26 +69,30 @@
         </div>
         <div class="controls">
             <div class="language-selector">
-                <label for="source-lang">Translate From: <span class="speak-btn" id="source-speak-btn">🔊</span></label>
-                <select id="source-lang"></select>
+                <label for="source-lang">Translate From:</label>
+                <div class="select-container">
+                    <select id="source-lang"></select>
+                    <span class="speak-btn" id="source-speak-btn">🔊</span>
+                </div>
             </div>
             <div class="language-selector">
-                <label for="target-lang">Translate To: <span class="speak-btn" id="target-speak-btn">🔊</span></label>
-                <select id="target-lang"></select>
+                <label for="target-lang">Translate To:</label>
+                <div class="select-container">
+                    <select id="target-lang"></select>
+                    <span class="speak-btn" id="target-speak-btn">🔊</span>
+                </div>
             </div>
         </div>
         <button id="translate-btn">Translate</button>
 
         <div class="ad-placeholder" style="margin-top: 20px; text-align: center; min-height:50px;">
             <!-- =================================================================== -->
-            <!-- AAPKE NAYE ADMOB CODES YAHAN ADD KAR DIYE GAYE HAIN                -->
+            <!-- AAPKE DONO ADMOB CODES YAHAN ADD KAR DIYE GAYE HAIN                -->
             <!-- AdMob App ID: ca-app-pub-2419838799751102~8618394379 -->
             <!-- AdMob Ad Unit ID: ca-app-pub-2419838799751102/2453307241 -->
             <!-- =================================================================== -->
 
-            <!-- =================================================================== -->
-            <!-- ZAROORI: Asli ads dikhane ke liye aapko abhi bhi AdSense se "Display ad" ka poora code nikal kar is sample code ki jagah paste karna hoga -->
-            <!-- =================================================================== -->
+            <!-- ZAROORI: Asli ads dikhane ke liye AdSense se "Display ad" ka poora code nikal kar is sample code ki jagah paste karna hoga -->
             <ins class="adsbygoogle"
                  style="display:block"
                  data-ad-client="ca-pub-2419838799751102"
@@ -97,7 +103,6 @@
                  (adsbygoogle = window.adsbygoogle || []).push({});
             </script>
         </div>
-
 
         <div class="output-container">
             <div class="output-header">
@@ -126,8 +131,16 @@
 
             function populateLanguages() { for (const code in languages) { const option = document.createElement('option'); option.value = code; option.textContent = languages[code]; sourceLangSelect.appendChild(option.cloneNode(true)); targetLangSelect.appendChild(option); } sourceLangSelect.value = "en"; targetLangSelect.value = "ur"; }
             
-            function getVoices() { voices = synth.getVoices(); }
-            if (synth.onvoiceschanged !== undefined) { synth.onvoiceschanged = getVoices; }
+            function getVoices() {
+                try {
+                    voices = synth.getVoices();
+                } catch(e) {
+                    console.error("Error getting voices:", e);
+                }
+            }
+            if ('onvoiceschanged' in synth) {
+                synth.onvoiceschanged = getVoices;
+            }
             getVoices();
 
             function speakText(text, language) {
@@ -148,7 +161,9 @@
                 synth.speak(utterance);
             }
 
-            async function translateText() { const textToTranslate = textInput.value; const sourceLanguage = sourceLangSelect.value; const targetLanguage = targetLangSelect.value; if (!textToTranslate.trim()) return; translatedOutput.textContent = 'Translating...'; translateBtn.disabled = true; const langPair = `${sourceLanguage}|${targetLanguage}`; const apiUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(textToTranslate)}&langpair=${langPair}`; try { const response = await fetch(apiUrl); if (!response.ok) throw new Error('Network response was not ok.'); const data = await response.json(); if (data.responseStatus !== 200) { throw new Error(data.responseDetails); } translatedOutput.textContent = data.responseData.translatedText; } catch (error) { console.error('Error during translation:', error); translatedOutput.textContent = `Error: ${message}`; } finally { translateBtn.disabled = false; } }
+            async function translateText() {
+                const textToTranslate = textInput.value; const sourceLanguage = sourceLangSelect.value; const targetLanguage = targetLangSelect.value; if (!textToTranslate.trim()) return; translatedOutput.textContent = 'Translating...'; translateBtn.disabled = true; const langPair = `${sourceLanguage}|${targetLanguage}`; const apiUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(textToTranslate)}&langpair=${langPair}`; try { const response = await fetch(apiUrl); if (!response.ok) throw new Error('Network response was not ok.'); const data = await response.json(); if (data.responseStatus !== 200) { throw new Error(data.responseDetails); } translatedOutput.textContent = data.responseData.translatedText; } catch (error) { console.error('Error during translation:', error); translatedOutput.textContent = `Error: ${error.message}`; } finally { translateBtn.disabled = false; }
+            }
 
             sourceSpeakBtn.addEventListener('click', () => { speakText(textInput.value, sourceLangSelect.value); });
             targetSpeakBtn.addEventListener('click', () => {

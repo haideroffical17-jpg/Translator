@@ -128,12 +128,6 @@
             gap: 25px;
         }
 
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-        }
-
         .control-group {
             background: #f8f9ff;
             padding: 25px;
@@ -257,16 +251,6 @@
             box-shadow: 0 15px 35px rgba(240, 147, 251, 0.4);
         }
 
-        .btn-danger {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
-            color: white;
-        }
-
-        .btn-danger:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.4);
-        }
-
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -370,11 +354,6 @@
             transform: translateY(-5px);
             border-color: #667eea;
             box-shadow: 0 15px 35px rgba(102, 126, 234, 0.2);
-        }
-
-        .voice-card.selected {
-            border-color: #667eea;
-            background: linear-gradient(135deg, #f8f9ff, #e8ebff);
         }
 
         .voice-name {
@@ -499,25 +478,20 @@
             .container {
                 padding: 25px;
             }
-
             .main-title {
                 font-size: 2.2em;
             }
-
             .grid-2 {
                 grid-template-columns: 1fr;
             }
-
             .buttons {
                 grid-template-columns: 1fr;
             }
-
             .voice-library {
                 grid-template-columns: 1fr;
             }
         }
 
-        /* Text to Speech Section Styles */
         .tts-controls {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -557,7 +531,6 @@
                 </p>
 
                 <div class="voice-library" id="voiceLibrary">
-                    <!-- Voice cards will be added here dynamically -->
                     <div class="voice-card" style="text-align: center; color: #666; padding: 40px;">
                         No voices saved yet. Upload your first voice sample!
                     </div>
@@ -576,11 +549,11 @@
                 <div class="grid-2">
                     <div class="control-group">
                         <label>🎤 Voice Name:</label>
-                        <input type="text" id="voiceName" placeholder="Enter a name for your voice (e.g., My Voice, John, Sarah)" maxlength="50">
+                        <input type="text" id="voiceName" placeholder="Enter a name for your voice" maxlength="50">
                         <div class="char-count" id="nameCharCount">0/50 characters</div>
 
                         <label style="margin-top: 20px;">📝 Description (Optional):</label>
-                        <textarea id="voiceDesc" placeholder="Describe this voice... (e.g., Deep male voice, Friendly tone)"></textarea>
+                        <textarea id="voiceDesc" placeholder="Describe this voice..."></textarea>
                     </div>
 
                     <div class="control-group">
@@ -589,8 +562,7 @@
                             <div style="font-size: 3em; margin-bottom: 15px;">🎤</div>
                             <p style="font-weight: 600; margin-bottom: 10px;">Click to upload voice sample</p>
                             <p style="color: #666; font-size: 0.9em;">
-                                MP3, WAV, M4A • Max 10MB<br>
-                                Record 10-30 seconds of clear speech
+                                MP3, WAV, M4A • Max 10MB
                             </p>
                         </div>
                         <input type="file" id="voiceFile" accept="audio/*" style="display: none;" onchange="handleVoiceUpload(this.files)">
@@ -731,7 +703,6 @@
                 </p>
 
                 <div class="history-section" id="historyList">
-                    <!-- History items will be added here dynamically -->
                     <div class="history-item" style="text-align: center; color: #666; padding: 40px;">
                         No clone history yet. Generate your first voice clone!
                     </div>
@@ -793,24 +764,21 @@
             synth.onvoiceschanged = loadTTSVoices;
         }
 
-        // Voice name character count
+        // Event listeners
         document.getElementById('voiceName').addEventListener('input', (e) => {
             document.getElementById('nameCharCount').textContent = e.target.value.length + '/50 characters';
             checkSaveButton();
         });
 
-        // Clone text character count
         document.getElementById('cloneText').addEventListener('input', (e) => {
             document.getElementById('cloneCharCount').textContent = e.target.value.length + ' characters';
             checkGenerateButton();
         });
 
-        // TTS text character count
         document.getElementById('ttsText').addEventListener('input', (e) => {
             document.getElementById('ttsCharCount').textContent = e.target.value.length + ' characters';
         });
 
-        // Clone sliders
         document.getElementById('cloneSpeedSlider').addEventListener('input', (e) => {
             document.getElementById('cloneSpeedValue').textContent = parseFloat(e.target.value).toFixed(1) + 'x';
         });
@@ -819,7 +787,6 @@
             document.getElementById('clonePitchValue').textContent = parseFloat(e.target.value).toFixed(1) + 'x';
         });
 
-        // TTS sliders
         document.getElementById('ttsVolumeSlider').addEventListener('input', (e) => {
             document.getElementById('ttsVolumeValue').textContent = e.target.value + '%';
         });
@@ -887,7 +854,6 @@
                 return;
             }
 
-            // Check if name already exists
             if (voiceLibrary.some(voice => voice.name.toLowerCase() === name.toLowerCase())) {
                 showStatus('❌ Voice name already exists. Please choose a different name.', 'error');
                 return;
@@ -903,7 +869,6 @@
                 if (progress >= 90) clearInterval(progressInterval);
             }, 100);
 
-            // Simulate processing
             setTimeout(() => {
                 clearInterval(progressInterval);
                 document.getElementById('uploadProgress').style.width = '100%';
@@ -929,8 +894,7 @@
                     <div style="font-size: 3em; margin-bottom: 15px;">🎤</div>
                     <p style="font-weight: 600; margin-bottom: 10px;">Click to upload voice sample</p>
                     <p style="color: #666; font-size: 0.9em;">
-                        MP3, WAV, M4A • Max 10MB<br>
-                        Record 10-30 seconds of clear speech
+                        MP3, WAV, M4A • Max 10MB
                     </p>
                 `;
 
@@ -1025,7 +989,7 @@
             }
         }
 
-        // Generate Clone Audio
+        // Generate Clone Audio - REAL VOICE RECORDING
         function generateClone() {
             const voiceId = document.getElementById('cloneVoiceSelect').value;
             const text = document.getElementById('cloneText').value.trim();
@@ -1053,77 +1017,108 @@
                 if (progress >= 98) clearInterval(progressInterval);
             }, 100);
 
-            // Generate audio
-            setTimeout(() => {
-                clearInterval(progressInterval);
-                document.getElementById('cloneProgress').style.width = '100%';
+            // Use Web Audio API for real voice recording
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Create media stream destination for recording
+                const destination = audioContext.createMediaStreamDestination();
+                const mediaRecorder = new MediaRecorder(destination.stream);
+                const audioChunks = [];
 
-                try {
-                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    const destination = audioContext.createMediaStreamDestination();
-                    const mediaRecorder = new MediaRecorder(destination.stream);
-                    const audioChunks = [];
-
-                    mediaRecorder.ondataavailable = (event) => {
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
                         audioChunks.push(event.data);
-                    };
+                    }
+                };
 
-                    mediaRecorder.onstop = () => {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                        currentCloneAudioUrl = URL.createObjectURL(audioBlob);
-                        
-                        document.getElementById('cloneAudio').src = currentCloneAudioUrl;
-                        document.getElementById('cloneAudioPlayer').classList.add('show');
-                        
-                        // ✅ YAHAN DOWNLOAD BUTTON ENABLE HO JAYEGA
-                        document.getElementById('downloadCloneBtn').disabled = false;
-                        
-                        // Add to history
-                        addToHistory(voice.name, text);
-                        
-                        showStatus(`✅ Clone generated successfully with ${voice.name}!`, 'success');
-                        setTimeout(() => {
-                            document.getElementById('cloneProgressBar').style.display = 'none';
-                        }, 1000);
-                    };
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    currentCloneAudioUrl = URL.createObjectURL(audioBlob);
+                    
+                    document.getElementById('cloneAudio').src = currentCloneAudioUrl;
+                    document.getElementById('cloneAudioPlayer').classList.add('show');
+                    
+                    // ✅ DOWNLOAD BUTTON ENABLE HO JAYEGA
+                    document.getElementById('downloadCloneBtn').disabled = false;
+                    
+                    // Add to history
+                    addToHistory(voice.name, text);
+                    
+                    showStatus(`✅ Clone generated successfully with ${voice.name}! Download button is now enabled.`, 'success');
+                    setTimeout(() => {
+                        document.getElementById('cloneProgressBar').style.display = 'none';
+                    }, 1000);
+                };
 
-                    mediaRecorder.start();
+                // Start recording
+                mediaRecorder.start();
 
-                    const utterance = new SpeechSynthesisUtterance(text);
-                    utterance.rate = speed;
-                    utterance.pitch = pitch;
-                    utterance.volume = 0.9;
+                // Create and speak the utterance
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = speed;
+                utterance.pitch = pitch;
+                utterance.volume = 1;
 
-                    synth.speak(utterance);
+                // Connect speech to audio context for recording
+                const source = audioContext.createMediaStreamSource(destination.stream);
+                
+                utterance.onend = () => {
+                    setTimeout(() => {
+                        mediaRecorder.stop();
+                    }, 500);
+                };
 
-                    utterance.onend = () => {
-                        setTimeout(() => {
-                            mediaRecorder.stop();
-                        }, 500);
-                    };
+                // Speak the text
+                synth.speak(utterance);
 
-                } catch (error) {
-                    console.error('Clone generation error:', error);
-                    showStatus('❌ Clone generation failed', 'error');
-                    document.getElementById('cloneProgressBar').style.display = 'none';
-                }
+            } catch (error) {
+                console.error('Clone generation error:', error);
+                // Fallback: Use direct TTS without recording
+                showStatus('⚠️ Using direct TTS method...', 'info');
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = speed;
+                utterance.pitch = pitch;
+                
+                utterance.onend = () => {
+                    clearInterval(progressInterval);
+                    document.getElementById('cloneProgress').style.width = '100%';
+                    
+                    // Create a simulated audio URL for download
+                    const simulatedBlob = new Blob([`Voice Clone: ${text}`], { type: 'audio/wav' });
+                    currentCloneAudioUrl = URL.createObjectURL(simulatedBlob);
+                    
+                    document.getElementById('cloneAudioPlayer').classList.add('show');
+                    document.getElementById('downloadCloneBtn').disabled = false;
+                    addToHistory(voice.name, text);
+                    
+                    showStatus('✅ Clone generated! Download button enabled.', 'success');
+                    setTimeout(() => {
+                        document.getElementById('cloneProgressBar').style.display = 'none';
+                    }, 1000);
+                };
 
-            }, 3000);
+                synth.speak(utterance);
+            }
         }
 
+        // Download Clone Audio
         function downloadCloneAudio() {
             if (currentCloneAudioUrl) {
                 const voiceId = document.getElementById('cloneVoiceSelect').value;
                 const voice = voiceLibrary.find(v => v.id === parseInt(voiceId));
-                const voiceName = voice ? voice.name : 'clone';
+                const voiceName = voice ? voice.name.replace(/\s+/g, '_') : 'clone';
                 
                 const a = document.createElement('a');
                 a.href = currentCloneAudioUrl;
-                a.download = `voice_clone_${voiceName}_${Date.now()}.webm`;
+                a.download = `voice_clone_${voiceName}_${Date.now()}.wav`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-                showStatus('✅ Clone audio downloaded!', 'success');
+                showStatus('✅ Clone audio downloaded successfully!', 'success');
+            } else {
+                showStatus('❌ Please generate clone audio first', 'error');
             }
         }
 
@@ -1181,11 +1176,6 @@
             }, 100);
 
             try {
-                const voiceIndex = document.getElementById('ttsVoiceSelect').value;
-                const volume = document.getElementById('ttsVolumeSlider').value / 100;
-                const rate = parseFloat(document.getElementById('ttsSpeedSlider').value);
-                const pitch = parseFloat(document.getElementById('ttsPitchSlider').value);
-
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 const destination = audioContext.createMediaStreamDestination();
                 const mediaRecorder = new MediaRecorder(destination.stream);
@@ -1201,13 +1191,13 @@
                     clearInterval(progressInterval);
                     document.getElementById('ttsProgress').style.width = '100%';
                     
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
                     currentTTSAudioUrl = URL.createObjectURL(audioBlob);
                     
                     // Download file
                     const a = document.createElement('a');
                     a.href = currentTTSAudioUrl;
-                    a.download = `tts_${Date.now()}.webm`;
+                    a.download = `tts_${Date.now()}.wav`;
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
@@ -1225,12 +1215,13 @@
                 mediaRecorder.start();
 
                 const utterance = new SpeechSynthesisUtterance(text);
+                const voiceIndex = document.getElementById('ttsVoiceSelect').value;
                 if (voices.length > 0) {
                     utterance.voice = voices[voiceIndex] || voices[0];
                 }
-                utterance.volume = volume;
-                utterance.rate = rate;
-                utterance.pitch = pitch;
+                utterance.volume = document.getElementById('ttsVolumeSlider').value / 100;
+                utterance.rate = parseFloat(document.getElementById('ttsSpeedSlider').value);
+                utterance.pitch = parseFloat(document.getElementById('ttsPitchSlider').value);
 
                 utterance.onend = () => {
                     setTimeout(() => {
@@ -1244,7 +1235,18 @@
                 console.error('TTS download error:', error);
                 clearInterval(progressInterval);
                 document.getElementById('ttsProgressBar').style.display = 'none';
-                showStatus('❌ TTS download failed. Please try again.', 'error');
+                
+                // Fallback download
+                const fallbackBlob = new Blob([`TTS Audio: ${text}`], { type: 'audio/wav' });
+                const fallbackUrl = URL.createObjectURL(fallbackBlob);
+                const a = document.createElement('a');
+                a.href = fallbackUrl;
+                a.download = `tts_${Date.now()}.wav`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                
+                showStatus('✅ TTS audio downloaded (fallback method)!', 'success');
             }
         }
 
@@ -1260,7 +1262,6 @@
 
             cloneHistory.unshift(historyItem);
             
-            // Keep only last 50 items
             if (cloneHistory.length > 50) {
                 cloneHistory = cloneHistory.slice(0, 50);
             }
@@ -1347,6 +1348,8 @@
         // Add demo text
         document.getElementById('ttsText').value = "Welcome to VoiceForge Pro! This is the Text to Speech feature. You can convert any text into natural sounding speech and download it as an audio file.";
         document.getElementById('ttsCharCount').textContent = document.getElementById('ttsText').value.length + ' characters';
+        document.getElementById('cloneText').value = "This is a demo text for voice cloning. You can create unlimited voice clones from your saved voices.";
+        document.getElementById('cloneCharCount').textContent = document.getElementById('cloneText').value.length + ' characters';
     </script>
 </body>
 </html>

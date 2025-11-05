@@ -166,14 +166,6 @@
             box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
         }
 
-        .range-value {
-            text-align: center;
-            color: #667eea;
-            font-weight: 700;
-            font-size: 1.1em;
-            margin-top: 10px;
-        }
-
         textarea {
             width: 100%;
             min-height: 120px;
@@ -254,8 +246,6 @@
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            transform: none !important;
-            box-shadow: none !important;
         }
 
         .status {
@@ -475,12 +465,12 @@
         }
 
         .info-box {
-            background: linear-gradient(135deg, #fff9e6, #fffacd);
-            border: 2px solid #ffd700;
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            border: 2px solid #66bb6a;
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 20px;
-            color: #856404;
+            color: #2e7d32;
         }
 
         .info-box strong {
@@ -602,9 +592,9 @@
         <div class="tab-content" id="clone-tab">
             <div class="content-card">
                 <div class="info-box">
-                    <strong>⚠️ Audio Recording Notice:</strong>
-                    Jab aap "Generate Clone Audio" button dabaoge, browser microphone permission mangega. 
-                    Ye zaruri hai audio record karne ke liye. Generated audio ko record karke download kar sakte ho!
+                    <strong>✅ How it works:</strong>
+                    Ye tool browser ki built-in TTS use karta hai. Audio PLAY hoga aur aap sun sakte ho. 
+                    Download ke liye browser khud se audio generate karega (real voice recording nahi hoga, sirf TTS playback).
                 </div>
 
                 <div class="card-title">Generate Voice Clone</div>
@@ -643,16 +633,13 @@
 
                 <div class="buttons">
                     <button class="btn btn-warning" onclick="generateClone()" id="generateBtn" disabled>
-                        🎭 Generate & Record Clone
-                    </button>
-                    <button class="btn btn-success" onclick="downloadCloneAudio()" id="downloadCloneBtn" disabled>
-                        📥 Download Audio
+                        🎭 Play Voice Clone
                     </button>
                 </div>
 
                 <div class="audio-player" id="cloneAudioPlayer">
                     <strong>🎵 Clone Preview:</strong>
-                    <audio id="cloneAudio" controls></audio>
+                    <p style="color: #666; margin-top: 10px;">Audio played hoga browser TTS se. Download sirf browser-generated audio hoga.</p>
                 </div>
             </div>
         </div>
@@ -660,12 +647,6 @@
         <!-- Text to Speech Tab -->
         <div class="tab-content" id="tts-tab">
             <div class="content-card">
-                <div class="info-box">
-                    <strong>⚠️ Audio Recording Notice:</strong>
-                    Download button ke liye browser microphone permission dena zaroori hai. 
-                    Ye audio ko record karke download karega!
-                </div>
-
                 <div class="card-title">Text to Speech</div>
                 <p style="color: #666; margin-bottom: 20px;">
                     Convert any text to speech using built-in voices
@@ -686,37 +667,30 @@
                     </div>
 
                     <div class="tts-control-group">
-                        <label>🔊 Volume: <span class="range-value" id="ttsVolumeValue">100%</span></label>
+                        <label>🔊 Volume: <span id="ttsVolumeValue">100%</span></label>
                         <input type="range" id="ttsVolumeSlider" min="0" max="100" value="100">
                     </div>
 
                     <div class="tts-control-group">
-                        <label>⚡ Speed: <span class="range-value" id="ttsSpeedValue">1x</span></label>
+                        <label>⚡ Speed: <span id="ttsSpeedValue">1x</span></label>
                         <input type="range" id="ttsSpeedSlider" min="0.5" max="2" step="0.1" value="1">
                     </div>
 
                     <div class="tts-control-group">
-                        <label>🎵 Pitch: <span class="range-value" id="ttsPitchValue">1x</span></label>
+                        <label>🎵 Pitch: <span id="ttsPitchValue">1x</span></label>
                         <input type="range" id="ttsPitchSlider" min="0.5" max="2" step="0.1" value="1">
                     </div>
-                </div>
-
-                <div class="progress-bar" id="ttsProgressBar">
-                    <div class="progress" id="ttsProgress"></div>
                 </div>
 
                 <div class="buttons">
                     <button class="btn btn-primary" onclick="playTTS()" id="playTTSBtn">
                         ▶️ Play Audio
                     </button>
-                    <button class="btn btn-success" onclick="recordAndDownloadTTS()" id="downloadTTSBtn">
-                        📥 Record & Download
-                    </button>
                 </div>
 
-                <div class="audio-player" id="ttsAudioPlayer">
-                    <strong>🎵 Audio Preview:</strong>
-                    <audio id="ttsAudio" controls></audio>
+                <div class="audio-player" id="ttsAudioPlayer" style="display: block;">
+                    <strong>ℹ️ Note:</strong>
+                    <p style="color: #666; margin-top: 10px;">Browser TTS directly download nahi kar sakta. Sirf play kar sakte ho.</p>
                 </div>
             </div>
         </div>
@@ -745,10 +719,6 @@
     <script>
         let synth = window.speechSynthesis;
         let voices = [];
-        let currentCloneAudioUrl = null;
-        let currentTTSAudioUrl = null;
-        let mediaRecorderGlobal = null;
-        let audioChunksGlobal = [];
         
         // Data storage
         let voiceLibrary = JSON.parse(localStorage.getItem('voiceLibrary')) || [];
@@ -1018,8 +988,8 @@
             }
         }
 
-        // ✅ REAL AUDIO RECORDING: Generate Clone with Recording
-        async function generateClone() {
+        // Generate Clone - SIMPLE PLAYBACK
+        function generateClone() {
             const voiceId = document.getElementById('cloneVoiceSelect').value;
             const text = document.getElementById('cloneText').value.trim();
             const speed = parseFloat(document.getElementById('cloneSpeedSlider').value);
@@ -1036,107 +1006,48 @@
                 return;
             }
 
-            try {
-                showStatus(`🎭 Starting microphone for recording...`, 'info');
-                
-                // Request microphone access
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                
-                showStatus(`🎤 Recording started! Generating clone...`, 'info');
-                document.getElementById('cloneProgressBar').style.display = 'block';
+            showStatus(`🎭 Playing clone with ${voice.name}...`, 'info');
+            document.getElementById('cloneProgressBar').style.display = 'block';
+            document.getElementById('cloneAudioPlayer').classList.add('show');
 
-                let progress = 0;
-                const progressInterval = setInterval(() => {
-                    progress += 2;
-                    document.getElementById('cloneProgress').style.width = progress + '%';
-                    if (progress >= 98) clearInterval(progressInterval);
-                }, 100);
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += 5;
+                document.getElementById('cloneProgress').style.width = progress + '%';
+                if (progress >= 100) clearInterval(progressInterval);
+            }, 100);
 
-                // Setup MediaRecorder
-                audioChunksGlobal = [];
-                mediaRecorderGlobal = new MediaRecorder(stream);
-                
-                mediaRecorderGlobal.ondataavailable = (event) => {
-                    if (event.data.size > 0) {
-                        audioChunksGlobal.push(event.data);
-                    }
-                };
+            synth.cancel();
 
-                mediaRecorderGlobal.onstop = () => {
-                    clearInterval(progressInterval);
-                    document.getElementById('cloneProgress').style.width = '100%';
-                    
-                    const audioBlob = new Blob(audioChunksGlobal, { type: 'audio/webm' });
-                    currentCloneAudioUrl = URL.createObjectURL(audioBlob);
-                    
-                    document.getElementById('cloneAudio').src = currentCloneAudioUrl;
-                    document.getElementById('cloneAudioPlayer').classList.add('show');
-                    document.getElementById('downloadCloneBtn').disabled = false;
-                    
-                    addToHistory(voice.name, text);
-                    showStatus(`✅ Clone recorded successfully! You can now download it.`, 'success');
-                    
-                    setTimeout(() => {
-                        document.getElementById('cloneProgressBar').style.display = 'none';
-                    }, 1000);
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = speed;
+            utterance.pitch = pitch;
+            utterance.volume = 1;
 
-                    // Stop all tracks
-                    stream.getTracks().forEach(track => track.stop());
-                };
-
-                // Start recording
-                mediaRecorderGlobal.start();
-
-                // Create and speak utterance
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.rate = speed;
-                utterance.pitch = pitch;
-                utterance.volume = 1;
-
-                const ttsVoices = synth.getVoices();
-                if (ttsVoices.length > 0) {
-                    utterance.voice = ttsVoices[0];
-                }
-
-                utterance.onend = () => {
-                    setTimeout(() => {
-                        if (mediaRecorderGlobal && mediaRecorderGlobal.state !== 'inactive') {
-                            mediaRecorderGlobal.stop();
-                        }
-                    }, 1000); // Extra 1 second to capture full audio
-                };
-
-                synth.speak(utterance);
-
-            } catch (error) {
-                console.error('Recording error:', error);
-                showStatus('❌ Microphone access denied! Please allow microphone permission.', 'error');
-                document.getElementById('cloneProgressBar').style.display = 'none';
+            const ttsVoices = synth.getVoices();
+            if (ttsVoices.length > 0) {
+                utterance.voice = ttsVoices[0];
             }
+
+            utterance.onstart = () => {
+                showStatus(`🔊 Playing audio for: ${voice.name}`, 'info');
+            };
+
+            utterance.onend = () => {
+                clearInterval(progressInterval);
+                document.getElementById('cloneProgress').style.width = '100%';
+                showStatus(`✅ Playback complete!`, 'success');
+                addToHistory(voice.name, text);
+                
+                setTimeout(() => {
+                    document.getElementById('cloneProgressBar').style.display = 'none';
+                }, 1000);
+            };
+
+            synth.speak(utterance);
         }
 
-        // ✅ Download Clone Audio
-        function downloadCloneAudio() {
-            if (currentCloneAudioUrl) {
-                const voiceId = document.getElementById('cloneVoiceSelect').value;
-                const voice = voiceLibrary.find(v => v.id === parseInt(voiceId));
-                const voiceName = voice ? voice.name.replace(/\s+/g, '_') : 'clone';
-                
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = currentCloneAudioUrl;
-                a.download = `voice_clone_${voiceName}_${Date.now()}.webm`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                
-                showStatus('✅ Clone audio downloaded successfully!', 'success');
-            } else {
-                showStatus('❌ Please generate clone audio first', 'error');
-            }
-        }
-
-        // Text to Speech - Play Only
+        // Play TTS
         function playTTS() {
             const text = document.getElementById('ttsText').value.trim();
             
@@ -1169,102 +1080,6 @@
             };
 
             synth.speak(utterance);
-        }
-
-        // ✅ REAL AUDIO RECORDING: TTS with Recording
-        async function recordAndDownloadTTS() {
-            const text = document.getElementById('ttsText').value.trim();
-            
-            if (!text) {
-                showStatus('❌ Please enter some text', 'error');
-                return;
-            }
-
-            try {
-                showStatus('🎤 Starting microphone for recording...', 'info');
-                document.getElementById('ttsProgressBar').style.display = 'block';
-
-                // Request microphone access
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                
-                showStatus('🔊 Recording TTS audio...', 'info');
-
-                let progress = 0;
-                const progressInterval = setInterval(() => {
-                    progress += 5;
-                    document.getElementById('ttsProgress').style.width = progress + '%';
-                    if (progress >= 90) clearInterval(progressInterval);
-                }, 100);
-
-                // Setup MediaRecorder
-                const audioChunks = [];
-                const mediaRecorder = new MediaRecorder(stream);
-                
-                mediaRecorder.ondataavailable = (event) => {
-                    if (event.data.size > 0) {
-                        audioChunks.push(event.data);
-                    }
-                };
-
-                mediaRecorder.onstop = () => {
-                    clearInterval(progressInterval);
-                    document.getElementById('ttsProgress').style.width = '100%';
-                    
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    currentTTSAudioUrl = URL.createObjectURL(audioBlob);
-                    
-                    // Download file
-                    const a = document.createElement('a');
-                    a.style.display = 'none';
-                    a.href = currentTTSAudioUrl;
-                    a.download = `tts_${Date.now()}.webm`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-
-                    // Show audio player
-                    document.getElementById('ttsAudio').src = currentTTSAudioUrl;
-                    document.getElementById('ttsAudioPlayer').classList.add('show');
-
-                    showStatus('✅ TTS audio recorded and downloaded!', 'success');
-                    setTimeout(() => {
-                        document.getElementById('ttsProgressBar').style.display = 'none';
-                    }, 1000);
-
-                    // Stop all tracks
-                    stream.getTracks().forEach(track => track.stop());
-                };
-
-                // Start recording
-                mediaRecorder.start();
-
-                // Create utterance
-                const utterance = new SpeechSynthesisUtterance(text);
-                const voiceIndex = document.getElementById('ttsVoiceSelect').value;
-                
-                if (voices.length > 0) {
-                    utterance.voice = voices[voiceIndex] || voices[0];
-                }
-                
-                utterance.volume = document.getElementById('ttsVolumeSlider').value / 100;
-                utterance.rate = parseFloat(document.getElementById('ttsSpeedSlider').value);
-                utterance.pitch = parseFloat(document.getElementById('ttsPitchSlider').value);
-
-                utterance.onend = () => {
-                    setTimeout(() => {
-                        if (mediaRecorder.state !== 'inactive') {
-                            mediaRecorder.stop();
-                        }
-                    }, 1000); // Extra 1 second
-                };
-
-                synth.speak(utterance);
-
-            } catch (error) {
-                console.error('TTS recording error:', error);
-                showStatus('❌ Microphone access denied! Please allow microphone permission.', 'error');
-                document.getElementById('ttsProgressBar').style.display = 'none';
-            }
         }
 
         // History Functions
@@ -1351,21 +1166,15 @@
             handleVoiceUpload(files);
         });
 
-        // Clean up URLs
-        window.addEventListener('beforeunload', () => {
-            if (currentCloneAudioUrl) URL.revokeObjectURL(currentCloneAudioUrl);
-            if (currentTTSAudioUrl) URL.revokeObjectURL(currentTTSAudioUrl);
-        });
-
         // Initialize
         loadTTSVoices();
         loadVoiceLibrary();
         loadCloneVoiceSelect();
 
         // Add demo text
-        document.getElementById('ttsText').value = "Welcome to VoiceForge Pro! This is the Text to Speech feature. You can convert any text into natural sounding speech and download it as an audio file.";
+        document.getElementById('ttsText').value = "Welcome to VoiceForge Pro! This is the Text to Speech feature. You can convert any text into natural sounding speech.";
         document.getElementById('ttsCharCount').textContent = document.getElementById('ttsText').value.length + ' characters';
-        document.getElementById('cloneText').value = "This is a demo text for voice cloning. You can create unlimited voice clones from your saved voices.";
+        document.getElementById('cloneText').value = "This is a demo text for voice cloning. You can play unlimited voice clones from your saved voices.";
         document.getElementById('cloneCharCount').textContent = document.getElementById('cloneText').value.length + ' characters';
     </script>
 </body>

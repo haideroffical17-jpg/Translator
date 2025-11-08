@@ -1,172 +1,148 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Simple Voice Clone App</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8"/>
+  <title>Voice Clone — Generate & Auto-Download</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <style>
-    :root{
-      --bg:#0f172a;--card:#111827;--muted:#94a3b8;--text:#e5e7eb;--accent:#22c55e;--border:#1f2937;
-    }
+    :root{--bg:#0b1220;--fg:#e5e7eb;--muted:#94a3b8;--card:#0f172a;--border:#1f2a40;--accent:#22c55e}
     *{box-sizing:border-box}
-    body{
-      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Ubuntu; background:var(--bg); color:var(--text);
-    }
-    .container{max-width:960px;margin:32px auto;padding:0 16px}
-    .title{font-size:28px;font-weight:700;margin:0 0 8px}
-    .sub{color:var(--muted);margin:0 0 24px}
+    body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,Segoe UI,Roboto,Inter}
+    .wrap{max-width:960px;margin:36px auto;padding:0 16px}
+    h1{margin:0 0 6px;font-size:28px}
+    p.sub{margin:0 0 20px;color:var(--muted)}
     .grid{display:grid;gap:16px}
     @media(min-width:900px){.grid{grid-template-columns:1fr 1fr}}
-    .card{
-      background:linear-gradient(180deg,#0b1220 0%, #0b1220 65%, #0a131f 100%);
-      border:1px solid var(--border); border-radius:16px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,.35);
-    }
-    h2{margin:0 0 12px;font-size:20px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px}
     label{display:block;margin:10px 0 6px;color:#cbd5e1}
-    input[type="text"], textarea, select{
-      width:100%; background:#0a0f1a; color:var(--text); border:1px solid var(--border);
-      border-radius:12px; padding:12px; outline:none;
-    }
-    input[type="file"]{width:100%; color:var(--muted)}
-    textarea{min-height:120px; resize:vertical}
-    .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
-    button{
-      background:var(--accent); color:#052e16; border:0; padding:12px 16px; border-radius:12px;
-      font-weight:700; cursor:pointer; transition:transform .04s ease, opacity .2s ease;
-    }
-    button[disabled]{opacity:.5; cursor:not-allowed}
-    button:active{transform:scale(.98)}
-    .list{margin:10px 0 0; padding:0; list-style:none; max-height:220px; overflow:auto; border:1px solid var(--border); border-radius:12px}
-    .item{padding:10px 12px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px dashed #162033}
+    input[type="text"],textarea{width:100%;background:#0a0f1a;border:1px solid var(--border);border-radius:12px;color:var(--fg);padding:12px}
+    textarea{min-height:110px}
+    input[type="file"]{width:100%;color:var(--muted)}
+    button{background:var(--accent);color:#052e16;border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
+    button[disabled]{opacity:.5;cursor:not-allowed}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+    .list{margin:10px 0 0;padding:0;list-style:none;max-height:220px;overflow:auto;border:1px solid var(--border);border-radius:12px}
+    .item{padding:10px 12px;display:flex;justify-content:space-between;border-bottom:1px dashed #1a2740}
     .item:last-child{border-bottom:0}
-    .muted{color:var(--muted); font-size:13px}
     .pill{background:#0a1a12;color:#86efac;border:1px solid #134e4a;padding:4px 8px;border-radius:999px;font-size:12px}
-    .status{margin-top:10px; min-height:20px; font-size:14px; color:#a5b4fc}
+    .muted{color:var(--muted);font-size:13px}
+    .status{min-height:18px;font-size:13px;color:#a5b4fc;margin-top:8px}
     .hr{height:1px;background:var(--border);margin:14px 0}
     .tiny{font-size:12px;color:#9ca3af}
-    .footer{margin-top:20px;color:#94a3b8;font-size:12px}
+    .bar{height:6px;background:#10233a;border-radius:999px;overflow:hidden;margin-top:10px}
+    .bar>i{display:block;height:100%;width:0;background:#60a5fa}
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1 class="title">🎙️ Voice Clone — Upload, Save, Generate</h1>
-    <p class="sub">Upload a sample + name → save voice → type text → generate unlimited audio → download MP3.</p>
+  <div class="wrap">
+    <h1>🎙️ Voice Clone — Generate & Auto-Download</h1>
+    <p class="sub">Upload sample + name → save voice → type text → <b>Generate MP3 & auto-download</b>.</p>
 
     <div class="grid">
-      <!-- Upload & Create Voice -->
+      <!-- UPLOAD -->
       <section class="card">
         <h2>1) Upload sample & save voice</h2>
         <label for="vname">Voice Name</label>
-        <input id="vname" type="text" placeholder="e.g. AliNarration" />
+        <input id="vname" type="text" placeholder="e.g., AliNarration"/>
 
         <label for="afile">Audio Sample (WAV/MP3/M4A)</label>
-        <input id="afile" type="file" accept="audio/*" />
+        <input id="afile" type="file" accept="audio/*"/>
 
-        <div class="row" style="margin-top:12px">
+        <div class="row">
           <button id="btnUpload">Upload & Create Voice</button>
           <span id="statusUpload" class="status"></span>
         </div>
+        <div class="bar"><i id="upBar"></i></div>
 
         <div class="hr"></div>
-        <p class="tiny">
-          Backend endpoint expected: <code>POST /api/upload (multipart: file, name)</code><br/>
-          Should return JSON like: <code>{"name":"AliNarration","voice_id":"xxxx","createdAt":"..."}</code>
-        </p>
+        <p class="tiny">Backend: <code>POST /api/upload</code> (multipart: <i>name,file</i>) → returns <code>{name,voice_id,createdAt}</code></p>
       </section>
 
-      <!-- Voices & Generate -->
+      <!-- GENERATE -->
       <section class="card">
         <h2>2) Saved voices & Generate</h2>
         <div class="row">
           <button id="btnRefresh">Refresh Voices</button>
-          <span class="muted">Select a saved voice, type text, generate MP3.</span>
+          <span class="muted">Select voice → type text → Generate MP3.</span>
         </div>
-
         <ul id="voiceList" class="list"></ul>
 
         <label for="gtext" style="margin-top:12px">Text to Speak</label>
         <textarea id="gtext" placeholder="Type the narration text here..."></textarea>
 
-        <div class="row" style="margin-top:12px">
+        <div class="row">
           <button id="btnGenerate">Generate & Download</button>
           <span id="statusSpeak" class="status"></span>
         </div>
+        <div class="bar"><i id="genBar"></i></div>
+
+        <audio id="player" controls style="width:100%;margin-top:10px"></audio>
 
         <div class="hr"></div>
-        <p class="tiny">
-          Backend endpoints expected:
-          <br/>• <code>GET /api/voices</code> → <code>[{ "name":"AliNarration","voice_id":"...", "createdAt":"..." }]</code>
-          <br/>• <code>POST /api/speak</code> (JSON: <code>{voice_id,text}</code>) → returns <strong>audio/mpeg</strong> stream
+        <p class="tiny">Backend:
+          <br/>• <code>GET /api/voices</code> → <code>[{name,voice_id,createdAt}]</code>
+          <br/>• <code>POST /api/speak</code> (JSON: <code>{voice_id,text}</code>) → returns <b>audio/mpeg</b>
         </p>
       </section>
     </div>
-
-    <p class="footer">⚠️ Don’t expose provider API keys in the browser. Call providers from your backend only. Get consent from the speaker.</p>
   </div>
 
   <script>
+    /* =============================
+       SET THIS TO YOUR BACKEND URL
+       Example for Vercel:
+       const BASE_API = "https://your-app.vercel.app";
+       If frontend & backend are same origin, keep it "".
+    ============================== */
+    const BASE_API = "https://YOUR-BACKEND-DOMAIN"; // e.g. https://voice-backend.vercel.app
+    const UPLOAD_URL = `${BASE_API}/api/upload`;
+    const VOICES_URL = `${BASE_API}/api/voices`;
+    const SPEAK_URL  = `${BASE_API}/api/speak`;
+
     const els = {
       vname: document.getElementById('vname'),
       afile: document.getElementById('afile'),
       btnUpload: document.getElementById('btnUpload'),
       statusUpload: document.getElementById('statusUpload'),
+      upBar: document.getElementById('upBar'),
 
       btnRefresh: document.getElementById('btnRefresh'),
       voiceList: document.getElementById('voiceList'),
       gtext: document.getElementById('gtext'),
       btnGenerate: document.getElementById('btnGenerate'),
-      statusSpeak: document.getElementById('statusSpeak')
+      statusSpeak: document.getElementById('statusSpeak'),
+      genBar: document.getElementById('genBar'),
+      player: document.getElementById('player')
     };
 
     let selectedVoice = null;
+    function setBar(el, p){ el.style.width = Math.max(0, Math.min(100, p)) + '%'; }
 
-    function setBusy(btn, statusEl, msg){
-      if(btn){ btn.disabled = true; }
-      if(statusEl){ statusEl.textContent = msg || '...'; }
-    }
-    function clearBusy(btn, statusEl, msgOk){
-      if(btn){ btn.disabled = false; }
-      if(statusEl){ statusEl.textContent = msgOk || ''; }
-    }
-    function showError(statusEl, err){
-      if(statusEl){ statusEl.textContent = 'Error: ' + (err?.message || err || 'Unknown'); }
+    function explainFetchError(err){
+      // Helpful hints for “Failed to fetch”
+      const m = (err && err.message) ? err.message : String(err||'Error');
+      if (m.includes('Failed to fetch')) {
+        return 'Failed to fetch — check BASE_API URL, CORS (Access-Control-Allow-Origin:*), HTTPS, and endpoint path.';
+      }
+      return m;
     }
 
-    // Build voice list UI
     function renderVoices(list){
       els.voiceList.innerHTML = '';
       if(!Array.isArray(list) || !list.length){
         els.voiceList.innerHTML = '<li class="item"><span class="muted">No voices saved yet.</span></li>';
-        selectedVoice = null;
-        return;
+        selectedVoice = null; return;
       }
       list.forEach(v=>{
-        const li = document.createElement('li');
-        li.className = 'item';
+        const li = document.createElement('li'); li.className='item';
         const left = document.createElement('div');
-        const name = document.createElement('div');
-        name.textContent = v.name || '(unnamed)';
-        const meta = document.createElement('div');
-        meta.className = 'muted';
-        meta.textContent = 'ID: ' + (v.voice_id || '—');
-        left.appendChild(name); left.appendChild(meta);
-
-        const right = document.createElement('div');
-        const pick = document.createElement('button');
-        pick.textContent = selectedVoice && selectedVoice.voice_id === v.voice_id ? 'Selected' : 'Select';
-        pick.style.background = selectedVoice && selectedVoice.voice_id === v.voice_id ? '#60a5fa' : '';
-        pick.onclick = ()=>{
-          selectedVoice = v;
-          renderVoices(list);
-        };
-
-        const badge = document.createElement('span');
-        badge.className = 'pill';
-        badge.textContent = (v.createdAt ? new Date(v.createdAt).toLocaleString() : 'saved');
-
-        right.style.display='flex'; right.style.gap='8px'; right.style.alignItems='center';
-        right.appendChild(badge); right.appendChild(pick);
-
+        left.innerHTML = `<div>${v.name || '(unnamed)'}</div><div class="muted">ID: ${v.voice_id||'—'}</div>`;
+        const right = document.createElement('div'); right.style.display='flex'; right.style.gap='8px'; right.style.alignItems='center';
+        const pill = document.createElement('span'); pill.className='pill'; pill.textContent = v.createdAt ? new Date(v.createdAt).toLocaleString() : 'saved';
+        const pick = document.createElement('button'); pick.textContent = (selectedVoice && selectedVoice.voice_id===v.voice_id)?'Selected':'Select';
+        if(selectedVoice && selectedVoice.voice_id===v.voice_id) pick.style.background='#60a5fa';
+        pick.onclick=()=>{ selectedVoice=v; renderVoices(list); };
+        right.appendChild(pill); right.appendChild(pick);
         li.appendChild(left); li.appendChild(right);
         els.voiceList.appendChild(li);
       });
@@ -174,75 +150,96 @@
 
     async function fetchVoices(){
       try{
-        const res = await fetch('/api/voices');
-        if(!res.ok) throw new Error('Voices fetch failed');
+        const res = await fetch(VOICES_URL, { method:'GET', mode:'cors' });
+        if(!res.ok) throw new Error(`${res.status} ${res.statusText}`);
         const data = await res.json();
         renderVoices(data);
-      }catch(err){
+      }catch(e){
         renderVoices([]);
-        console.error(err);
+        console.error('Voices error:', e);
+        alert('Voices fetch error: ' + explainFetchError(e));
       }
     }
 
-    els.btnRefresh.addEventListener('click', fetchVoices);
     window.addEventListener('DOMContentLoaded', fetchVoices);
+    els.btnRefresh.addEventListener('click', fetchVoices);
 
-    // Upload & create voice
+    // Upload with progress (XHR easiest for progress)
     els.btnUpload.addEventListener('click', async ()=>{
       const name = els.vname.value.trim();
       const file = els.afile.files?.[0];
-      if(!name) return alert('Please enter a voice name.');
-      if(!file) return alert('Please choose an audio file.');
+      if(!name) return alert('Enter voice name');
+      if(!file) return alert('Choose an audio file');
 
-      const fd = new FormData();
-      fd.append('name', name);
-      fd.append('file', file);
+      els.btnUpload.disabled = true; els.statusUpload.textContent='Uploading...'; setBar(els.upBar, 10);
 
-      try{
-        setBusy(els.btnUpload, els.statusUpload, 'Uploading & creating voice...');
-        const res = await fetch('/api/upload', { method:'POST', body: fd });
-        const json = await res.json().catch(()=> ({}));
-        if(!res.ok) throw new Error(json.message || res.statusText);
-        els.vname.value = '';
-        els.afile.value = '';
-        clearBusy(els.btnUpload, els.statusUpload, 'Saved ✔');
-        fetchVoices();
-      }catch(err){
-        showError(els.statusUpload, err);
-        clearBusy(els.btnUpload);
-      }
+      const fd = new FormData(); fd.append('name', name); fd.append('file', file);
+      await new Promise((resolve,reject)=>{
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', UPLOAD_URL);
+        xhr.withCredentials = false; // using public CORS
+        xhr.onload = ()=>{
+          try{
+            const j = JSON.parse(xhr.responseText||'{}');
+            if(xhr.status>=200 && xhr.status<300){
+              els.statusUpload.textContent='Saved ✔'; els.vname.value=''; els.afile.value='';
+              fetchVoices(); setBar(els.upBar,100); setTimeout(()=>setBar(els.upBar,0),800);
+              resolve();
+            }else{
+              reject(new Error(j.message || `${xhr.status} ${xhr.statusText}`));
+            }
+          }catch(err){ reject(err); }
+        };
+        xhr.onerror = ()=> reject(new Error('Failed to fetch'));
+        xhr.upload.onprogress = (e)=>{ if(e.lengthComputable){ setBar(els.upBar, Math.round((e.loaded/e.total)*100)); } };
+        xhr.send(fd);
+      }).catch(err=>{
+        els.statusUpload.textContent='Error: '+explainFetchError(err);
+      }).finally(()=>{
+        els.btnUpload.disabled=false;
+      });
     });
 
-    // Generate & download
+    // Generate & auto-download
     els.btnGenerate.addEventListener('click', async ()=>{
-      if(!selectedVoice) return alert('Select a saved voice first.');
+      if(!selectedVoice) return alert('Select a voice');
       const text = els.gtext.value.trim();
-      if(!text) return alert('Type some text to speak.');
+      if(!text) return alert('Type text to speak');
 
+      els.btnGenerate.disabled=true; els.statusSpeak.textContent='Generating...'; setBar(els.genBar, 25);
       try{
-        setBusy(els.btnGenerate, els.statusSpeak, 'Generating audio...');
-        const res = await fetch('/api/speak', {
+        const res = await fetch(SPEAK_URL, {
           method:'POST',
-          headers:{ 'Content-Type':'application/json' },
+          mode:'cors',
+          headers:{'Content-Type':'application/json'},
           body: JSON.stringify({ voice_id: selectedVoice.voice_id, text })
         });
         if(!res.ok){
-          const j = await res.json().catch(()=> ({}));
-          throw new Error(j.message || res.statusText);
+          let msg = `${res.status} ${res.statusText}`;
+          try { const j = await res.json(); if(j && j.message) msg = j.message; } catch {}
+          throw new Error(msg);
         }
-        const blob = await res.blob();
+        setBar(els.genBar, 70);
+        const blob = await res.blob(); // audio/mpeg
+        setBar(els.genBar, 90);
+
         const url = URL.createObjectURL(blob);
+        // auto-download
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${selectedVoice.name || 'voice'}-${Date.now()}.mp3`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-        clearBusy(els.btnGenerate, els.statusSpeak, 'Done ✔');
+        a.download = `${(selectedVoice.name||'voice')}-${Date.now()}.mp3`;
+        document.body.appendChild(a); a.click(); a.remove();
+
+        // also load in player
+        els.player.src = url;
+
+        els.statusSpeak.textContent='Done ✔';
+        setBar(els.genBar,100); setTimeout(()=>setBar(els.genBar,0),900);
       }catch(err){
-        showError(els.statusSpeak, err);
-        clearBusy(els.btnGenerate);
+        els.statusSpeak.textContent='Error: '+explainFetchError(err);
+        setBar(els.genBar,0);
+      }finally{
+        els.btnGenerate.disabled=false;
       }
     });
   </script>

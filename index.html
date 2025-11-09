@@ -1,258 +1,130 @@
-<html>
-	 <head>
-
-		<meta charset="utf-8">
-
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-
-		<meta name="description" content="Enter text and upload an audio file of a voice you want to clone. The app will generate audio of the cloned voice saying your text.">
-
-		<meta property="fb:app_id" content="1321688464574422">
-
-		<meta name="twitter:card" content="summary_large_image">
-
-		<meta name="twitter:site" content="@huggingface">
-
-		<meta name="twitter:image" content="https://cdn-thumbnails.huggingface.co/social-thumbnails/spaces/tonyassi/voice-clone.png">
-
-		<meta property="og:title" content="Voice Clone - a Hugging Face Space by tonyassi">
-
-		<meta property="og:type" content="website">
-
-		<meta property="og:url" content="https://huggingface.co/spaces/tonyassi/voice-clone">
-
-		<meta property="og:image" content="https://cdn-thumbnails.huggingface.co/social-thumbnails/spaces/tonyassi/voice-clone.png">
-
-		<link rel="stylesheet" href="/front/build/kube-243cccb/style.css">
-
-		<link rel="preconnect" href="https://fonts.gstatic.com">
-
-		<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
-
-		<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-
-		<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-
-		<noscript> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css"> </noscript>
-		 <script>const guestTheme = document.cookie.match(/theme=(\w+)/)?.[1]; document.documentElement.classList.toggle('dark', guestTheme === 'dark' || ( (!guestTheme || guestTheme === 'system') && window.matchMedia('(prefers-color-scheme: dark)').matches));</script>
-<link rel="canonical" href="https://huggingface.co/spaces/tonyassi/voice-clone"> <script type="application/ld+json">{
-  "@context": "https:\/\/schema.org",
-  "@type": "WebApplication",
-  "name": "Voice Clone",
-  "identifier": "tonyassi\/voice-clone",
-  "creator": {
-    "@type": "Person",
-    "name": "Tony Assi",
-    "url": "https:\/\/huggingface.co\/tonyassi"
-  },
-  "applicationCategory": "AIApplication",
-  "sameAs": "tonyassi-voice-clone",
-  "url": "https:\/\/huggingface.co\/spaces\/tonyassi\/voice-clone",
-  "operatingSystem": "Web"
-}</script> 
-		<title>Voice Clone - a Hugging Face Space by tonyassi</title>
-
-		<script defer src="/js/script.js"></script>
-
-		<script>
-			((window.plausible =
-				window.plausible ||
-				function () {
-					(plausible.q = plausible.q || []).push(arguments);
-				}),
-				(plausible.init =
-					plausible.init ||
-					function (i) {
-						plausible.o = i || {};
-					}));
-			plausible.init({
-				customProperties: {
-					loggedIn: "false",
-				},
-				endpoint: "/api/event",
-			});
-		</script>
-
-		<script>
-			 window.hubConfig = {"features":{"signupDisabled":false},"sshGitUrl":"git@hf.co","moonHttpUrl":"https:\/\/huggingface.co","captchaApiKey":"bd5f2066-93dc-4bdd-a64b-a24646ca3859","datasetViewerPublicUrl":"https:\/\/datasets-server.huggingface.co","stripePublicKey":"pk_live_x2tdjFXBCvXo2FFmMybezpeM00J6gPCAAc","environment":"production","userAgent":"HuggingFace (production)","spacesIframeDomain":"hf.space","spacesApiUrl":"https:\/\/api.hf.space","docSearchKey":"ece5e02e57300e17d152c08056145326e90c4bff3dd07d7d1ae40cf1c8d39cb6","logoDev":{"apiUrl":"https:\/\/img.logo.dev\/","apiKey":"pk_UHS2HZOeRnaSOdDp7jbd5w"}};
-		</script>
-		 <script type="text/javascript" src="https://de5282c3ca0c.edge.sdk.awswaf.com/de5282c3ca0c/526cf06acb0d/challenge.js" defer></script>  </head>
-	<body class="flex flex-col min-h-dvh bg-white dark:bg-gray-950 text-black SpacePage">
-		 <div class="flex min-h-dvh flex-col"><div class="SVELTE_HYDRATER contents" data-target="SystemThemeMonitor" data-props="{&quot;isLoggedIn&quot;:false}"></div>
-
-	
-	<div class="SVELTE_HYDRATER contents" data-target="SpaceHeader" data-props="{&quot;activeTab&quot;:&quot;spaceApp&quot;,&quot;author&quot;:{&quot;_id&quot;:&quot;648a824a8ca6cf9857d1349c&quot;,&quot;avatarUrl&quot;:&quot;https://cdn-avatars.huggingface.co/v1/production/uploads/648a824a8ca6cf9857d1349c/wAdFg_x9Km-_Jw2ccD6DV.jpeg&quot;,&quot;fullname&quot;:&quot;Tony Assi&quot;,&quot;name&quot;:&quot;tonyassi&quot;,&quot;type&quot;:&quot;user&quot;,&quot;isPro&quot;:false,&quot;isHf&quot;:false,&quot;isHfAdmin&quot;:false,&quot;isMod&quot;:false,&quot;followerCount&quot;:4169},&quot;canDisable&quot;:false,&quot;canWriteRepoSettings&quot;:false,&quot;canWrite&quot;:false,&quot;discussionsStats&quot;:{&quot;closed&quot;:13,&quot;open&quot;:31,&quot;total&quot;:44},&quot;query&quot;:{},&quot;space&quot;:{&quot;author&quot;:&quot;tonyassi&quot;,&quot;colorFrom&quot;:&quot;pink&quot;,&quot;colorTo&quot;:&quot;indigo&quot;,&quot;cardData&quot;:{&quot;title&quot;:&quot;Voice Clone&quot;,&quot;emoji&quot;:&quot;🗣️&quot;,&quot;colorFrom&quot;:&quot;pink&quot;,&quot;colorTo&quot;:&quot;indigo&quot;,&quot;sdk&quot;:&quot;gradio&quot;,&quot;sdk_version&quot;:&quot;5.43.1&quot;,&quot;app_file&quot;:&quot;app.py&quot;,&quot;pinned&quot;:true,&quot;disable_embedding&quot;:true,&quot;models&quot;:[&quot;coqui/XTTS-v2&quot;]},&quot;createdAt&quot;:&quot;2024-04-10T15:59:14.000Z&quot;,&quot;emoji&quot;:&quot;🗣️&quot;,&quot;discussionsDisabled&quot;:false,&quot;discussionsSorting&quot;:&quot;recently-created&quot;,&quot;duplicationDisabled&quot;:false,&quot;id&quot;:&quot;tonyassi/voice-clone&quot;,&quot;isLikedByUser&quot;:false,&quot;lastModified&quot;:&quot;2025-09-08T22:42:28.000Z&quot;,&quot;likes&quot;:2489,&quot;pinned&quot;:true,&quot;private&quot;:false,&quot;gated&quot;:false,&quot;repoType&quot;:&quot;space&quot;,&quot;subdomain&quot;:&quot;tonyassi-voice-clone&quot;,&quot;sdk&quot;:&quot;gradio&quot;,&quot;sdkVersion&quot;:&quot;5.43.1&quot;,&quot;title&quot;:&quot;Voice Clone&quot;,&quot;runtime&quot;:{&quot;stage&quot;:&quot;RUNNING&quot;,&quot;hardware&quot;:{&quot;current&quot;:&quot;zero-a10g&quot;,&quot;requested&quot;:&quot;cpu-basic&quot;},&quot;storage&quot;:null,&quot;gcTimeout&quot;:172800,&quot;replicas&quot;:{&quot;current&quot;:1,&quot;requested&quot;:1},&quot;devMode&quot;:false,&quot;domains&quot;:[{&quot;domain&quot;:&quot;tonyassi-voice-clone.hf.space&quot;,&quot;stage&quot;:&quot;READY&quot;}],&quot;sha&quot;:&quot;9d9a216978ee1956e7f1f7f9df1a1670f3308bf8&quot;},&quot;iframe&quot;:{&quot;embedSrc&quot;:&quot;https://tonyassi-voice-clone.hf.space&quot;,&quot;src&quot;:&quot;https://tonyassi-voice-clone.hf.space&quot;},&quot;secrets&quot;:[],&quot;variables&quot;:[],&quot;sse&quot;:{&quot;status&quot;:{&quot;url&quot;:&quot;https://huggingface.co/api/spaces/tonyassi/voice-clone/events&quot;},&quot;liveMetrics&quot;:{&quot;url&quot;:&quot;https://huggingface.co/api/spaces/tonyassi/voice-clone/metrics&quot;}},&quot;linkedModels&quot;:[{&quot;author&quot;:&quot;coqui&quot;,&quot;authorData&quot;:{&quot;_id&quot;:&quot;61dc7134fac758729c205aad&quot;,&quot;avatarUrl&quot;:&quot;https://cdn-avatars.huggingface.co/v1/production/uploads/1648459271425-61dbf25b99eac69222659467.png&quot;,&quot;fullname&quot;:&quot;Coqui.ai&quot;,&quot;name&quot;:&quot;coqui&quot;,&quot;type&quot;:&quot;org&quot;,&quot;isHf&quot;:false,&quot;isHfAdmin&quot;:false,&quot;isMod&quot;:false,&quot;isEnterprise&quot;:false,&quot;followerCount&quot;:819},&quot;downloads&quot;:5102828,&quot;gated&quot;:false,&quot;id&quot;:&quot;coqui/XTTS-v2&quot;,&quot;availableInferenceProviders&quot;:[],&quot;lastModified&quot;:&quot;2023-12-11T17:50:00.000Z&quot;,&quot;likes&quot;:3155,&quot;pipeline_tag&quot;:&quot;text-to-speech&quot;,&quot;private&quot;:false,&quot;repoType&quot;:&quot;model&quot;,&quot;isLikedByUser&quot;:false,&quot;widgetOutputUrls&quot;:[]}],&quot;linkedDatasets&quot;:[],&quot;linkedCollections&quot;:[],&quot;sha&quot;:&quot;9d9a216978ee1956e7f1f7f9df1a1670f3308bf8&quot;,&quot;hasBlockedOids&quot;:false,&quot;region&quot;:&quot;us&quot;,&quot;tags&quot;:[&quot;gradio&quot;,&quot;region:us&quot;]},&quot;sessionUuid&quot;:&quot;e9qPZcK81GQE7excNXsL0&quot;,&quot;hasPaidPlanEligibleOrg&quot;:false}">
-
-<header class="from-gray-50-to-white bg-linear-to-t relative z-40 border-b border-gray-100 via-white pt-0.5 dark:via-gray-950"><div class="relative mx-4 mb-1 flex flex-col justify-between max-sm:mt-2 sm:mb-0 xl:flex-row"><div class="flex items-center justify-between xl:min-w-0"><h1 class="my-2 flex w-full min-w-0 flex-wrap items-center gap-y-2 text-lg leading-tight xl:flex-nowrap"><span class="flex shrink-0 flex-nowrap items-center"><a href="/spaces" class="hover:bg-linear-to-r peer order-last hidden font-bold hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 hover:bg-clip-text hover:text-transparent sm:inline">Spaces</a>
-							<svg class="hidden peer-hover:block mr-1.5 w-5 animate__animated animate__fadeInUp animate__fast" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32" />
-							<a href="/" class="mr-0 w-5 peer-hover:hidden sm:mr-1.5"><img alt="Hugging Face's logo" src="/front/assets/huggingface_logo-noborder.svg" class="w-5"></a></span>
-						<hr class="rounded-xs mx-2 h-2 translate-y-px border-r dark:border-gray-600 xl:mx-2.5">
-						<div class="group flex flex-none items-center"><div class="relative mr-1 flex items-center">
-
-			
-
-<span class="inline-block"><span class="contents"><a href="/tonyassi" class="text-gray-400 hover:text-blue-600"><img alt="" class="size-3.5 rounded-full flex-none select-none" src="https://cdn-avatars.huggingface.co/v1/production/uploads/648a824a8ca6cf9857d1349c/wAdFg_x9Km-_Jw2ccD6DV.jpeg" crossorigin="anonymous"></a></span>
-	</span></div>
-		
-
-<span class="inline-block"><span class="contents"><a href="/tonyassi" class="text-gray-400 hover:text-blue-600">tonyassi</a></span>
-	</span>
-		<div class="mx-0.5 text-gray-300">/</div></div>
-
-<div class="max-w-full xl:flex xl:min-w-0 xl:flex-nowrap xl:items-center xl:gap-x-1"><a class="break-words font-mono font-semibold hover:text-blue-600 text-[1.07rem] xl:truncate" href="/spaces/tonyassi/voice-clone">voice-clone</a>
-	<button class="text-xs mr-3 focus:outline-hidden inline-flex cursor-pointer items-center text-sm mx-0.5 text-gray-600" title="Copy space name to clipboard" type="button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="currentColor" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32" />
-		</button></div>
-						<div class="inline-flex items-center overflow-hidden whitespace-nowrap rounded-md border bg-white text-sm leading-none text-gray-500 mr-2 shrink-0"><button class="relative flex items-center overflow-hidden from-red-50 to-transparent dark:from-red-900 px-1.5 py-1 hover:bg-linear-to-t focus:outline-hidden" title="Like"><svg class="left-1.5 absolute" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32" fill="currentColor" />
-
-		
-		<span class="ml-4 pl-0.5">like</span></button>
-	<button class="focus:outline-hidden flex items-center border-l px-1.5 py-1 text-gray-400 hover:bg-gray-50 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-800" title="See users who liked this repository">2.49k</button></div>
-
-
-
-
-						
-						
-						
-
-
-
-<span class="inline-block"><span class="contents"><div class="cursor-pointer select-none overflow-hidden font-mono text-xs shrink-0 mr-2 flex items-center rounded-lg border leading-none dark:bg-gray-900 border-green-100 text-green-700 dark:text-green-500"><div class="inline-flex items-center px-2 py-[0.32rem] dark:bg-gray-900 border-green-100 bg-green-50 hover:bg-green-100/70 hover:text-green-800 dark:hover:text-green-400">
-		Running
-		
-			<span class="mx-1">on </span>
-			
-			<span class="-skew-x-6 truncate font-bold uppercase">Zero</span></div>
-	</div></span>
-	</span>
-
-	
-
-
-
-						
-
-<div class="xl:hidden"><div class="relative">
-	<button class="btn px-1 py-1 text-sm translate-y-0" type="button">
-		
-			<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="p-px" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32" />
-			<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" class="absolute right-[-0.25rem] bottom-[-0.25rem] rounded-xs bg-gray-50 p-px text-[0.85rem] text-gray-500 dark:bg-gray-925" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 12 12" />
-		
-		</button>
-	
-	
-	</div></div>
-
-
-
-</h1>
-
-					<div class="flex flex-none items-center justify-center p-0.5 place-self-start p-0 max-sm:absolute max-sm:-right-4 max-sm:-top-2 sm:my-2 xl:hidden aspect-1"><button class="relative z-40 flex h-6 w-8 items-center justify-center" type="button"><svg width="1em" height="1em" viewBox="0 0 10 10" class="text-xl" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" preserveAspectRatio="xMidYMid meet" fill="currentColor" />
-		</button>
-
-	</div></div>
-
-				<div class="hidden flex-row items-center justify-between gap-x-2 xl:flex xl:flex-none"><div class="-mb-px flex h-12 items-center overflow-x-auto overflow-y-hidden">
-	<a class="tab-alternate active" href="/spaces/tonyassi/voice-clone"><svg class="mr-1.5 text-gray-400 flex-none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" />
-	App
-	
-
-	
-		</a><a class="tab-alternate" href="/spaces/tonyassi/voice-clone/tree/main"><svg class="mr-1.5 text-gray-400 flex-none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" />
-	<span class="xl:hidden">Files</span>
-		<span class="hidden xl:inline">Files</span>
-	
-
-	
-		</a><a class="tab-alternate" href="/spaces/tonyassi/voice-clone/discussions"><svg class="mr-1.5 text-gray-400 flex-none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32" />
-	Community
-	<div class="ml-1.5 flex h-4 min-w-[1rem] items-center justify-center rounded px-1 text-xs leading-none shadow-sm bg-black text-white dark:bg-gray-800 dark:text-gray-200">44</div>
-
-	
-		</a></div>
-
-					
-
-<div class="mt-0"><div class="relative">
-	<button class="btn px-1 py-1 text-base translate-y-px" type="button">
-		
-			<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="p-0.5" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32" />
-			<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" class="absolute right-[-0.18rem] bottom-[-0.18rem] rounded-xs bg-gray-50 p-px text-[0.85rem] text-gray-500 dark:bg-gray-925" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 12 12" />
-		
-		</button>
-	
-	
-	</div></div>
-
-
-
-
-					</div></div>
-			</header>
-
-
-
-
-
-<div class="spinner-overlay fixed inset-0 z-50 flex h-full w-full items-center justify-center overflow-y-auto bg-gray-500 text-white opacity-80 hidden"><svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" fill="none" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" />
-	<span>Fetching metadata from the HF Docker repository...</span></div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</div>
-	
-	
-	
-	<div class="SVELTE_HYDRATER contents" data-target="SSOBanner" data-props="{}"></div>
-	
-
-	<main class="flex flex-1 flex-col">
-	
-	
-	
-
-	<div class="SVELTE_HYDRATER contents" data-target="SpacePageInner" data-props="{&quot;author&quot;:{&quot;_id&quot;:&quot;648a824a8ca6cf9857d1349c&quot;,&quot;avatarUrl&quot;:&quot;https://cdn-avatars.huggingface.co/v1/production/uploads/648a824a8ca6cf9857d1349c/wAdFg_x9Km-_Jw2ccD6DV.jpeg&quot;,&quot;fullname&quot;:&quot;Tony Assi&quot;,&quot;name&quot;:&quot;tonyassi&quot;,&quot;type&quot;:&quot;user&quot;,&quot;isPro&quot;:false,&quot;isHf&quot;:false,&quot;isHfAdmin&quot;:false,&quot;isMod&quot;:false,&quot;followerCount&quot;:4169},&quot;canRestart&quot;:false,&quot;canWrite&quot;:false,&quot;csrf&quot;:&quot;&quot;,&quot;hideNFAA&quot;:false,&quot;readmeTemplate&quot;:&quot;---\ntitle: {{title}}\nemoji: {{emoji}}\ncolorFrom: {{colorFrom}}\ncolorTo: {{colorTo}}\nsdk: {{sdk}}\nsdk_version: \&quot;{{sdkVersion}}\&quot;\napp_file: app.py\npinned: false\n---\n\nCheck out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference\n&quot;,&quot;space&quot;:{&quot;author&quot;:&quot;tonyassi&quot;,&quot;colorFrom&quot;:&quot;pink&quot;,&quot;colorTo&quot;:&quot;indigo&quot;,&quot;cardData&quot;:{&quot;title&quot;:&quot;Voice Clone&quot;,&quot;emoji&quot;:&quot;🗣️&quot;,&quot;colorFrom&quot;:&quot;pink&quot;,&quot;colorTo&quot;:&quot;indigo&quot;,&quot;sdk&quot;:&quot;gradio&quot;,&quot;sdk_version&quot;:&quot;5.43.1&quot;,&quot;app_file&quot;:&quot;app.py&quot;,&quot;pinned&quot;:true,&quot;disable_embedding&quot;:true,&quot;models&quot;:[&quot;coqui/XTTS-v2&quot;]},&quot;createdAt&quot;:&quot;2024-04-10T15:59:14.000Z&quot;,&quot;emoji&quot;:&quot;🗣️&quot;,&quot;discussionsDisabled&quot;:false,&quot;discussionsSorting&quot;:&quot;recently-created&quot;,&quot;duplicationDisabled&quot;:false,&quot;id&quot;:&quot;tonyassi/voice-clone&quot;,&quot;isLikedByUser&quot;:false,&quot;lastModified&quot;:&quot;2025-09-08T22:42:28.000Z&quot;,&quot;likes&quot;:2489,&quot;pinned&quot;:true,&quot;private&quot;:false,&quot;gated&quot;:false,&quot;repoType&quot;:&quot;space&quot;,&quot;subdomain&quot;:&quot;tonyassi-voice-clone&quot;,&quot;sdk&quot;:&quot;gradio&quot;,&quot;sdkVersion&quot;:&quot;5.43.1&quot;,&quot;title&quot;:&quot;Voice Clone&quot;,&quot;runtime&quot;:{&quot;stage&quot;:&quot;RUNNING&quot;,&quot;hardware&quot;:{&quot;current&quot;:&quot;zero-a10g&quot;,&quot;requested&quot;:&quot;cpu-basic&quot;},&quot;storage&quot;:null,&quot;gcTimeout&quot;:172800,&quot;replicas&quot;:{&quot;current&quot;:1,&quot;requested&quot;:1},&quot;devMode&quot;:false,&quot;domains&quot;:[{&quot;domain&quot;:&quot;tonyassi-voice-clone.hf.space&quot;,&quot;stage&quot;:&quot;READY&quot;}],&quot;sha&quot;:&quot;9d9a216978ee1956e7f1f7f9df1a1670f3308bf8&quot;},&quot;iframe&quot;:{&quot;embedSrc&quot;:&quot;https://tonyassi-voice-clone.hf.space&quot;,&quot;src&quot;:&quot;https://tonyassi-voice-clone.hf.space&quot;},&quot;secrets&quot;:[],&quot;variables&quot;:[],&quot;sse&quot;:{&quot;status&quot;:{&quot;url&quot;:&quot;https://huggingface.co/api/spaces/tonyassi/voice-clone/events&quot;},&quot;liveMetrics&quot;:{&quot;url&quot;:&quot;https://huggingface.co/api/spaces/tonyassi/voice-clone/metrics&quot;}},&quot;linkedModels&quot;:[{&quot;author&quot;:&quot;coqui&quot;,&quot;authorData&quot;:{&quot;_id&quot;:&quot;61dc7134fac758729c205aad&quot;,&quot;avatarUrl&quot;:&quot;https://cdn-avatars.huggingface.co/v1/production/uploads/1648459271425-61dbf25b99eac69222659467.png&quot;,&quot;fullname&quot;:&quot;Coqui.ai&quot;,&quot;name&quot;:&quot;coqui&quot;,&quot;type&quot;:&quot;org&quot;,&quot;isHf&quot;:false,&quot;isHfAdmin&quot;:false,&quot;isMod&quot;:false,&quot;isEnterprise&quot;:false,&quot;followerCount&quot;:819},&quot;downloads&quot;:5102828,&quot;gated&quot;:false,&quot;id&quot;:&quot;coqui/XTTS-v2&quot;,&quot;availableInferenceProviders&quot;:[],&quot;lastModified&quot;:&quot;2023-12-11T17:50:00.000Z&quot;,&quot;likes&quot;:3155,&quot;pipeline_tag&quot;:&quot;text-to-speech&quot;,&quot;private&quot;:false,&quot;repoType&quot;:&quot;model&quot;,&quot;isLikedByUser&quot;:false,&quot;widgetOutputUrls&quot;:[]}],&quot;linkedDatasets&quot;:[],&quot;linkedCollections&quot;:[],&quot;sha&quot;:&quot;9d9a216978ee1956e7f1f7f9df1a1670f3308bf8&quot;,&quot;hasBlockedOids&quot;:false,&quot;region&quot;:&quot;us&quot;,&quot;tags&quot;:[&quot;gradio&quot;,&quot;region:us&quot;]},&quot;iframeSrc&quot;:&quot;https://tonyassi-voice-clone.hf.space/?__theme=system&quot;,&quot;showGettingStarted&quot;:false,&quot;sessionUuid&quot;:&quot;e9qPZcK81GQE7excNXsL0&quot;,&quot;jwt&quot;:null,&quot;plan&quot;:{&quot;user&quot;:&quot;anonymous&quot;}}">
-
-
-<div class="spinner-overlay fixed inset-0 flex h-full w-full items-center justify-center overflow-y-auto bg-gray-500 text-white opacity-80 hidden"><svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" fill="none" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" />
-	<span>Refreshing</span></div>
-
-
-	<iframe src="https://tonyassi-voice-clone.hf.space/?__theme=system" aria-label="Space app" class="space-iframe outline-hidden grow overflow-hidden bg-white p-0" allow="accelerometer; ambient-light-sensor; autoplay; battery; camera; clipboard-read; clipboard-write; display-capture; document-domain; encrypted-media; fullscreen; geolocation; gyroscope; layout-animations; legacy-image-formats; magnetometer; microphone; midi; oversized-images; payment; picture-in-picture; publickey-credentials-get; serial; sync-xhr; usb; vr ; wake-lock; xr-spatial-tracking" sandbox="allow-downloads allow-forms allow-modals allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-storage-access-by-user-activation" scrolling="no"></iframe>
-
-		
-
-</div></main>
-
-	</div>
-		<script>
-			 import("\/front\/build\/kube-243cccb\/index.js"); window.moonSha = "kube-243cccb\/"; window.__hf_deferred =
-			{};
-		</script>
-		 <!-- Stripe -->
-		<script>
-			if (["hf.co", "huggingface.co"].includes(window.location.hostname)) {
-				const script = document.createElement("script");
-				script.src = "https://js.stripe.com/v3/";
-				script.async = true;
-				document.head.appendChild(script);
-			}
-		</script>
-
-	</body>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Cloning Tool (Working Attempt)</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f9; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #333; }
+        label { display: block; margin-top: 15px; margin-bottom: 5px; font-weight: bold; }
+        input[type="file"], textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background-color: #5cb85c; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; margin-top: 20px; width: 100%; font-size: 16px; }
+        button:hover { background-color: #4cae4c; }
+        #output { margin-top: 30px; padding: 15px; border: 1px solid #ddd; border-radius: 4px; background-color: #e9e9e9; }
+        .loading { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 20px; height: 20px; animation: spin 2s linear infinite; display: inline-block; margin-right: 10px; }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>🎙️ Awaaz Clone Karne Ka Tool</h2>
+        <p><strong>NOTE:</strong> Behtar results ke liye, 6-10 seconds ki *saaf* (clear) English audio file use karein.</p>
+        
+        <form id="voiceCloneForm">
+            <label for="referenceAudio">1. Reference Audio Upload Karein (Awaaz Ka Sample):</label>
+            <input type="file" id="referenceAudio" accept="audio/*" required>
+            
+            <label for="inputText">2. Jo Text Bulwana Hai, Woh English Mein Likhein:</label>
+            <textarea id="inputText" rows="4" placeholder="Example: Hello, this is my cloned voice speaking now." required></textarea>
+            
+            <button type="submit" id="generateButton">Awaaz Generate Karo</button>
+        </form>
+
+        <div id="output">
+            <p><strong>Result:</strong> Generated audio yahan aayega.</p>
+        </div>
+    </div>
+
+    <script>
+        // Aapka diya hua Token yahan use ho raha hai:
+        const API_TOKEN = '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';
+        // Coqui XTTS-v2 model ka API URL:
+        const MODEL_API_URL = 'https://api-inference.huggingface.co/models/coqui/XTTS-v2'; 
+
+        // File ko Base64 mein convert karne ka function
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    // Data URL (data:audio/wav;base64,....) mein se sirf Base64 string nikalna
+                    resolve(reader.result.split(',')[1]); 
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        document.getElementById('voiceCloneForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const referenceAudioFile = document.getElementById('referenceAudio').files[0];
+            const inputText = document.getElementById('inputText').value;
+            const outputDiv = document.getElementById('output');
+            
+            // Output area update karna aur Loading dikhana
+            outputDiv.innerHTML = '<p><span class="loading"></span><strong>Processing...</strong> Awaaz generate ho rahi hai. Please wait (20-60 seconds lag sakte hain).</p>';
+            document.getElementById('generateButton').disabled = true;
+
+            if (!referenceAudioFile) {
+                outputDiv.innerHTML = '<p style="color:red;">Reference Audio File upload karna zaroori hai.</p>';
+                document.getElementById('generateButton').disabled = false;
+                return;
+            }
+
+            try {
+                // 1. Audio file ko Base64 string mein convert karna
+                const audioDataUrl = await fileToBase64(referenceAudioFile);
+
+                // 2. JSON Payload banana
+                const payload = {
+                    "text": inputText,
+                    "speaker_wav": audioDataUrl, 
+                    "language": "en" // XTTS-v2 English mein sabse accha kaam karta hai.
+                };
+
+                // 3. API Call karna
+                const response = await fetch(
+                    MODEL_API_URL,
+                    {
+                        headers: { 
+                            "Authorization": `Bearer ${API_TOKEN}`,
+                            "Content-Type": "application/json"
+                        },
+                        method: "POST",
+                        body: JSON.stringify(payload),
+                    }
+                );
+
+                document.getElementById('generateButton').disabled = false;
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    outputDiv.innerHTML = `<p style="color:red;">❌ API Error: ${response.status} - ${errorText || response.statusText}</p>`;
+                    return;
+                }
+
+                // 4. Audio data ko blob mein badalna aur play karna
+                const audioBlob = await response.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+                
+                outputDiv.innerHTML = `
+                    <p><strong>✅ Success!</strong> Awaaz generate ho gayi hai.</p>
+                    <audio controls src="${audioUrl}"></audio>
+                `;
+
+            } catch (error) {
+                document.getElementById('generateButton').disabled = false;
+                console.error("Fetch error:", error);
+                outputDiv.innerHTML = `<p style="color:red;">❌ Network Error: Server se connect nahi ho paya ya file size bahut bada hai.</p>`;
+            }
+        });
+    </script>
+
+</body>
 </html>

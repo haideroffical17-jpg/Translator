@@ -1,247 +1,258 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8"/>
-  <title>Voice Clone — Generate & Auto-Download</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <style>
-    :root{--bg:#0b1220;--fg:#e5e7eb;--muted:#94a3b8;--card:#0f172a;--border:#1f2a40;--accent:#22c55e}
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,Segoe UI,Roboto,Inter}
-    .wrap{max-width:960px;margin:36px auto;padding:0 16px}
-    h1{margin:0 0 6px;font-size:28px}
-    p.sub{margin:0 0 20px;color:var(--muted)}
-    .grid{display:grid;gap:16px}
-    @media(min-width:900px){.grid{grid-template-columns:1fr 1fr}}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px}
-    label{display:block;margin:10px 0 6px;color:#cbd5e1}
-    input[type="text"],textarea{width:100%;background:#0a0f1a;border:1px solid var(--border);border-radius:12px;color:var(--fg);padding:12px}
-    textarea{min-height:110px}
-    input[type="file"]{width:100%;color:var(--muted)}
-    button{background:var(--accent);color:#052e16;border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
-    button[disabled]{opacity:.5;cursor:not-allowed}
-    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
-    .list{margin:10px 0 0;padding:0;list-style:none;max-height:220px;overflow:auto;border:1px solid var(--border);border-radius:12px}
-    .item{padding:10px 12px;display:flex;justify-content:space-between;border-bottom:1px dashed #1a2740}
-    .item:last-child{border-bottom:0}
-    .pill{background:#0a1a12;color:#86efac;border:1px solid #134e4a;padding:4px 8px;border-radius:999px;font-size:12px}
-    .muted{color:var(--muted);font-size:13px}
-    .status{min-height:18px;font-size:13px;color:#a5b4fc;margin-top:8px}
-    .hr{height:1px;background:var(--border);margin:14px 0}
-    .tiny{font-size:12px;color:#9ca3af}
-    .bar{height:6px;background:#10233a;border-radius:999px;overflow:hidden;margin-top:10px}
-    .bar>i{display:block;height:100%;width:0;background:#60a5fa}
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <h1>🎙️ Voice Clone — Generate & Auto-Download</h1>
-    <p class="sub">Upload sample + name → save voice → type text → <b>Generate MP3 & auto-download</b>.</p>
+<html>
+	 <head>
 
-    <div class="grid">
-      <!-- UPLOAD -->
-      <section class="card">
-        <h2>1) Upload sample & save voice</h2>
-        <label for="vname">Voice Name</label>
-        <input id="vname" type="text" placeholder="e.g., AliNarration"/>
+		<meta charset="utf-8">
 
-        <label for="afile">Audio Sample (WAV/MP3/M4A)</label>
-        <input id="afile" type="file" accept="audio/*"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
-        <div class="row">
-          <button id="btnUpload">Upload & Create Voice</button>
-          <span id="statusUpload" class="status"></span>
-        </div>
-        <div class="bar"><i id="upBar"></i></div>
+		<meta name="description" content="Enter text and upload an audio file of a voice you want to clone. The app will generate audio of the cloned voice saying your text.">
 
-        <div class="hr"></div>
-        <p class="tiny">Backend: <code>POST /api/upload</code> (multipart: <i>name,file</i>) → returns <code>{name,voice_id,createdAt}</code></p>
-      </section>
+		<meta property="fb:app_id" content="1321688464574422">
 
-      <!-- GENERATE -->
-      <section class="card">
-        <h2>2) Saved voices & Generate</h2>
-        <div class="row">
-          <button id="btnRefresh">Refresh Voices</button>
-          <span class="muted">Select voice → type text → Generate MP3.</span>
-        </div>
-        <ul id="voiceList" class="list"></ul>
+		<meta name="twitter:card" content="summary_large_image">
 
-        <label for="gtext" style="margin-top:12px">Text to Speak</label>
-        <textarea id="gtext" placeholder="Type the narration text here..."></textarea>
+		<meta name="twitter:site" content="@huggingface">
 
-        <div class="row">
-          <button id="btnGenerate">Generate & Download</button>
-          <span id="statusSpeak" class="status"></span>
-        </div>
-        <div class="bar"><i id="genBar"></i></div>
+		<meta name="twitter:image" content="https://cdn-thumbnails.huggingface.co/social-thumbnails/spaces/tonyassi/voice-clone.png">
 
-        <audio id="player" controls style="width:100%;margin-top:10px"></audio>
+		<meta property="og:title" content="Voice Clone - a Hugging Face Space by tonyassi">
 
-        <div class="hr"></div>
-        <p class="tiny">Backend:
-          <br/>• <code>GET /api/voices</code> → <code>[{name,voice_id,createdAt}]</code>
-          <br/>• <code>POST /api/speak</code> (JSON: <code>{voice_id,text}</code>) → returns <b>audio/mpeg</b>
-        </p>
-      </section>
-    </div>
-  </div>
+		<meta property="og:type" content="website">
 
-  <script>
-    /* =============================
-       SET THIS TO YOUR BACKEND URL
-       Example for Vercel:
-       const BASE_API = "https://your-app.vercel.app";
-       If frontend & backend are same origin, keep it "".
-    ============================== */
-    const BASE_API = "https://YOUR-BACKEND-DOMAIN"; // e.g. https://voice-backend.vercel.app
-    const UPLOAD_URL = `${BASE_API}/api/upload`;
-    const VOICES_URL = `${BASE_API}/api/voices`;
-    const SPEAK_URL  = `${BASE_API}/api/speak`;
+		<meta property="og:url" content="https://huggingface.co/spaces/tonyassi/voice-clone">
 
-    const els = {
-      vname: document.getElementById('vname'),
-      afile: document.getElementById('afile'),
-      btnUpload: document.getElementById('btnUpload'),
-      statusUpload: document.getElementById('statusUpload'),
-      upBar: document.getElementById('upBar'),
+		<meta property="og:image" content="https://cdn-thumbnails.huggingface.co/social-thumbnails/spaces/tonyassi/voice-clone.png">
 
-      btnRefresh: document.getElementById('btnRefresh'),
-      voiceList: document.getElementById('voiceList'),
-      gtext: document.getElementById('gtext'),
-      btnGenerate: document.getElementById('btnGenerate'),
-      statusSpeak: document.getElementById('statusSpeak'),
-      genBar: document.getElementById('genBar'),
-      player: document.getElementById('player')
-    };
+		<link rel="stylesheet" href="/front/build/kube-243cccb/style.css">
 
-    let selectedVoice = null;
-    function setBar(el, p){ el.style.width = Math.max(0, Math.min(100, p)) + '%'; }
+		<link rel="preconnect" href="https://fonts.gstatic.com">
 
-    function explainFetchError(err){
-      // Helpful hints for “Failed to fetch”
-      const m = (err && err.message) ? err.message : String(err||'Error');
-      if (m.includes('Failed to fetch')) {
-        return 'Failed to fetch — check BASE_API URL, CORS (Access-Control-Allow-Origin:*), HTTPS, and endpoint path.';
-      }
-      return m;
-    }
+		<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
 
-    function renderVoices(list){
-      els.voiceList.innerHTML = '';
-      if(!Array.isArray(list) || !list.length){
-        els.voiceList.innerHTML = '<li class="item"><span class="muted">No voices saved yet.</span></li>';
-        selectedVoice = null; return;
-      }
-      list.forEach(v=>{
-        const li = document.createElement('li'); li.className='item';
-        const left = document.createElement('div');
-        left.innerHTML = `<div>${v.name || '(unnamed)'}</div><div class="muted">ID: ${v.voice_id||'—'}</div>`;
-        const right = document.createElement('div'); right.style.display='flex'; right.style.gap='8px'; right.style.alignItems='center';
-        const pill = document.createElement('span'); pill.className='pill'; pill.textContent = v.createdAt ? new Date(v.createdAt).toLocaleString() : 'saved';
-        const pick = document.createElement('button'); pick.textContent = (selectedVoice && selectedVoice.voice_id===v.voice_id)?'Selected':'Select';
-        if(selectedVoice && selectedVoice.voice_id===v.voice_id) pick.style.background='#60a5fa';
-        pick.onclick=()=>{ selectedVoice=v; renderVoices(list); };
-        right.appendChild(pill); right.appendChild(pick);
-        li.appendChild(left); li.appendChild(right);
-        els.voiceList.appendChild(li);
-      });
-    }
+		<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-    async function fetchVoices(){
-      try{
-        const res = await fetch(VOICES_URL, { method:'GET', mode:'cors' });
-        if(!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-        const data = await res.json();
-        renderVoices(data);
-      }catch(e){
-        renderVoices([]);
-        console.error('Voices error:', e);
-        alert('Voices fetch error: ' + explainFetchError(e));
-      }
-    }
+		<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
 
-    window.addEventListener('DOMContentLoaded', fetchVoices);
-    els.btnRefresh.addEventListener('click', fetchVoices);
+		<noscript> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css"> </noscript>
+		 <script>const guestTheme = document.cookie.match(/theme=(\w+)/)?.[1]; document.documentElement.classList.toggle('dark', guestTheme === 'dark' || ( (!guestTheme || guestTheme === 'system') && window.matchMedia('(prefers-color-scheme: dark)').matches));</script>
+<link rel="canonical" href="https://huggingface.co/spaces/tonyassi/voice-clone"> <script type="application/ld+json">{
+  "@context": "https:\/\/schema.org",
+  "@type": "WebApplication",
+  "name": "Voice Clone",
+  "identifier": "tonyassi\/voice-clone",
+  "creator": {
+    "@type": "Person",
+    "name": "Tony Assi",
+    "url": "https:\/\/huggingface.co\/tonyassi"
+  },
+  "applicationCategory": "AIApplication",
+  "sameAs": "tonyassi-voice-clone",
+  "url": "https:\/\/huggingface.co\/spaces\/tonyassi\/voice-clone",
+  "operatingSystem": "Web"
+}</script> 
+		<title>Voice Clone - a Hugging Face Space by tonyassi</title>
 
-    // Upload with progress (XHR easiest for progress)
-    els.btnUpload.addEventListener('click', async ()=>{
-      const name = els.vname.value.trim();
-      const file = els.afile.files?.[0];
-      if(!name) return alert('Enter voice name');
-      if(!file) return alert('Choose an audio file');
+		<script defer src="/js/script.js"></script>
 
-      els.btnUpload.disabled = true; els.statusUpload.textContent='Uploading...'; setBar(els.upBar, 10);
+		<script>
+			((window.plausible =
+				window.plausible ||
+				function () {
+					(plausible.q = plausible.q || []).push(arguments);
+				}),
+				(plausible.init =
+					plausible.init ||
+					function (i) {
+						plausible.o = i || {};
+					}));
+			plausible.init({
+				customProperties: {
+					loggedIn: "false",
+				},
+				endpoint: "/api/event",
+			});
+		</script>
 
-      const fd = new FormData(); fd.append('name', name); fd.append('file', file);
-      await new Promise((resolve,reject)=>{
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', UPLOAD_URL);
-        xhr.withCredentials = false; // using public CORS
-        xhr.onload = ()=>{
-          try{
-            const j = JSON.parse(xhr.responseText||'{}');
-            if(xhr.status>=200 && xhr.status<300){
-              els.statusUpload.textContent='Saved ✔'; els.vname.value=''; els.afile.value='';
-              fetchVoices(); setBar(els.upBar,100); setTimeout(()=>setBar(els.upBar,0),800);
-              resolve();
-            }else{
-              reject(new Error(j.message || `${xhr.status} ${xhr.statusText}`));
-            }
-          }catch(err){ reject(err); }
-        };
-        xhr.onerror = ()=> reject(new Error('Failed to fetch'));
-        xhr.upload.onprogress = (e)=>{ if(e.lengthComputable){ setBar(els.upBar, Math.round((e.loaded/e.total)*100)); } };
-        xhr.send(fd);
-      }).catch(err=>{
-        els.statusUpload.textContent='Error: '+explainFetchError(err);
-      }).finally(()=>{
-        els.btnUpload.disabled=false;
-      });
-    });
+		<script>
+			 window.hubConfig = {"features":{"signupDisabled":false},"sshGitUrl":"git@hf.co","moonHttpUrl":"https:\/\/huggingface.co","captchaApiKey":"bd5f2066-93dc-4bdd-a64b-a24646ca3859","datasetViewerPublicUrl":"https:\/\/datasets-server.huggingface.co","stripePublicKey":"pk_live_x2tdjFXBCvXo2FFmMybezpeM00J6gPCAAc","environment":"production","userAgent":"HuggingFace (production)","spacesIframeDomain":"hf.space","spacesApiUrl":"https:\/\/api.hf.space","docSearchKey":"ece5e02e57300e17d152c08056145326e90c4bff3dd07d7d1ae40cf1c8d39cb6","logoDev":{"apiUrl":"https:\/\/img.logo.dev\/","apiKey":"pk_UHS2HZOeRnaSOdDp7jbd5w"}};
+		</script>
+		 <script type="text/javascript" src="https://de5282c3ca0c.edge.sdk.awswaf.com/de5282c3ca0c/526cf06acb0d/challenge.js" defer></script>  </head>
+	<body class="flex flex-col min-h-dvh bg-white dark:bg-gray-950 text-black SpacePage">
+		 <div class="flex min-h-dvh flex-col"><div class="SVELTE_HYDRATER contents" data-target="SystemThemeMonitor" data-props="{&quot;isLoggedIn&quot;:false}"></div>
 
-    // Generate & auto-download
-    els.btnGenerate.addEventListener('click', async ()=>{
-      if(!selectedVoice) return alert('Select a voice');
-      const text = els.gtext.value.trim();
-      if(!text) return alert('Type text to speak');
+	
+	<div class="SVELTE_HYDRATER contents" data-target="SpaceHeader" data-props="{&quot;activeTab&quot;:&quot;spaceApp&quot;,&quot;author&quot;:{&quot;_id&quot;:&quot;648a824a8ca6cf9857d1349c&quot;,&quot;avatarUrl&quot;:&quot;https://cdn-avatars.huggingface.co/v1/production/uploads/648a824a8ca6cf9857d1349c/wAdFg_x9Km-_Jw2ccD6DV.jpeg&quot;,&quot;fullname&quot;:&quot;Tony Assi&quot;,&quot;name&quot;:&quot;tonyassi&quot;,&quot;type&quot;:&quot;user&quot;,&quot;isPro&quot;:false,&quot;isHf&quot;:false,&quot;isHfAdmin&quot;:false,&quot;isMod&quot;:false,&quot;followerCount&quot;:4169},&quot;canDisable&quot;:false,&quot;canWriteRepoSettings&quot;:false,&quot;canWrite&quot;:false,&quot;discussionsStats&quot;:{&quot;closed&quot;:13,&quot;open&quot;:31,&quot;total&quot;:44},&quot;query&quot;:{},&quot;space&quot;:{&quot;author&quot;:&quot;tonyassi&quot;,&quot;colorFrom&quot;:&quot;pink&quot;,&quot;colorTo&quot;:&quot;indigo&quot;,&quot;cardData&quot;:{&quot;title&quot;:&quot;Voice Clone&quot;,&quot;emoji&quot;:&quot;🗣️&quot;,&quot;colorFrom&quot;:&quot;pink&quot;,&quot;colorTo&quot;:&quot;indigo&quot;,&quot;sdk&quot;:&quot;gradio&quot;,&quot;sdk_version&quot;:&quot;5.43.1&quot;,&quot;app_file&quot;:&quot;app.py&quot;,&quot;pinned&quot;:true,&quot;disable_embedding&quot;:true,&quot;models&quot;:[&quot;coqui/XTTS-v2&quot;]},&quot;createdAt&quot;:&quot;2024-04-10T15:59:14.000Z&quot;,&quot;emoji&quot;:&quot;🗣️&quot;,&quot;discussionsDisabled&quot;:false,&quot;discussionsSorting&quot;:&quot;recently-created&quot;,&quot;duplicationDisabled&quot;:false,&quot;id&quot;:&quot;tonyassi/voice-clone&quot;,&quot;isLikedByUser&quot;:false,&quot;lastModified&quot;:&quot;2025-09-08T22:42:28.000Z&quot;,&quot;likes&quot;:2489,&quot;pinned&quot;:true,&quot;private&quot;:false,&quot;gated&quot;:false,&quot;repoType&quot;:&quot;space&quot;,&quot;subdomain&quot;:&quot;tonyassi-voice-clone&quot;,&quot;sdk&quot;:&quot;gradio&quot;,&quot;sdkVersion&quot;:&quot;5.43.1&quot;,&quot;title&quot;:&quot;Voice Clone&quot;,&quot;runtime&quot;:{&quot;stage&quot;:&quot;RUNNING&quot;,&quot;hardware&quot;:{&quot;current&quot;:&quot;zero-a10g&quot;,&quot;requested&quot;:&quot;cpu-basic&quot;},&quot;storage&quot;:null,&quot;gcTimeout&quot;:172800,&quot;replicas&quot;:{&quot;current&quot;:1,&quot;requested&quot;:1},&quot;devMode&quot;:false,&quot;domains&quot;:[{&quot;domain&quot;:&quot;tonyassi-voice-clone.hf.space&quot;,&quot;stage&quot;:&quot;READY&quot;}],&quot;sha&quot;:&quot;9d9a216978ee1956e7f1f7f9df1a1670f3308bf8&quot;},&quot;iframe&quot;:{&quot;embedSrc&quot;:&quot;https://tonyassi-voice-clone.hf.space&quot;,&quot;src&quot;:&quot;https://tonyassi-voice-clone.hf.space&quot;},&quot;secrets&quot;:[],&quot;variables&quot;:[],&quot;sse&quot;:{&quot;status&quot;:{&quot;url&quot;:&quot;https://huggingface.co/api/spaces/tonyassi/voice-clone/events&quot;},&quot;liveMetrics&quot;:{&quot;url&quot;:&quot;https://huggingface.co/api/spaces/tonyassi/voice-clone/metrics&quot;}},&quot;linkedModels&quot;:[{&quot;author&quot;:&quot;coqui&quot;,&quot;authorData&quot;:{&quot;_id&quot;:&quot;61dc7134fac758729c205aad&quot;,&quot;avatarUrl&quot;:&quot;https://cdn-avatars.huggingface.co/v1/production/uploads/1648459271425-61dbf25b99eac69222659467.png&quot;,&quot;fullname&quot;:&quot;Coqui.ai&quot;,&quot;name&quot;:&quot;coqui&quot;,&quot;type&quot;:&quot;org&quot;,&quot;isHf&quot;:false,&quot;isHfAdmin&quot;:false,&quot;isMod&quot;:false,&quot;isEnterprise&quot;:false,&quot;followerCount&quot;:819},&quot;downloads&quot;:5102828,&quot;gated&quot;:false,&quot;id&quot;:&quot;coqui/XTTS-v2&quot;,&quot;availableInferenceProviders&quot;:[],&quot;lastModified&quot;:&quot;2023-12-11T17:50:00.000Z&quot;,&quot;likes&quot;:3155,&quot;pipeline_tag&quot;:&quot;text-to-speech&quot;,&quot;private&quot;:false,&quot;repoType&quot;:&quot;model&quot;,&quot;isLikedByUser&quot;:false,&quot;widgetOutputUrls&quot;:[]}],&quot;linkedDatasets&quot;:[],&quot;linkedCollections&quot;:[],&quot;sha&quot;:&quot;9d9a216978ee1956e7f1f7f9df1a1670f3308bf8&quot;,&quot;hasBlockedOids&quot;:false,&quot;region&quot;:&quot;us&quot;,&quot;tags&quot;:[&quot;gradio&quot;,&quot;region:us&quot;]},&quot;sessionUuid&quot;:&quot;e9qPZcK81GQE7excNXsL0&quot;,&quot;hasPaidPlanEligibleOrg&quot;:false}">
 
-      els.btnGenerate.disabled=true; els.statusSpeak.textContent='Generating...'; setBar(els.genBar, 25);
-      try{
-        const res = await fetch(SPEAK_URL, {
-          method:'POST',
-          mode:'cors',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ voice_id: selectedVoice.voice_id, text })
-        });
-        if(!res.ok){
-          let msg = `${res.status} ${res.statusText}`;
-          try { const j = await res.json(); if(j && j.message) msg = j.message; } catch {}
-          throw new Error(msg);
-        }
-        setBar(els.genBar, 70);
-        const blob = await res.blob(); // audio/mpeg
-        setBar(els.genBar, 90);
+<header class="from-gray-50-to-white bg-linear-to-t relative z-40 border-b border-gray-100 via-white pt-0.5 dark:via-gray-950"><div class="relative mx-4 mb-1 flex flex-col justify-between max-sm:mt-2 sm:mb-0 xl:flex-row"><div class="flex items-center justify-between xl:min-w-0"><h1 class="my-2 flex w-full min-w-0 flex-wrap items-center gap-y-2 text-lg leading-tight xl:flex-nowrap"><span class="flex shrink-0 flex-nowrap items-center"><a href="/spaces" class="hover:bg-linear-to-r peer order-last hidden font-bold hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 hover:bg-clip-text hover:text-transparent sm:inline">Spaces</a>
+							<svg class="hidden peer-hover:block mr-1.5 w-5 animate__animated animate__fadeInUp animate__fast" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32" />
+							<a href="/" class="mr-0 w-5 peer-hover:hidden sm:mr-1.5"><img alt="Hugging Face's logo" src="/front/assets/huggingface_logo-noborder.svg" class="w-5"></a></span>
+						<hr class="rounded-xs mx-2 h-2 translate-y-px border-r dark:border-gray-600 xl:mx-2.5">
+						<div class="group flex flex-none items-center"><div class="relative mr-1 flex items-center">
 
-        const url = URL.createObjectURL(blob);
-        // auto-download
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${(selectedVoice.name||'voice')}-${Date.now()}.mp3`;
-        document.body.appendChild(a); a.click(); a.remove();
+			
 
-        // also load in player
-        els.player.src = url;
+<span class="inline-block"><span class="contents"><a href="/tonyassi" class="text-gray-400 hover:text-blue-600"><img alt="" class="size-3.5 rounded-full flex-none select-none" src="https://cdn-avatars.huggingface.co/v1/production/uploads/648a824a8ca6cf9857d1349c/wAdFg_x9Km-_Jw2ccD6DV.jpeg" crossorigin="anonymous"></a></span>
+	</span></div>
+		
 
-        els.statusSpeak.textContent='Done ✔';
-        setBar(els.genBar,100); setTimeout(()=>setBar(els.genBar,0),900);
-      }catch(err){
-        els.statusSpeak.textContent='Error: '+explainFetchError(err);
-        setBar(els.genBar,0);
-      }finally{
-        els.btnGenerate.disabled=false;
-      }
-    });
-  </script>
-</body>
+<span class="inline-block"><span class="contents"><a href="/tonyassi" class="text-gray-400 hover:text-blue-600">tonyassi</a></span>
+	</span>
+		<div class="mx-0.5 text-gray-300">/</div></div>
+
+<div class="max-w-full xl:flex xl:min-w-0 xl:flex-nowrap xl:items-center xl:gap-x-1"><a class="break-words font-mono font-semibold hover:text-blue-600 text-[1.07rem] xl:truncate" href="/spaces/tonyassi/voice-clone">voice-clone</a>
+	<button class="text-xs mr-3 focus:outline-hidden inline-flex cursor-pointer items-center text-sm mx-0.5 text-gray-600" title="Copy space name to clipboard" type="button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="currentColor" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32" />
+		</button></div>
+						<div class="inline-flex items-center overflow-hidden whitespace-nowrap rounded-md border bg-white text-sm leading-none text-gray-500 mr-2 shrink-0"><button class="relative flex items-center overflow-hidden from-red-50 to-transparent dark:from-red-900 px-1.5 py-1 hover:bg-linear-to-t focus:outline-hidden" title="Like"><svg class="left-1.5 absolute" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32" fill="currentColor" />
+
+		
+		<span class="ml-4 pl-0.5">like</span></button>
+	<button class="focus:outline-hidden flex items-center border-l px-1.5 py-1 text-gray-400 hover:bg-gray-50 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-800" title="See users who liked this repository">2.49k</button></div>
+
+
+
+
+						
+						
+						
+
+
+
+<span class="inline-block"><span class="contents"><div class="cursor-pointer select-none overflow-hidden font-mono text-xs shrink-0 mr-2 flex items-center rounded-lg border leading-none dark:bg-gray-900 border-green-100 text-green-700 dark:text-green-500"><div class="inline-flex items-center px-2 py-[0.32rem] dark:bg-gray-900 border-green-100 bg-green-50 hover:bg-green-100/70 hover:text-green-800 dark:hover:text-green-400">
+		Running
+		
+			<span class="mx-1">on </span>
+			
+			<span class="-skew-x-6 truncate font-bold uppercase">Zero</span></div>
+	</div></span>
+	</span>
+
+	
+
+
+
+						
+
+<div class="xl:hidden"><div class="relative">
+	<button class="btn px-1 py-1 text-sm translate-y-0" type="button">
+		
+			<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="p-px" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32" />
+			<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" class="absolute right-[-0.25rem] bottom-[-0.25rem] rounded-xs bg-gray-50 p-px text-[0.85rem] text-gray-500 dark:bg-gray-925" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 12 12" />
+		
+		</button>
+	
+	
+	</div></div>
+
+
+
+</h1>
+
+					<div class="flex flex-none items-center justify-center p-0.5 place-self-start p-0 max-sm:absolute max-sm:-right-4 max-sm:-top-2 sm:my-2 xl:hidden aspect-1"><button class="relative z-40 flex h-6 w-8 items-center justify-center" type="button"><svg width="1em" height="1em" viewBox="0 0 10 10" class="text-xl" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" preserveAspectRatio="xMidYMid meet" fill="currentColor" />
+		</button>
+
+	</div></div>
+
+				<div class="hidden flex-row items-center justify-between gap-x-2 xl:flex xl:flex-none"><div class="-mb-px flex h-12 items-center overflow-x-auto overflow-y-hidden">
+	<a class="tab-alternate active" href="/spaces/tonyassi/voice-clone"><svg class="mr-1.5 text-gray-400 flex-none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" />
+	App
+	
+
+	
+		</a><a class="tab-alternate" href="/spaces/tonyassi/voice-clone/tree/main"><svg class="mr-1.5 text-gray-400 flex-none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" />
+	<span class="xl:hidden">Files</span>
+		<span class="hidden xl:inline">Files</span>
+	
+
+	
+		</a><a class="tab-alternate" href="/spaces/tonyassi/voice-clone/discussions"><svg class="mr-1.5 text-gray-400 flex-none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32" />
+	Community
+	<div class="ml-1.5 flex h-4 min-w-[1rem] items-center justify-center rounded px-1 text-xs leading-none shadow-sm bg-black text-white dark:bg-gray-800 dark:text-gray-200">44</div>
+
+	
+		</a></div>
+
+					
+
+<div class="mt-0"><div class="relative">
+	<button class="btn px-1 py-1 text-base translate-y-px" type="button">
+		
+			<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="p-0.5" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 32 32" />
+			<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" role="img" class="absolute right-[-0.18rem] bottom-[-0.18rem] rounded-xs bg-gray-50 p-px text-[0.85rem] text-gray-500 dark:bg-gray-925" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 12 12" />
+		
+		</button>
+	
+	
+	</div></div>
+
+
+
+
+					</div></div>
+			</header>
+
+
+
+
+
+<div class="spinner-overlay fixed inset-0 z-50 flex h-full w-full items-center justify-center overflow-y-auto bg-gray-500 text-white opacity-80 hidden"><svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" fill="none" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" />
+	<span>Fetching metadata from the HF Docker repository...</span></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+	
+	
+	
+	<div class="SVELTE_HYDRATER contents" data-target="SSOBanner" data-props="{}"></div>
+	
+
+	<main class="flex flex-1 flex-col">
+	
+	
+	
+
+	<div class="SVELTE_HYDRATER contents" data-target="SpacePageInner" data-props="{&quot;author&quot;:{&quot;_id&quot;:&quot;648a824a8ca6cf9857d1349c&quot;,&quot;avatarUrl&quot;:&quot;https://cdn-avatars.huggingface.co/v1/production/uploads/648a824a8ca6cf9857d1349c/wAdFg_x9Km-_Jw2ccD6DV.jpeg&quot;,&quot;fullname&quot;:&quot;Tony Assi&quot;,&quot;name&quot;:&quot;tonyassi&quot;,&quot;type&quot;:&quot;user&quot;,&quot;isPro&quot;:false,&quot;isHf&quot;:false,&quot;isHfAdmin&quot;:false,&quot;isMod&quot;:false,&quot;followerCount&quot;:4169},&quot;canRestart&quot;:false,&quot;canWrite&quot;:false,&quot;csrf&quot;:&quot;&quot;,&quot;hideNFAA&quot;:false,&quot;readmeTemplate&quot;:&quot;---\ntitle: {{title}}\nemoji: {{emoji}}\ncolorFrom: {{colorFrom}}\ncolorTo: {{colorTo}}\nsdk: {{sdk}}\nsdk_version: \&quot;{{sdkVersion}}\&quot;\napp_file: app.py\npinned: false\n---\n\nCheck out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference\n&quot;,&quot;space&quot;:{&quot;author&quot;:&quot;tonyassi&quot;,&quot;colorFrom&quot;:&quot;pink&quot;,&quot;colorTo&quot;:&quot;indigo&quot;,&quot;cardData&quot;:{&quot;title&quot;:&quot;Voice Clone&quot;,&quot;emoji&quot;:&quot;🗣️&quot;,&quot;colorFrom&quot;:&quot;pink&quot;,&quot;colorTo&quot;:&quot;indigo&quot;,&quot;sdk&quot;:&quot;gradio&quot;,&quot;sdk_version&quot;:&quot;5.43.1&quot;,&quot;app_file&quot;:&quot;app.py&quot;,&quot;pinned&quot;:true,&quot;disable_embedding&quot;:true,&quot;models&quot;:[&quot;coqui/XTTS-v2&quot;]},&quot;createdAt&quot;:&quot;2024-04-10T15:59:14.000Z&quot;,&quot;emoji&quot;:&quot;🗣️&quot;,&quot;discussionsDisabled&quot;:false,&quot;discussionsSorting&quot;:&quot;recently-created&quot;,&quot;duplicationDisabled&quot;:false,&quot;id&quot;:&quot;tonyassi/voice-clone&quot;,&quot;isLikedByUser&quot;:false,&quot;lastModified&quot;:&quot;2025-09-08T22:42:28.000Z&quot;,&quot;likes&quot;:2489,&quot;pinned&quot;:true,&quot;private&quot;:false,&quot;gated&quot;:false,&quot;repoType&quot;:&quot;space&quot;,&quot;subdomain&quot;:&quot;tonyassi-voice-clone&quot;,&quot;sdk&quot;:&quot;gradio&quot;,&quot;sdkVersion&quot;:&quot;5.43.1&quot;,&quot;title&quot;:&quot;Voice Clone&quot;,&quot;runtime&quot;:{&quot;stage&quot;:&quot;RUNNING&quot;,&quot;hardware&quot;:{&quot;current&quot;:&quot;zero-a10g&quot;,&quot;requested&quot;:&quot;cpu-basic&quot;},&quot;storage&quot;:null,&quot;gcTimeout&quot;:172800,&quot;replicas&quot;:{&quot;current&quot;:1,&quot;requested&quot;:1},&quot;devMode&quot;:false,&quot;domains&quot;:[{&quot;domain&quot;:&quot;tonyassi-voice-clone.hf.space&quot;,&quot;stage&quot;:&quot;READY&quot;}],&quot;sha&quot;:&quot;9d9a216978ee1956e7f1f7f9df1a1670f3308bf8&quot;},&quot;iframe&quot;:{&quot;embedSrc&quot;:&quot;https://tonyassi-voice-clone.hf.space&quot;,&quot;src&quot;:&quot;https://tonyassi-voice-clone.hf.space&quot;},&quot;secrets&quot;:[],&quot;variables&quot;:[],&quot;sse&quot;:{&quot;status&quot;:{&quot;url&quot;:&quot;https://huggingface.co/api/spaces/tonyassi/voice-clone/events&quot;},&quot;liveMetrics&quot;:{&quot;url&quot;:&quot;https://huggingface.co/api/spaces/tonyassi/voice-clone/metrics&quot;}},&quot;linkedModels&quot;:[{&quot;author&quot;:&quot;coqui&quot;,&quot;authorData&quot;:{&quot;_id&quot;:&quot;61dc7134fac758729c205aad&quot;,&quot;avatarUrl&quot;:&quot;https://cdn-avatars.huggingface.co/v1/production/uploads/1648459271425-61dbf25b99eac69222659467.png&quot;,&quot;fullname&quot;:&quot;Coqui.ai&quot;,&quot;name&quot;:&quot;coqui&quot;,&quot;type&quot;:&quot;org&quot;,&quot;isHf&quot;:false,&quot;isHfAdmin&quot;:false,&quot;isMod&quot;:false,&quot;isEnterprise&quot;:false,&quot;followerCount&quot;:819},&quot;downloads&quot;:5102828,&quot;gated&quot;:false,&quot;id&quot;:&quot;coqui/XTTS-v2&quot;,&quot;availableInferenceProviders&quot;:[],&quot;lastModified&quot;:&quot;2023-12-11T17:50:00.000Z&quot;,&quot;likes&quot;:3155,&quot;pipeline_tag&quot;:&quot;text-to-speech&quot;,&quot;private&quot;:false,&quot;repoType&quot;:&quot;model&quot;,&quot;isLikedByUser&quot;:false,&quot;widgetOutputUrls&quot;:[]}],&quot;linkedDatasets&quot;:[],&quot;linkedCollections&quot;:[],&quot;sha&quot;:&quot;9d9a216978ee1956e7f1f7f9df1a1670f3308bf8&quot;,&quot;hasBlockedOids&quot;:false,&quot;region&quot;:&quot;us&quot;,&quot;tags&quot;:[&quot;gradio&quot;,&quot;region:us&quot;]},&quot;iframeSrc&quot;:&quot;https://tonyassi-voice-clone.hf.space/?__theme=system&quot;,&quot;showGettingStarted&quot;:false,&quot;sessionUuid&quot;:&quot;e9qPZcK81GQE7excNXsL0&quot;,&quot;jwt&quot;:null,&quot;plan&quot;:{&quot;user&quot;:&quot;anonymous&quot;}}">
+
+
+<div class="spinner-overlay fixed inset-0 flex h-full w-full items-center justify-center overflow-y-auto bg-gray-500 text-white opacity-80 hidden"><svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" fill="none" focusable="false" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" />
+	<span>Refreshing</span></div>
+
+
+	<iframe src="https://tonyassi-voice-clone.hf.space/?__theme=system" aria-label="Space app" class="space-iframe outline-hidden grow overflow-hidden bg-white p-0" allow="accelerometer; ambient-light-sensor; autoplay; battery; camera; clipboard-read; clipboard-write; display-capture; document-domain; encrypted-media; fullscreen; geolocation; gyroscope; layout-animations; legacy-image-formats; magnetometer; microphone; midi; oversized-images; payment; picture-in-picture; publickey-credentials-get; serial; sync-xhr; usb; vr ; wake-lock; xr-spatial-tracking" sandbox="allow-downloads allow-forms allow-modals allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-storage-access-by-user-activation" scrolling="no"></iframe>
+
+		
+
+</div></main>
+
+	</div>
+		<script>
+			 import("\/front\/build\/kube-243cccb\/index.js"); window.moonSha = "kube-243cccb\/"; window.__hf_deferred =
+			{};
+		</script>
+		 <!-- Stripe -->
+		<script>
+			if (["hf.co", "huggingface.co"].includes(window.location.hostname)) {
+				const script = document.createElement("script");
+				script.src = "https://js.stripe.com/v3/";
+				script.async = true;
+				document.head.appendChild(script);
+			}
+		</script>
+
+	</body>
+
 </html>

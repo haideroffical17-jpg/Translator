@@ -1,133 +1,406 @@
 <!DOCTYPE html>
-<html lang="ur">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Free Unlimited TTS (FastAPI + Coqui)</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        body { font-family: Arial, sans-serif; margin: 2rem; }
-        .container { max-width: 800px; margin: 0 auto; }
-        textarea { width: 100%; height: 150px; font-size: 1rem; padding: 0.5rem; }
-        .row { display: flex; gap: 1rem; margin: 0.5rem 0; }
-        .row > div { flex: 1; }
-        button { background: #0d6efd; color: white; border: none; padding: 0.6rem 1rem; cursor: pointer; border-radius: 4px; }
-        button:disabled { opacity: .6; cursor: not-allowed; }
-        .output { margin-top: 1rem; }
-        .hidden { display: none; }
-        .small { font-size: .9rem; color: #666; }
-    </style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Bulk AI Image Generator – Static (No Backend)</title>
+  <meta name="description" content="Generate dozens of images from prompts in one go — no backend needed."/>
+  <link rel="icon" href="data:,">
+  <style>
+    :root{
+      --bg:#0b0f19;--panel:#111827;--text:#e6e8ee;--muted:#9aa3b2;
+      --brand:#6c8cff;--accent:#22d3ee;--ring:rgba(108,140,255,.35)
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:
+      radial-gradient(1200px 600px at 70% -10%, rgba(108,140,255,.15), transparent 60%),
+      radial-gradient(900px 500px at 10% 0%, rgba(34,211,238,.12), transparent 55%),
+      var(--bg); color:var(--text); font-family:Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial}
+    .container{width:min(1140px,92vw);margin:0 auto;padding:16px}
+    header{display:flex;align-items:center;justify-content:space-between;padding:20px 0}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800;text-decoration:none;color:var(--text)}
+    nav a{color:var(--muted);text-decoration:none;margin-left:18px;font-weight:600}
+    nav a:hover{color:var(--text)}
+    .hero{padding:26px 0 10px;text-align:center}
+    .hero h1{margin:0 0 8px;font-size:clamp(30px,5vw,44px)}
+    .hero p{margin:0;color:var(--muted)}
+    .panel{background:linear-gradient(180deg, rgba(36,50,74,.28), rgba(17,24,39,.9));
+      border:1px solid #1b2740;border-radius:16px;box-shadow:0 16px 40px -20px rgba(0,0,0,.6);padding:18px}
+    .grid{display:grid;gap:14px;grid-template-columns:1.2fr .8fr}
+    .grid-2{display:grid;gap:14px;grid-template-columns:1fr 1fr}
+    label{font-size:13px;color:var(--muted);margin-bottom:6px;display:block}
+    textarea,input,select,button{width:100%;border-radius:12px;border:1px solid #23324a;background:#0f1626;color:var(--text);padding:12px;outline:none}
+    textarea{min-height:180px;resize:vertical}
+    input[type="checkbox"]{width:auto}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .btn{cursor:pointer;user-select:none;font-weight:800;border:1px solid transparent}
+    .btn.primary{background:linear-gradient(90deg,var(--brand),var(--accent));color:#08101e}
+    .btn.ghost{background:transparent;color:var(--text);border-color:#24324a}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .results{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+    .card{background:linear-gradient(180deg, rgba(36,50,74,.35), rgba(18,24,41,.9));border:1px solid #1b2740;border-radius:14px;overflow:hidden}
+    .thumb{width:100%;aspect-ratio:1/1;display:block;background:#0b1221}
+    .meta{padding:10px;display:flex;justify-content:space-between;gap:10px}
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid #24324a;border-radius:999px;color:var(--muted);font-size:12px}
+    .muted{color:var(--muted)}
+    footer{margin:24px 0 50px;text-align:center;color:var(--muted)}
+    #ad-banner{display:flex;align-items:center;justify-content:center;height:90px;background:#0f1626;border:1px dashed #26324a;border-radius:12px;color:#7f8aa3;font-size:13px}
+    @media(max-width:980px){.grid{grid-template-columns:1fr}}
+  </style>
 </head>
 <body>
-<div class="container">
-    <h1>Free Unlimited Text‑to‑Speech</h1>
-    <p class="small">
-        یہ پیج آپ کے مقامی FastAPI ٹی ٹی ایس سروس سے فالتو آواز بنا کر ڈاؤن لوڈ کرنے کی سہولت دیتا ہے۔
-        (API: <code>http://127.0.0.1:8000/tts</code>)
-    </p>
+  <header class="container">
+    <a class="brand" href="#">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 4v10l-7 4-7-4V7l7-4Z" stroke="currentColor" stroke-width="1.5"/></svg>
+      <span>Bulk AI Image Generator</span>
+    </a>
+    <nav>
+      <a href="#how">How it works</a>
+      <a href="#results">Results</a>
+      <a href="#footer">Contact</a>
+    </nav>
+  </header>
 
-    <form id="tts-form">
-        <label for="text">متن:</label>
-        <textarea id="text" name="text" required placeholder="یہاں لکھیں…"></textarea>
+  <section class="container hero">
+    <h1>Generate Dozens of Images from Prompts</h1>
+    <p class="muted">Paste multiple prompts, pick aspect ratio, and download everything as a ZIP. No backend required.</p>
+  </section>
 
-        <div class="row">
-            <div>
-                <label for="speed">سپیڈ (0.5‑2.0):</label>
-                <input type="number" id="speed" name="speed" step="0.1" min="0.5" max="2.0" value="1.0">
-            </div>
-            <div>
-                <label for="language">زبان (اختیاری):</label>
-                <input type="text" id="language" name="language" placeholder="مثال: en, es, fr">
-            </div>
-            <div>
-                <label for="speaker">اسپیکر (اختیاری):</label>
-                <input type="text" id="speaker" name="speaker" placeholder="اگر ماڈل multi‑speaker ہے">
-            </div>
+  <section class="container" style="margin-top:14px;">
+    <div id="ad-banner" class="panel">
+      <!-- Ad slot (paste your code below). Example: AdSense / Monetag / Propeller -->
+      <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXX" crossorigin="anonymous"></script> -->
+      Banner Ad Placeholder — paste your ad code here
+    </div>
+  </section>
+
+  <section class="container" style="margin-top:14px;">
+    <div class="grid">
+      <!-- LEFT: Prompts & Controls -->
+      <div class="panel">
+        <div style="margin-bottom:12px;">
+          <label for="prompts">Prompts (one per line)</label>
+          <textarea id="prompts" placeholder="A neon cyberpunk alley with rain and reflections&#10;Ancient forest with sunlight god rays&#10;Low-poly desert with minimalist pyramids"></textarea>
         </div>
 
-        <button type="submit" id="generateBtn">آواز بنائیں</button>
-        <span id="loading" class="small hidden">…پراسیسنگ… براہ کرم انتظار کریں</span>
-    </form>
+        <div class="grid-2" style="margin-bottom:10px;">
+          <div>
+            <label for="ratio">Aspect Ratio</label>
+            <select id="ratio">
+              <option value="1:1" selected>1:1 (square)</option>
+              <option value="3:4">3:4 (portrait)</option>
+              <option value="9:16">9:16 (portrait tall)</option>
+              <option value="4:3">4:3 (landscape)</option>
+              <option value="16:9">16:9 (landscape wide)</option>
+            </select>
+          </div>
+          <div>
+            <label for="size">Base Size (px on the short side)</label>
+            <input id="size" type="number" min="320" max="2048" value="768"/>
+          </div>
+        </div>
 
-    <div class="output" id="output" class="hidden">
-        <h3>Result:</h3>
-        <audio id="player" controls class="hidden"></audio>
-        <p><a id="downloadLink" href="#" download="voice.wav" class="hidden">WAV ڈاؤن لوڈ کریں</a></p>
-        <p id="info" class="small"></p>
+        <div class="grid-2" style="margin-bottom:10px;">
+          <div>
+            <label>Watermark</label>
+            <input id="watermark" placeholder="Optional watermark (e.g., @yourbrand)" />
+          </div>
+          <div class="row" style="margin-top:22px;">
+            <input id="wmToggle" type="checkbox" checked />
+            <label for="wmToggle" style="margin:0;">Show Watermark</label>
+          </div>
+        </div>
+
+        <div class="panel" style="margin:12px 0;">
+          <div class="row" style="justify-content:space-between;align-items:flex-end;">
+            <div style="flex:1;min-width:260px;margin-right:10px;">
+              <label for="apiKey">Optional Prompt Enhance (Gemini 1.5 Flash)</label>
+              <input id="apiKey" placeholder="Your Google API Key" />
+              <div class="row" style="margin-top:6px;">
+                <input id="enhanceToggle" type="checkbox" checked />
+                <label for="enhanceToggle" style="margin:0;">Enhance prompts before generation</label>
+              </div>
+              <small class="muted">Frontend keys are public. This enhancer only rewrites prompts; images render locally.</small>
+            </div>
+            <div style="min-width:220px">
+              <label>Pick one of your keys</label>
+              <select id="keyPicker">
+                <option value="AIzaSyDTXdc33kXwgMuPnsOXESQNegzT8_BbfI0">Key #1 (default)</option>
+                <option value="AIzaSyCl7Ac-91mPHtLCmRFJHS2nmOKFx4ZSFms">Key #2</option>
+                <option value="">None</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px;">
+          <button id="btn-generate" class="btn primary">Generate Images</button>
+          <button id="btn-clear" class="btn ghost">Clear Results</button>
+        </div>
+      </div>
+
+      <!-- RIGHT: Help -->
+      <aside class="panel" id="how">
+        <h3 style="margin:4px 0 10px;">How it works</h3>
+        <ol class="muted" style="margin:0; padding-left:18px; line-height:1.6;">
+          <li>Paste prompts (one per line). Optionally enable “Enhance” to polish them via Gemini.</li>
+          <li>Choose <b>aspect ratio</b> and <b>size</b>. Images render locally using HTML Canvas.</li>
+          <li>Click <b>Generate</b>. Save each or <b>Download ZIP</b> for all.</li>
+        </ol>
+        <div style="margin-top:12px;">
+          <span class="badge">No server needed</span>
+          <span class="badge">ZIP export</span>
+          <span class="badge">Canvas render</span>
+        </div>
+      </aside>
     </div>
-</div>
+  </section>
 
-<script>
-    // ================== ترتیب ==================
-    const API_URL = 'http://127.0.0.1:8000/tts';   // اگر کوئی اور ڈومین استعمال کریں تو اسے بدل دیں
+  <section class="container" style="margin-top:14px;">
+    <div class="panel">
+      <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <h3 style="margin:0;">Results</h3>
+        <div class="row">
+          <button id="btn-download-zip" class="btn ghost">Download All as ZIP</button>
+        </div>
+      </div>
+      <div id="results" class="results"></div>
+    </div>
+  </section>
 
-    const form = document.getElementById('tts-form');
-    const generateBtn = document.getElementById('generateBtn');
-    const loading = document.getElementById('loading');
+  <footer class="container" id="footer">
+    <p class="muted">POwered by GROW WITH HAIDER</p>
+    <small class="muted">© <span id="year"></span> — Static Batch Generator (Canvas). Frontend API enhancer optional.</small>
+  </footer>
 
-    const player = document.getElementById('player');
-    const downloadLink = document.getElementById('downloadLink');
-    const info = document.getElementById('info');
+  <!-- Dependencies for zipping downloads -->
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
+  <script>
+    // ====== Utils ======
+    const $ = (sel)=>document.querySelector(sel);
+    const resultsEl = $('#results');
+    $('#year').textContent = new Date().getFullYear();
 
-        // UI کو لوڈنگ موڈ میں ڈال دیتے ہیں
-        generateBtn.disabled = true;
-        loading.classList.remove('hidden');
-        player.classList.add('hidden');
-        downloadLink.classList.add('hidden');
-        info.textContent = '';
+    const ratioToWH = (ratio, baseShort) => {
+      const [a,b] = ratio.split(':').map(Number);
+      if(!a || !b) return [baseShort, baseShort];
+      // Make the smaller side = baseShort
+      if (a === b) return [baseShort, baseShort];
+      if (a > b) { // landscape
+        const h = baseShort;
+        const w = Math.round((a/b)*h);
+        return [w,h];
+      } else { // portrait
+        const w = baseShort;
+        const h = Math.round((b/a)*w);
+        return [w,h];
+      }
+    };
 
-        const text = document.getElementById('text').value.trim();
-        const speed = document.getElementById('speed').value || 1.0;
-        const language = document.getElementById('language').value.trim();
-        const speaker = document.getElementById('speaker').value.trim();
+    const sleep = (ms)=> new Promise(r=>setTimeout(r, ms));
 
-        // FormData object بناتے ہیں (multipart/form-data)
-        const formData = new FormData();
-        formData.append('text', text);
-        formData.append('speed', speed);
-        if (language) formData.append('language', language);
-        if (speaker) formData.append('speaker', speaker);
+    // ====== Gemini Prompt Enhancer (optional) ======
+    async function enhancePrompts(prompts, apiKey) {
+      try{
+        if(!apiKey) return prompts;
+        const body = {
+          contents: [{
+            role: "user",
+            parts: [{text:
+`You are a helpful prompt editor. Improve these image prompts for clarity and visual richness.
+Rules: keep each line separate; don't add numbering; keep style tags if present; don't invent copyrighted characters.
 
-        try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                body: formData,
-                // CORS کے لیے کوئی اضافی header درکار نہیں، FastAPI CORS middleware میں "*" ہے
-            });
+Prompts:
+${prompts.join("\\n")}`
+            }]
+          }]
+        };
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${encodeURIComponent(apiKey)}`,{
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify(body)
+        });
+        if(!res.ok){ console.warn("Enhancer HTTP", res.status); return prompts; }
+        const data = await res.json();
+        const text = data?.candidates?.[0]?.content?.parts?.map(p=>p.text).join("") || "";
+        // Split back to lines close to original count
+        const out = text.split(/\r?\n/).filter(Boolean);
+        // Try to keep same length; if mismatch, just return improved list
+        return out.length ? out : prompts;
+      }catch(e){
+        console.warn("Enhancer error", e);
+        return prompts;
+      }
+    }
 
-            if (!response.ok) {
-                const errText = await response.text();
-                throw new Error(`Server error (${response.status}): ${errText}`);
-            }
+    // ====== Canvas Render ======
+    function renderCanvasImage(prompt, w, h, watermark, showWm) {
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
 
-            // سروس سے آنے والا WAV فائل ہمیشہ `audio/wav` ہوتا ہے
-            const blob = await response.blob();
-            const objectUrl = URL.createObjectURL(blob);
+      // Background gradient
+      const g = ctx.createLinearGradient(0,0,w,h);
+      const seed = [...prompt].reduce((a,c)=>a+c.charCodeAt(0),0) % 360;
+      g.addColorStop(0, `hsl(${(seed)%360} 70% 12%)`);
+      g.addColorStop(1, `hsl(${(seed+60)%360} 70% 18%)`);
+      ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
 
-            // Audio پلیئر اور ڈاؤن لوڈ لنک سیٹ کرتے ہیں
-            player.src = objectUrl;
-            player.classList.remove('hidden');
+      // Subtle noise
+      const noise = ctx.createImageData(120, 120);
+      for (let i=0; i<noise.data.length; i+=4){
+        const n = 10 + Math.random()*12;
+        noise.data[i]=n; noise.data[i+1]=n; noise.data[i+2]=n; noise.data[i+3]=30;
+      }
+      const patternCanvas = document.createElement('canvas');
+      patternCanvas.width=120; patternCanvas.height=120;
+      patternCanvas.getContext('2d').putImageData(noise,0,0);
+      const ptt = ctx.createPattern(patternCanvas, 'repeat');
+      ctx.globalAlpha = 0.25; ctx.fillStyle = ptt; ctx.fillRect(0,0,w,h); ctx.globalAlpha = 1;
 
-            // ڈاؤن لوڈ لنک میں بھی object URL دیتے ہیں
-            downloadLink.href = objectUrl;
-            // Random نام کی ضرورت نہیں، لیکن اگر چاہیں تو UUID بنا سکتے ہیں
-            downloadLink.classList.remove('hidden');
+      // Prompt text
+      const pad = Math.round(w*0.06);
+      ctx.fillStyle = "rgba(255,255,255,.92)";
+      ctx.font = `bold ${Math.max(18, Math.round(Math.min(w,h)*0.06))}px Inter, Arial, sans-serif`;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
 
-            // معلومات (اگر چاہیں)
-            const audioId = response.headers.get('X-Audio-ID') || 'N/A';
-            info.textContent = `Generated audio ID: ${audioId} | Size: ${(blob.size/1024).toFixed(1)} KB`;
+      // Wrap text
+      const maxWidth = w - pad*2;
+      const words = prompt.replace(/\s+/g,' ').trim().split(' ');
+      const lines = [];
+      let line = '';
+      for (let i=0; i<words.length; i++){
+        const test = line ? line + ' ' + words[i] : words[i];
+        const m = ctx.measureText(test);
+        if (m.width > maxWidth && line) { lines.push(line); line = words[i]; }
+        else line = test;
+      }
+      if(line) lines.push(line);
+      const lineHeight = Math.round(Math.min(w,h)*0.08);
+      let y = pad;
+      lines.slice(0, 10).forEach(l=>{
+        ctx.fillText(l, pad, y);
+        y += lineHeight;
+      });
 
-        } catch (err) {
-            console.error(err);
-            info.textContent = `غلطی: ${err.message}`;
-        } finally {
-            // UI واپس نرم کرتے ہیں
-            generateBtn.disabled = false;
-            loading.classList.add('hidden');
-        }
+      // Watermark
+      if (showWm && watermark?.trim()) {
+        ctx.save();
+        ctx.globalAlpha = 0.85;
+        ctx.fillStyle = "rgba(255,255,255,.9)";
+        ctx.font = `600 ${Math.max(14, Math.round(Math.min(w,h)*0.04))}px Inter, Arial, sans-serif`;
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(watermark.trim(), w - pad, h - pad);
+        ctx.restore();
+      }
+
+      // Border ring
+      ctx.strokeStyle = "rgba(255,255,255,.12)";
+      ctx.lineWidth = Math.max(2, Math.round(Math.min(w,h)*0.01));
+      ctx.strokeRect(1,1,w-2,h-2);
+
+      return canvas;
+    }
+
+    // ====== Generate Flow ======
+    const btnGen = $('#btn-generate');
+    const btnClear = $('#btn-clear');
+    const btnZip = $('#btn-download-zip');
+
+    btnClear.addEventListener('click', ()=>{
+      resultsEl.innerHTML = '';
     });
-</script>
+
+    $('#keyPicker').addEventListener('change', (e)=>{
+      $('#apiKey').value = e.target.value;
+    });
+    // Set default key
+    $('#apiKey').value = $('#keyPicker').value;
+
+    btnGen.addEventListener('click', async ()=>{
+      const raw = $('#prompts').value;
+      if(!raw.trim()){ alert('Please paste at least one prompt.'); return; }
+      const prompts = raw.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+      const ratio = $('#ratio').value;
+      const base = Math.max(320, Math.min(2048, parseInt($('#size').value||'768',10)));
+      const [w,h] = ratioToWH(ratio, base);
+      const wm = $('#watermark').value || '© Bulk Generator';
+      const showWm = $('#wmToggle').checked;
+      const enhance = $('#enhanceToggle').checked;
+      const apiKey = $('#apiKey').value.trim();
+
+      btnGen.disabled = true; btnGen.textContent = 'Generating…';
+      try {
+        let list = prompts;
+        if (enhance && apiKey) {
+          list = await enhancePrompts(prompts, apiKey);
+        }
+
+        for (const p of list) {
+          // Render
+          const canvas = renderCanvasImage(p, w, h, wm, showWm);
+          const dataURL = canvas.toDataURL('image/png');
+
+          // Card
+          const card = document.createElement('div'); card.className = 'card';
+          const img = document.createElement('img'); img.className = 'thumb'; img.src = dataURL; img.alt = p.slice(0,120);
+          card.appendChild(img);
+
+          const meta = document.createElement('div'); meta.className = 'meta';
+          const left = document.createElement('div'); left.style.minWidth='0';
+          left.innerHTML = `<div class="muted" style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${p.replace(/"/g, '&quot;')}">${p}</div>
+                            <div class="muted" style="font-size:12px">${w}×${h} • ${new Date().toLocaleTimeString()}</div>`;
+          const right = document.createElement('div'); right.className='row';
+          const dl = document.createElement('button'); dl.className='btn ghost'; dl.textContent='Download';
+          dl.addEventListener('click', async ()=>{
+            const b = await (await fetch(dataURL)).blob();
+            saveAs(b, slugify(p).slice(0,60) + `_${w}x${h}.png`);
+          });
+          right.appendChild(dl);
+          meta.appendChild(left); meta.appendChild(right);
+          card.appendChild(meta);
+
+          resultsEl.prepend(card); // newest first
+          await sleep(30); // smooth
+        }
+      } finally {
+        btnGen.disabled = false; btnGen.textContent = 'Generate Images';
+      }
+    });
+
+    btnZip.addEventListener('click', async ()=>{
+      const imgs = Array.from(resultsEl.querySelectorAll('img.thumb'));
+      if(!imgs.length){ alert('No images yet. Generate first.'); return; }
+      btnZip.disabled = true; btnZip.textContent = 'Preparing ZIP…';
+      try{
+        const zip = new JSZip();
+        let idx = 1;
+        for (const img of imgs){
+          const res = await fetch(img.src);
+          const blob = await res.blob();
+          const arr = await blob.arrayBuffer();
+          const name = (img.alt ? slugify(img.alt).slice(0,60) : 'image') + '_' + String(idx).padStart(3,'0') + '.png';
+          zip.file(name, arr);
+          idx++;
+        }
+        const content = await zip.generateAsync({type:'blob'});
+        saveAs(content, 'bulk_images.zip');
+      } finally {
+        btnZip.disabled = false; btnZip.textContent = 'Download All as ZIP';
+      }
+    });
+
+    function slugify(s){
+      return (s||'image')
+        .toLowerCase()
+        .replace(/[^\w\s-]/g,'')
+        .trim()
+        .replace(/\s+/g,'-');
+    }
+  </script>
 </body>
 </html>

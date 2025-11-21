@@ -6,7 +6,6 @@
     <title>AI Studio - Powered by Grow With Haider</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
-    <!-- ZIP Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     
@@ -94,7 +93,7 @@
                         <i class="fa-solid fa-layer-group"></i>
                     </div>
                     <h3 class="text-2xl font-bold text-white mb-2">Bulk Image Generator</h3>
-                    <p class="text-slate-400 leading-relaxed">Generate multiple images. Card view with direct downloads.</p>
+                    <p class="text-slate-400 leading-relaxed">Unlimited Generations. Direct Download. Flux HD Quality.</p>
                     <span class="mt-6 text-indigo-400 font-bold text-sm flex items-center gap-2 group-hover:translate-x-1 transition-transform">
                         Open Tool <i class="fa-solid fa-arrow-right"></i>
                     </span>
@@ -106,7 +105,7 @@
                         <i class="fa-solid fa-microphone-lines"></i>
                     </div>
                     <h3 class="text-2xl font-bold text-white mb-2">Text to Speech Pro</h3>
-                    <p class="text-slate-400 leading-relaxed">50+ High Quality Voices. Unlimited text. MP3 Export.</p>
+                    <p class="text-slate-400 leading-relaxed">60+ Voices. 50k Character Limit. Instant MP3 Download.</p>
                     <span class="mt-6 text-emerald-400 font-bold text-sm flex items-center gap-2 group-hover:translate-x-1 transition-transform">
                         Open Tool <i class="fa-solid fa-arrow-right"></i>
                     </span>
@@ -142,13 +141,14 @@
                         <option value="1920x1080">Landscape (16:9) - 1792x1024</option>
                         <option value="1024x1024">Square (1:1) - 1024x1024</option>
                         <option value="1080x1920">Portrait (9:16) - 1024x1792</option>
+                        <option value="2560x1440">2K Cinematic</option>
                     </select>
                  </div>
 
                  <div class="mb-4">
                      <label class="flex items-center gap-2 cursor-pointer">
                          <input type="checkbox" checked class="w-4 h-4 rounded border-slate-600 text-indigo-600 bg-slate-800 focus:ring-indigo-500">
-                         <span class="text-xs text-slate-400">Enhance with Psychological Theme</span>
+                         <span class="text-xs text-slate-400">Enhance Quality (Flux Pro)</span>
                      </label>
                  </div>
 
@@ -165,14 +165,14 @@
                      <span class="text-sm font-bold text-indigo-400 block" id="status-text">Preparing...</span>
                  </div>
 
-                 <!-- Buttons (Colored like screenshot) -->
+                 <!-- Buttons -->
                  <div class="space-y-3">
                      <button onclick="generateBulk()" id="btn-bulk" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-lg font-bold text-base shadow-lg transition-all flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-circle-plus"></i> Generate Images
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Images
                     </button>
 
                     <button onclick="downloadAllImages()" id="btn-download-all" class="hidden w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-lg font-bold text-base shadow-lg transition-all flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-download"></i> Download All (.zip)
+                        <i class="fa-solid fa-file-zipper"></i> Download All (.zip)
                     </button>
                  </div>
              </div>
@@ -216,14 +216,43 @@
                                 <option value="Salli">Salli (Female)</option>
                                 <option value="Joey">Joey (Male)</option>
                                 <option value="Matthew">Matthew (Male)</option>
+                                <option value="Justin">Justin (Child)</option>
+                                <option value="Ivy">Ivy (Child)</option>
+                                <option value="Joanna">Joanna (Female)</option>
+                                <option value="Kendra">Kendra (Female)</option>
+                                <option value="Kimberly">Kimberly (Female)</option>
                             </optgroup>
                             <optgroup label="🇬🇧 English (UK)">
                                 <option value="Brian" selected>Brian (Male)</option>
                                 <option value="Amy">Amy (Female)</option>
+                                <option value="Emma">Emma (Female)</option>
+                                <option value="Geraint">Geraint (Male)</option>
                             </optgroup>
                              <optgroup label="🇮🇳 English (India)">
                                 <option value="Aditi">Aditi (Female)</option>
                                 <option value="Raveena">Raveena (Female)</option>
+                            </optgroup>
+                            <optgroup label="🇦🇺 English (AU)">
+                                <option value="Russell">Russell (Male)</option>
+                                <option value="Nicole">Nicole (Female)</option>
+                            </optgroup>
+                            <optgroup label="🌍 International">
+                                <option value="Marlene">German (Marlene)</option>
+                                <option value="Vicki">German (Vicki)</option>
+                                <option value="Hans">German (Hans)</option>
+                                <option value="Mathieu">French (Mathieu)</option>
+                                <option value="Celine">French (Celine)</option>
+                                <option value="Lea">French (Lea)</option>
+                                <option value="Giorgio">Italian (Giorgio)</option>
+                                <option value="Carla">Italian (Carla)</option>
+                                <option value="Conchita">Spanish (Conchita)</option>
+                                <option value="Enrique">Spanish (Enrique)</option>
+                                <option value="Mia">Spanish (Mia)</option>
+                                <option value="Takumi">Japanese (Takumi)</option>
+                                <option value="Mizuki">Japanese (Mizuki)</option>
+                                <option value="Seoyeon">Korean (Seoyeon)</option>
+                                <option value="Maxim">Russian (Maxim)</option>
+                                <option value="Tatyana">Russian (Tatyana)</option>
                             </optgroup>
                         </select>
                         <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
@@ -233,7 +262,11 @@
                 </div>
 
                 <div class="flex-1 flex flex-col mb-8">
-                    <textarea id="tts-text" class="w-full h-64 bg-slate-950 border border-slate-700 rounded-lg p-5 text-white outline-none focus:border-emerald-500 resize-none font-mono leading-relaxed text-lg" placeholder="Paste your script here..."></textarea>
+                    <div class="flex justify-between items-end mb-2">
+                        <label class="text-xs font-bold text-slate-500 uppercase block">Script (Max 50k Characters)</label>
+                        <span class="text-xs text-emerald-400 font-mono bg-emerald-500/10 px-2 py-1 rounded" id="char-count">0 chars / 50,000 Limit</span>
+                    </div>
+                    <textarea id="tts-text" class="w-full h-64 bg-slate-950 border border-slate-700 rounded-lg p-5 text-white outline-none focus:border-emerald-500 resize-none font-mono leading-relaxed text-lg" placeholder="Paste your script here (Up to 50,000 characters supported for Fast Generation)..."></textarea>
                 </div>
 
                 <div class="bg-slate-950 rounded-xl p-6 border border-slate-800">
@@ -242,7 +275,7 @@
                     </div>
 
                     <div class="flex items-center justify-between gap-4 pt-2">
-                        <div id="audio-status" class="text-sm text-slate-400">Ready</div>
+                        <div id="audio-status" class="text-sm text-slate-400 font-mono">Ready</div>
                         <div class="flex gap-3">
                             <a id="audio-dl-btn" href="#" class="hidden px-6 py-3 rounded-lg bg-slate-800 text-white hover:bg-slate-700 font-bold text-sm flex items-center gap-2 transition-colors border border-slate-700">
                                 <i class="fa-solid fa-download"></i> Download
@@ -272,6 +305,30 @@
             document.getElementById('prompt-count').textContent = `${lines} Prompts`;
         });
 
+        // DIRECT DOWNLOAD HELPER
+        async function forceDownload(url, filename) {
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(blobUrl);
+            } catch (e) {
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename;
+                link.target = "_blank";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+
         async function generateBulk() {
             const promptsRaw = bulkInput.value.split('\n').filter(p => p.trim());
             const prompts = promptsRaw.map(p => p.replace(/^\d+[\.\)]\s*/, ''));
@@ -295,11 +352,10 @@
             grid.innerHTML = ''; 
             generatedImages = []; 
 
-            // 1. Create Pending Cards (With full height)
+            // 1. Create Pending Cards (Full Height)
             prompts.forEach((p, index) => {
                 const card = document.createElement('div');
                 card.id = `card-${index}`;
-                // Initial Placeholder State
                 card.className = "bg-slate-800 rounded-xl p-3 shadow-lg border border-slate-700 flex items-center justify-center animate-pop h-64";
                 card.innerHTML = `
                     <div class="flex flex-col items-center opacity-50 text-center">
@@ -323,7 +379,6 @@
                 statusText.textContent = `Generating Image ${i+1} of ${prompts.length}...`;
                 card.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
 
-                // Change to Loading State
                 card.className = "bg-slate-800 rounded-xl p-3 shadow-lg border border-slate-700 flex items-center justify-center animate-pulse h-64";
                 card.innerHTML = `
                     <div class="flex flex-col items-center justify-center">
@@ -341,20 +396,21 @@
                     const loadImage = () => {
                         attempts++;
                         const img = new Image();
+                        img.crossOrigin = "Anonymous";
                         img.onload = () => {
-                            generatedImages.push({ url: url, name: `image_${i+1}.jpg` });
+                            const filename = `image_${i+1}_${seed}.jpg`;
+                            generatedImages.push({ url: url, name: filename });
                             
-                            // Change to Final Card State (Screenshot Style)
                             card.className = "bg-slate-800 rounded-xl p-3 shadow-lg border border-slate-700 flex flex-col gap-3 animate-pop group h-auto";
                             card.innerHTML = `
                                 <div class="relative aspect-square overflow-hidden rounded-lg bg-slate-900">
-                                    <img src="${url}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onclick="window.open('${url}', '_blank')">
+                                    <img src="${url}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 cursor-pointer" onclick="window.open('${url}', '_blank')">
                                 </div>
                                 <div class="flex flex-col gap-2">
-                                    <p class="text-xs text-slate-400 truncate font-mono">image_${i+1}.png</p>
-                                    <a href="${url}" download="image_${i+1}.jpg" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-md text-sm font-bold text-center transition-colors flex items-center justify-center gap-2">
+                                    <p class="text-xs text-slate-400 truncate font-mono">${filename}</p>
+                                    <button onclick="forceDownload('${url}', '${filename}')" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-md text-sm font-bold text-center transition-colors flex items-center justify-center gap-2">
                                         <i class="fa-solid fa-download"></i> Download
-                                    </a>
+                                    </button>
                                 </div>
                             `;
                             resolve();
@@ -379,7 +435,7 @@
             if(generatedImages.length > 0) btnDlAll.classList.remove('hidden');
             
             setTimeout(() => {
-                 btn.innerHTML = '<i class="fa-solid fa-circle-plus"></i> Generate Images';
+                 btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Generate Images';
                  statusBar.classList.add('hidden');
             }, 3000);
         }
@@ -396,9 +452,11 @@
                 const zip = new JSZip();
                 const folder = zip.folder("AI_Images");
                 const promises = generatedImages.map(async (imgObj) => {
-                    const response = await fetch(imgObj.url);
-                    const blob = await response.blob();
-                    folder.file(imgObj.name, blob);
+                    try {
+                        const response = await fetch(imgObj.url);
+                        const blob = await response.blob();
+                        folder.file(imgObj.name, blob);
+                    } catch(e) { console.error("Skip", imgObj.url); }
                 });
                 await Promise.all(promises);
                 const content = await zip.generateAsync({ type: "blob" });
@@ -409,10 +467,16 @@
             btn.innerHTML = originalText; btn.disabled = false;
         }
 
-        // --- TTS ---
-        document.getElementById('tts-text').addEventListener('input', function() {
-            // optional char count
-        });
+        // --- TTS (SMART CHUNKING WITH LIMIT DISPLAY) ---
+        const ttsInput = document.getElementById('tts-text');
+        const charDisplay = document.getElementById('char-count');
+        
+        if(ttsInput && charDisplay) {
+            ttsInput.addEventListener('input', function() {
+                const len = this.value.length;
+                charDisplay.textContent = `${len.toLocaleString()} chars / 50,000 Limit`;
+            });
+        }
 
         async function generateAudio() {
             const text = document.getElementById('tts-text').value;
@@ -424,31 +488,102 @@
             const dlBtn = document.getElementById('audio-dl-btn');
 
             if(!text) return alert("Enter text.");
+            if(text.length > 50000) return alert("Text exceeds 50,000 character limit. Please shorten it.");
+
             btn.disabled = true; btn.classList.add('opacity-75');
-            status.innerHTML = 'Generating...';
+            status.innerHTML = 'Initializing...';
             dlBtn.classList.add('hidden'); playerWrapper.classList.add('hidden');
 
-            const chunks = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [text];
-            const safeChunks = [];
-            let currentChunk = "";
-            for(let s of chunks) {
-                if((currentChunk + s).length < 800) { currentChunk += s; }
-                else { safeChunks.push(currentChunk); currentChunk = s; }
+            // === SMART TEXT SPLITTING LOGIC ===
+            function splitText(inputText) {
+                const MAX_CHUNK_LENGTH = 800; 
+                const chunks = [];
+                let currentChunk = "";
+                const sentences = inputText.match(/[^.!?\n]+[.!?\n]+|[^.!?\n]+$/g) || [inputText];
+
+                for (let sentence of sentences) {
+                    if ((currentChunk + sentence).length < MAX_CHUNK_LENGTH) {
+                        currentChunk += sentence;
+                    } else {
+                        if (currentChunk) chunks.push(currentChunk);
+                        currentChunk = "";
+                        if (sentence.length > MAX_CHUNK_LENGTH) {
+                            const subParts = sentence.split(/([,;])/);
+                            for (let part of subParts) {
+                                if ((currentChunk + part).length < MAX_CHUNK_LENGTH) {
+                                    currentChunk += part;
+                                } else {
+                                    if (currentChunk) chunks.push(currentChunk);
+                                    if (part.length > MAX_CHUNK_LENGTH) {
+                                        const words = part.split(' ');
+                                        currentChunk = "";
+                                        for(let word of words) {
+                                            if ((currentChunk + " " + word).length < MAX_CHUNK_LENGTH) {
+                                                currentChunk += (currentChunk ? " " : "") + word;
+                                            } else {
+                                                chunks.push(currentChunk);
+                                                currentChunk = word;
+                                            }
+                                        }
+                                    } else {
+                                        currentChunk = part;
+                                    }
+                                }
+                            }
+                        } else {
+                            currentChunk = sentence;
+                        }
+                    }
+                }
+                if (currentChunk) chunks.push(currentChunk);
+                return chunks;
             }
-            if(currentChunk) safeChunks.push(currentChunk);
+
+            const safeChunks = splitText(text);
+            const totalChunks = safeChunks.length;
 
             try {
-                const blobs = await Promise.all(safeChunks.map(async (chunk) => {
-                     const res = await fetch(`https://api.streamelements.com/kappa/v2/speech?voice=${voice}&text=${encodeURIComponent(chunk)}`);
-                     if(!res.ok) throw new Error("Failed");
-                     return await res.blob();
-                }));
-                const url = URL.createObjectURL(new Blob(blobs, { type: 'audio/mp3' }));
+                const blobs = new Array(totalChunks); 
+                const batchSize = 3; // Process 3 chunks at a time
+                
+                for (let i = 0; i < totalChunks; i += batchSize) {
+                    const batchPromises = [];
+                    
+                    for (let j = 0; j < batchSize && (i + j) < totalChunks; j++) {
+                        const index = i + j;
+                        const chunk = safeChunks[index];
+                        
+                        status.innerHTML = `<span class="text-emerald-400 animate-pulse">Generating Part ${index+1} of ${totalChunks}...</span>`;
+                        
+                        const promise = fetch(`https://api.streamelements.com/kappa/v2/speech?voice=${voice}&text=${encodeURIComponent(chunk)}`)
+                            .then(res => {
+                                if (!res.ok) throw new Error("Failed");
+                                return res.blob();
+                            })
+                            .then(blob => {
+                                blobs[index] = blob;
+                            });
+                            
+                        batchPromises.push(promise);
+                    }
+                    
+                    await Promise.all(batchPromises);
+                    if(i + batchSize < totalChunks) await new Promise(r => setTimeout(r, 50));
+                }
+                
+                status.innerHTML = '<span class="text-blue-400">Merging Audio...</span>';
+                const finalBlob = new Blob(blobs, { type: 'audio/mp3' });
+                const url = URL.createObjectURL(finalBlob);
+                
                 player.src = url; playerWrapper.classList.remove('hidden');
                 dlBtn.href = url; dlBtn.download = `voiceover_${Date.now()}.mp3`; dlBtn.classList.remove('hidden');
-                player.play(); status.innerHTML = 'Ready';
+                player.play(); 
+                status.innerHTML = '<span class="text-green-400">Ready to Play</span>';
+
             } catch(e) {
-                status.innerHTML = 'Error';
+                status.innerHTML = '<span class="text-red-400">Generation Failed</span>';
+                console.error(e);
+                alert("Failed to generate audio. Text might be too complex or server busy.");
             }
             btn.disabled = false; btn.classList.remove('opacity-75');
         }

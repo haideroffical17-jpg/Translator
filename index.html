@@ -1,406 +1,457 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Bulk AI Image Generator – Static (No Backend)</title>
-  <meta name="description" content="Generate dozens of images from prompts in one go — no backend needed."/>
-  <link rel="icon" href="data:,">
-  <style>
-    :root{
-      --bg:#0b0f19;--panel:#111827;--text:#e6e8ee;--muted:#9aa3b2;
-      --brand:#6c8cff;--accent:#22d3ee;--ring:rgba(108,140,255,.35)
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0;background:
-      radial-gradient(1200px 600px at 70% -10%, rgba(108,140,255,.15), transparent 60%),
-      radial-gradient(900px 500px at 10% 0%, rgba(34,211,238,.12), transparent 55%),
-      var(--bg); color:var(--text); font-family:Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial}
-    .container{width:min(1140px,92vw);margin:0 auto;padding:16px}
-    header{display:flex;align-items:center;justify-content:space-between;padding:20px 0}
-    .brand{display:flex;align-items:center;gap:10px;font-weight:800;text-decoration:none;color:var(--text)}
-    nav a{color:var(--muted);text-decoration:none;margin-left:18px;font-weight:600}
-    nav a:hover{color:var(--text)}
-    .hero{padding:26px 0 10px;text-align:center}
-    .hero h1{margin:0 0 8px;font-size:clamp(30px,5vw,44px)}
-    .hero p{margin:0;color:var(--muted)}
-    .panel{background:linear-gradient(180deg, rgba(36,50,74,.28), rgba(17,24,39,.9));
-      border:1px solid #1b2740;border-radius:16px;box-shadow:0 16px 40px -20px rgba(0,0,0,.6);padding:18px}
-    .grid{display:grid;gap:14px;grid-template-columns:1.2fr .8fr}
-    .grid-2{display:grid;gap:14px;grid-template-columns:1fr 1fr}
-    label{font-size:13px;color:var(--muted);margin-bottom:6px;display:block}
-    textarea,input,select,button{width:100%;border-radius:12px;border:1px solid #23324a;background:#0f1626;color:var(--text);padding:12px;outline:none}
-    textarea{min-height:180px;resize:vertical}
-    input[type="checkbox"]{width:auto}
-    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .btn{cursor:pointer;user-select:none;font-weight:800;border:1px solid transparent}
-    .btn.primary{background:linear-gradient(90deg,var(--brand),var(--accent));color:#08101e}
-    .btn.ghost{background:transparent;color:var(--text);border-color:#24324a}
-    .btn:disabled{opacity:.6;cursor:not-allowed}
-    .results{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
-    .card{background:linear-gradient(180deg, rgba(36,50,74,.35), rgba(18,24,41,.9));border:1px solid #1b2740;border-radius:14px;overflow:hidden}
-    .thumb{width:100%;aspect-ratio:1/1;display:block;background:#0b1221}
-    .meta{padding:10px;display:flex;justify-content:space-between;gap:10px}
-    .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid #24324a;border-radius:999px;color:var(--muted);font-size:12px}
-    .muted{color:var(--muted)}
-    footer{margin:24px 0 50px;text-align:center;color:var(--muted)}
-    #ad-banner{display:flex;align-items:center;justify-content:center;height:90px;background:#0f1626;border:1px dashed #26324a;border-radius:12px;color:#7f8aa3;font-size:13px}
-    @media(max-width:980px){.grid{grid-template-columns:1fr}}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Studio - Powered by Grow With Haider</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <!-- ZIP Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            overflow: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+        .dashboard-card {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            height: 100%;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            border-color: #6366f1;
+            box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.3);
+        }
+
+        .tool-view {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0f172a;
+            z-index: 50;
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+        }
+        .tool-view.active {
+            transform: translateX(0);
+        }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+            border-top-color: #6366f1;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @keyframes popIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop {
+            animation: popIn 0.3s ease-out forwards;
+        }
+    </style>
 </head>
-<body>
-  <header class="container">
-    <a class="brand" href="#">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 4v10l-7 4-7-4V7l7-4Z" stroke="currentColor" stroke-width="1.5"/></svg>
-      <span>Bulk AI Image Generator</span>
-    </a>
-    <nav>
-      <a href="#how">How it works</a>
-      <a href="#results">Results</a>
-      <a href="#footer">Contact</a>
-    </nav>
-  </header>
+<body class="h-screen flex flex-col">
 
-  <section class="container hero">
-    <h1>Generate Dozens of Images from Prompts</h1>
-    <p class="muted">Paste multiple prompts, pick aspect ratio, and download everything as a ZIP. No backend required.</p>
-  </section>
-
-  <section class="container" style="margin-top:14px;">
-    <div id="ad-banner" class="panel">
-      <!-- Ad slot (paste your code below). Example: AdSense / Monetag / Propeller -->
-      <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXX" crossorigin="anonymous"></script> -->
-      Banner Ad Placeholder — paste your ad code here
-    </div>
-  </section>
-
-  <section class="container" style="margin-top:14px;">
-    <div class="grid">
-      <!-- LEFT: Prompts & Controls -->
-      <div class="panel">
-        <div style="margin-bottom:12px;">
-          <label for="prompts">Prompts (one per line)</label>
-          <textarea id="prompts" placeholder="A neon cyberpunk alley with rain and reflections&#10;Ancient forest with sunlight god rays&#10;Low-poly desert with minimalist pyramids"></textarea>
-        </div>
-
-        <div class="grid-2" style="margin-bottom:10px;">
-          <div>
-            <label for="ratio">Aspect Ratio</label>
-            <select id="ratio">
-              <option value="1:1" selected>1:1 (square)</option>
-              <option value="3:4">3:4 (portrait)</option>
-              <option value="9:16">9:16 (portrait tall)</option>
-              <option value="4:3">4:3 (landscape)</option>
-              <option value="16:9">16:9 (landscape wide)</option>
-            </select>
-          </div>
-          <div>
-            <label for="size">Base Size (px on the short side)</label>
-            <input id="size" type="number" min="320" max="2048" value="768"/>
-          </div>
-        </div>
-
-        <div class="grid-2" style="margin-bottom:10px;">
-          <div>
-            <label>Watermark</label>
-            <input id="watermark" placeholder="Optional watermark (e.g., @yourbrand)" />
-          </div>
-          <div class="row" style="margin-top:22px;">
-            <input id="wmToggle" type="checkbox" checked />
-            <label for="wmToggle" style="margin:0;">Show Watermark</label>
-          </div>
-        </div>
-
-        <div class="panel" style="margin:12px 0;">
-          <div class="row" style="justify-content:space-between;align-items:flex-end;">
-            <div style="flex:1;min-width:260px;margin-right:10px;">
-              <label for="apiKey">Optional Prompt Enhance (Gemini 1.5 Flash)</label>
-              <input id="apiKey" placeholder="Your Google API Key" />
-              <div class="row" style="margin-top:6px;">
-                <input id="enhanceToggle" type="checkbox" checked />
-                <label for="enhanceToggle" style="margin:0;">Enhance prompts before generation</label>
-              </div>
-              <small class="muted">Frontend keys are public. This enhancer only rewrites prompts; images render locally.</small>
+    <!-- ================= DASHBOARD ================= -->
+    <div id="dashboard" class="flex-1 overflow-y-auto p-6 md:p-10 animate-fade-in flex items-center justify-center">
+        <div class="max-w-5xl w-full">
+            <div class="mb-12 text-center">
+                <div class="inline-block mb-2 px-4 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20">
+                    <span class="text-xs font-bold text-indigo-400 tracking-wider uppercase">Powered by Grow With Haider</span>
+                </div>
+                <h1 class="text-4xl font-bold text-white mb-2">AI Creator Studio</h1>
+                <p class="text-slate-400">Professional Tools Suite</p>
             </div>
-            <div style="min-width:220px">
-              <label>Pick one of your keys</label>
-              <select id="keyPicker">
-                <option value="AIzaSyDTXdc33kXwgMuPnsOXESQNegzT8_BbfI0">Key #1 (default)</option>
-                <option value="AIzaSyCl7Ac-91mPHtLCmRFJHS2nmOKFx4ZSFms">Key #2</option>
-                <option value="">None</option>
-              </select>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Tool 1: Bulk Image Gen -->
+                <div onclick="openTool('bulk-tool')" class="dashboard-card p-8 rounded-3xl flex flex-col items-center text-center group border-indigo-500/30 hover:border-indigo-500">
+                    <div class="w-20 h-20 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-3xl shadow-lg shadow-indigo-600/30 mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-2">Bulk Image Generator</h3>
+                    <p class="text-slate-400 leading-relaxed">Generate multiple images. Card view with direct downloads.</p>
+                    <span class="mt-6 text-indigo-400 font-bold text-sm flex items-center gap-2 group-hover:translate-x-1 transition-transform">
+                        Open Tool <i class="fa-solid fa-arrow-right"></i>
+                    </span>
+                </div>
+
+                <!-- Tool 2: Text to Speech -->
+                <div onclick="openTool('audio-tool')" class="dashboard-card p-8 rounded-3xl flex flex-col items-center text-center group border-emerald-500/30 hover:border-emerald-500">
+                    <div class="w-20 h-20 rounded-2xl bg-emerald-600 text-white flex items-center justify-center text-3xl shadow-lg shadow-emerald-600/30 mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-microphone-lines"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-2">Text to Speech Pro</h3>
+                    <p class="text-slate-400 leading-relaxed">50+ High Quality Voices. Unlimited text. MP3 Export.</p>
+                    <span class="mt-6 text-emerald-400 font-bold text-sm flex items-center gap-2 group-hover:translate-x-1 transition-transform">
+                        Open Tool <i class="fa-solid fa-arrow-right"></i>
+                    </span>
+                </div>
+
             </div>
-          </div>
         </div>
-
-        <div class="row" style="margin-top:10px;">
-          <button id="btn-generate" class="btn primary">Generate Images</button>
-          <button id="btn-clear" class="btn ghost">Clear Results</button>
-        </div>
-      </div>
-
-      <!-- RIGHT: Help -->
-      <aside class="panel" id="how">
-        <h3 style="margin:4px 0 10px;">How it works</h3>
-        <ol class="muted" style="margin:0; padding-left:18px; line-height:1.6;">
-          <li>Paste prompts (one per line). Optionally enable “Enhance” to polish them via Gemini.</li>
-          <li>Choose <b>aspect ratio</b> and <b>size</b>. Images render locally using HTML Canvas.</li>
-          <li>Click <b>Generate</b>. Save each or <b>Download ZIP</b> for all.</li>
-        </ol>
-        <div style="margin-top:12px;">
-          <span class="badge">No server needed</span>
-          <span class="badge">ZIP export</span>
-          <span class="badge">Canvas render</span>
-        </div>
-      </aside>
     </div>
-  </section>
 
-  <section class="container" style="margin-top:14px;">
-    <div class="panel">
-      <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <h3 style="margin:0;">Results</h3>
-        <div class="row">
-          <button id="btn-download-zip" class="btn ghost">Download All as ZIP</button>
+
+    <!-- ================= TOOL 1: BULK IMAGE GENERATOR ================= -->
+    <div id="bulk-tool" class="tool-view">
+        <div class="h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-6 shrink-0 z-20">
+            <div class="flex items-center gap-4">
+                <button onclick="closeTool('bulk-tool')" class="w-10 h-10 rounded-full hover:bg-slate-800 flex items-center justify-center text-slate-400 transition-colors">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </button>
+                <div class="flex flex-col">
+                    <h2 class="font-bold text-white text-lg leading-none">Bulk Image Generator</h2>
+                    <span class="text-[10px] text-indigo-400 font-medium mt-1">Powered by Grow With Haider</span>
+                </div>
+            </div>
         </div>
-      </div>
-      <div id="results" class="results"></div>
+
+        <div class="flex-1 flex flex-col md:flex-row overflow-hidden bg-slate-950">
+             
+             <!-- Left Sidebar: Inputs -->
+             <div class="w-full md:w-96 bg-slate-900 border-r border-slate-800 flex flex-col h-full shrink-0 z-10 p-6 shadow-2xl overflow-y-auto md:overflow-y-visible">
+                 
+                 <div class="mb-4">
+                    <label class="text-xs font-bold text-slate-500 uppercase mb-2 block">Aspect Ratio</label>
+                    <select id="bulk-ratio" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-white outline-none focus:border-indigo-500">
+                        <option value="1920x1080">Landscape (16:9) - 1792x1024</option>
+                        <option value="1024x1024">Square (1:1) - 1024x1024</option>
+                        <option value="1080x1920">Portrait (9:16) - 1024x1792</option>
+                    </select>
+                 </div>
+
+                 <div class="mb-4">
+                     <label class="flex items-center gap-2 cursor-pointer">
+                         <input type="checkbox" checked class="w-4 h-4 rounded border-slate-600 text-indigo-600 bg-slate-800 focus:ring-indigo-500">
+                         <span class="text-xs text-slate-400">Enhance with Psychological Theme</span>
+                     </label>
+                 </div>
+
+                 <div class="flex-1 flex flex-col mb-4 min-h-[200px]">
+                    <div class="flex justify-between items-end mb-2">
+                        <label class="text-xs font-bold text-slate-500 uppercase block">Image Prompts (one per line)</label>
+                        <span class="text-xs text-indigo-400" id="prompt-count">0 Prompts</span>
+                    </div>
+                    <textarea id="bulk-prompt" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg p-4 text-sm text-white outline-none focus:border-indigo-500 resize-none font-mono leading-relaxed" placeholder="Enter your prompts here..."></textarea>
+                 </div>
+
+                 <!-- Status -->
+                 <div id="status-bar" class="hidden mb-3 bg-indigo-900/20 border border-indigo-500/30 rounded-lg p-3 text-center animate-pulse">
+                     <span class="text-sm font-bold text-indigo-400 block" id="status-text">Preparing...</span>
+                 </div>
+
+                 <!-- Buttons (Colored like screenshot) -->
+                 <div class="space-y-3">
+                     <button onclick="generateBulk()" id="btn-bulk" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-lg font-bold text-base shadow-lg transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-plus"></i> Generate Images
+                    </button>
+
+                    <button onclick="downloadAllImages()" id="btn-download-all" class="hidden w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-lg font-bold text-base shadow-lg transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-download"></i> Download All (.zip)
+                    </button>
+                 </div>
+             </div>
+
+             <!-- Right Area: Grid -->
+             <div class="flex-1 p-6 overflow-y-auto scroll-smooth bg-slate-950" id="grid-container">
+                 <div id="bulk-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 pb-32">
+                    <!-- Empty State -->
+                    <div class="col-span-full flex flex-col items-center justify-center h-96 text-slate-600">
+                        <i class="fa-solid fa-layer-group text-6xl mb-4 opacity-20"></i>
+                        <p class="text-lg font-medium">Enter prompts to start generating</p>
+                    </div>
+                 </div>
+             </div>
+        </div>
     </div>
-  </section>
 
-  <footer class="container" id="footer">
-    <p class="muted">POwered by GROW WITH HAIDER</p>
-    <small class="muted">© <span id="year"></span> — Static Batch Generator (Canvas). Frontend API enhancer optional.</small>
-  </footer>
 
-  <!-- Dependencies for zipping downloads -->
-  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+    <!-- ================= TOOL 2: TEXT TO SPEECH ================= -->
+    <div id="audio-tool" class="tool-view">
+        <div class="h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-6 shrink-0 z-20">
+            <div class="flex items-center gap-4">
+                <button onclick="closeTool('audio-tool')" class="w-10 h-10 rounded-full hover:bg-slate-800 flex items-center justify-center text-slate-400 transition-colors">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </button>
+                <div class="flex flex-col">
+                    <h2 class="font-bold text-white text-lg leading-none">Text to Speech Studio</h2>
+                    <span class="text-[10px] text-emerald-400 font-medium mt-1">Powered by Grow With Haider</span>
+                </div>
+            </div>
+        </div>
 
-  <script>
-    // ====== Utils ======
-    const $ = (sel)=>document.querySelector(sel);
-    const resultsEl = $('#results');
-    $('#year').textContent = new Date().getFullYear();
+        <div class="flex-1 p-4 md:p-8 overflow-y-auto bg-slate-950">
+            <div class="max-w-4xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-xl">
+                
+                <div class="mb-6">
+                    <label class="text-xs font-bold text-slate-500 uppercase mb-2 block">Select Voice</label>
+                    <div class="relative">
+                        <select id="tts-voice" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-white focus:border-emerald-500 outline-none appearance-none cursor-pointer text-lg">
+                            <optgroup label="🇺🇸 English (US)">
+                                <option value="Salli">Salli (Female)</option>
+                                <option value="Joey">Joey (Male)</option>
+                                <option value="Matthew">Matthew (Male)</option>
+                            </optgroup>
+                            <optgroup label="🇬🇧 English (UK)">
+                                <option value="Brian" selected>Brian (Male)</option>
+                                <option value="Amy">Amy (Female)</option>
+                            </optgroup>
+                             <optgroup label="🇮🇳 English (India)">
+                                <option value="Aditi">Aditi (Female)</option>
+                                <option value="Raveena">Raveena (Female)</option>
+                            </optgroup>
+                        </select>
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                    </div>
+                </div>
 
-    const ratioToWH = (ratio, baseShort) => {
-      const [a,b] = ratio.split(':').map(Number);
-      if(!a || !b) return [baseShort, baseShort];
-      // Make the smaller side = baseShort
-      if (a === b) return [baseShort, baseShort];
-      if (a > b) { // landscape
-        const h = baseShort;
-        const w = Math.round((a/b)*h);
-        return [w,h];
-      } else { // portrait
-        const w = baseShort;
-        const h = Math.round((b/a)*w);
-        return [w,h];
-      }
-    };
+                <div class="flex-1 flex flex-col mb-8">
+                    <textarea id="tts-text" class="w-full h-64 bg-slate-950 border border-slate-700 rounded-lg p-5 text-white outline-none focus:border-emerald-500 resize-none font-mono leading-relaxed text-lg" placeholder="Paste your script here..."></textarea>
+                </div>
 
-    const sleep = (ms)=> new Promise(r=>setTimeout(r, ms));
+                <div class="bg-slate-950 rounded-xl p-6 border border-slate-800">
+                    <div id="player-wrapper" class="hidden mb-6 animate-fade-in">
+                        <audio id="main-audio-player" controls class="w-full h-12 rounded"></audio>
+                    </div>
 
-    // ====== Gemini Prompt Enhancer (optional) ======
-    async function enhancePrompts(prompts, apiKey) {
-      try{
-        if(!apiKey) return prompts;
-        const body = {
-          contents: [{
-            role: "user",
-            parts: [{text:
-`You are a helpful prompt editor. Improve these image prompts for clarity and visual richness.
-Rules: keep each line separate; don't add numbering; keep style tags if present; don't invent copyrighted characters.
+                    <div class="flex items-center justify-between gap-4 pt-2">
+                        <div id="audio-status" class="text-sm text-slate-400">Ready</div>
+                        <div class="flex gap-3">
+                            <a id="audio-dl-btn" href="#" class="hidden px-6 py-3 rounded-lg bg-slate-800 text-white hover:bg-slate-700 font-bold text-sm flex items-center gap-2 transition-colors border border-slate-700">
+                                <i class="fa-solid fa-download"></i> Download
+                            </a>
+                            <button onclick="generateAudio()" id="play-btn" class="px-8 py-3 rounded-lg bg-emerald-600 text-white font-bold text-sm hover:bg-emerald-500 shadow-lg shadow-emerald-600/25 flex items-center gap-2 transition-colors transform active:scale-95">
+                                <i class="fa-solid fa-wand-magic"></i> GENERATE
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
-Prompts:
-${prompts.join("\\n")}`
-            }]
-          }]
-        };
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${encodeURIComponent(apiKey)}`,{
-          method:"POST",
-          headers:{"Content-Type":"application/json"},
-          body:JSON.stringify(body)
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- GLOBAL NAV ---
+        function openTool(id) { document.getElementById(id).classList.add('active'); }
+        function closeTool(id) { document.getElementById(id).classList.remove('active'); }
+
+        // --- BULK GENERATOR ---
+        let generatedImages = [];
+
+        const bulkInput = document.getElementById('bulk-prompt');
+        bulkInput.addEventListener('input', () => {
+            const lines = bulkInput.value.split('\n').filter(l => l.trim()).length;
+            document.getElementById('prompt-count').textContent = `${lines} Prompts`;
         });
-        if(!res.ok){ console.warn("Enhancer HTTP", res.status); return prompts; }
-        const data = await res.json();
-        const text = data?.candidates?.[0]?.content?.parts?.map(p=>p.text).join("") || "";
-        // Split back to lines close to original count
-        const out = text.split(/\r?\n/).filter(Boolean);
-        // Try to keep same length; if mismatch, just return improved list
-        return out.length ? out : prompts;
-      }catch(e){
-        console.warn("Enhancer error", e);
-        return prompts;
-      }
-    }
 
-    // ====== Canvas Render ======
-    function renderCanvasImage(prompt, w, h, watermark, showWm) {
-      const canvas = document.createElement('canvas');
-      canvas.width = w; canvas.height = h;
-      const ctx = canvas.getContext('2d');
+        async function generateBulk() {
+            const promptsRaw = bulkInput.value.split('\n').filter(p => p.trim());
+            const prompts = promptsRaw.map(p => p.replace(/^\d+[\.\)]\s*/, ''));
+            
+            const grid = document.getElementById('bulk-grid');
+            const btn = document.getElementById('btn-bulk');
+            const btnDlAll = document.getElementById('btn-download-all');
+            const statusText = document.getElementById('status-text');
+            const statusBar = document.getElementById('status-bar');
+            const ratio = document.getElementById('bulk-ratio').value;
+            const [w, h] = ratio.split('x');
 
-      // Background gradient
-      const g = ctx.createLinearGradient(0,0,w,h);
-      const seed = [...prompt].reduce((a,c)=>a+c.charCodeAt(0),0) % 360;
-      g.addColorStop(0, `hsl(${(seed)%360} 70% 12%)`);
-      g.addColorStop(1, `hsl(${(seed+60)%360} 70% 18%)`);
-      ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+            if(!prompts.length) return alert("Please enter at least one prompt.");
 
-      // Subtle noise
-      const noise = ctx.createImageData(120, 120);
-      for (let i=0; i<noise.data.length; i+=4){
-        const n = 10 + Math.random()*12;
-        noise.data[i]=n; noise.data[i+1]=n; noise.data[i+2]=n; noise.data[i+3]=30;
-      }
-      const patternCanvas = document.createElement('canvas');
-      patternCanvas.width=120; patternCanvas.height=120;
-      patternCanvas.getContext('2d').putImageData(noise,0,0);
-      const ptt = ctx.createPattern(patternCanvas, 'repeat');
-      ctx.globalAlpha = 0.25; ctx.fillStyle = ptt; ctx.fillRect(0,0,w,h); ctx.globalAlpha = 1;
+            // UI Start
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner border-white w-5 h-5"></div> Processing...';
+            btnDlAll.classList.add('hidden');
+            statusBar.classList.remove('hidden');
+            statusText.textContent = "Initializing Queue...";
+            grid.innerHTML = ''; 
+            generatedImages = []; 
 
-      // Prompt text
-      const pad = Math.round(w*0.06);
-      ctx.fillStyle = "rgba(255,255,255,.92)";
-      ctx.font = `bold ${Math.max(18, Math.round(Math.min(w,h)*0.06))}px Inter, Arial, sans-serif`;
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'top';
+            // 1. Create Pending Cards (With full height)
+            prompts.forEach((p, index) => {
+                const card = document.createElement('div');
+                card.id = `card-${index}`;
+                // Initial Placeholder State
+                card.className = "bg-slate-800 rounded-xl p-3 shadow-lg border border-slate-700 flex items-center justify-center animate-pop h-64";
+                card.innerHTML = `
+                    <div class="flex flex-col items-center opacity-50 text-center">
+                        <i class="fa-regular fa-clock text-3xl mb-2 text-slate-500"></i>
+                        <span class="text-sm font-medium text-slate-400">Pending...</span>
+                        <div class="text-xs text-slate-500 mt-2 truncate w-32">${p}</div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
 
-      // Wrap text
-      const maxWidth = w - pad*2;
-      const words = prompt.replace(/\s+/g,' ').trim().split(' ');
-      const lines = [];
-      let line = '';
-      for (let i=0; i<words.length; i++){
-        const test = line ? line + ' ' + words[i] : words[i];
-        const m = ctx.measureText(test);
-        if (m.width > maxWidth && line) { lines.push(line); line = words[i]; }
-        else line = test;
-      }
-      if(line) lines.push(line);
-      const lineHeight = Math.round(Math.min(w,h)*0.08);
-      let y = pad;
-      lines.slice(0, 10).forEach(l=>{
-        ctx.fillText(l, pad, y);
-        y += lineHeight;
-      });
+            if(window.innerWidth < 768) {
+                document.getElementById('grid-container').scrollIntoView({ behavior: 'smooth' });
+            }
 
-      // Watermark
-      if (showWm && watermark?.trim()) {
-        ctx.save();
-        ctx.globalAlpha = 0.85;
-        ctx.fillStyle = "rgba(255,255,255,.9)";
-        ctx.font = `600 ${Math.max(14, Math.round(Math.min(w,h)*0.04))}px Inter, Arial, sans-serif`;
-        ctx.textAlign = 'right';
-        ctx.textBaseline = 'bottom';
-        ctx.fillText(watermark.trim(), w - pad, h - pad);
-        ctx.restore();
-      }
+            // 2. Process Loop
+            for(let i=0; i < prompts.length; i++) {
+                const p = prompts[i];
+                const card = document.getElementById(`card-${i}`);
+                
+                statusText.textContent = `Generating Image ${i+1} of ${prompts.length}...`;
+                card.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
 
-      // Border ring
-      ctx.strokeStyle = "rgba(255,255,255,.12)";
-      ctx.lineWidth = Math.max(2, Math.round(Math.min(w,h)*0.01));
-      ctx.strokeRect(1,1,w-2,h-2);
+                // Change to Loading State
+                card.className = "bg-slate-800 rounded-xl p-3 shadow-lg border border-slate-700 flex items-center justify-center animate-pulse h-64";
+                card.innerHTML = `
+                    <div class="flex flex-col items-center justify-center">
+                        <div class="spinner border-indigo-500 mb-3"></div>
+                        <span class="text-sm font-medium text-indigo-400">Generating...</span>
+                    </div>
+                `;
 
-      return canvas;
-    }
+                const seed = Math.floor(Math.random() * 999999);
+                const finalPrompt = `${p}, high quality, 8k, highly detailed, flux style`;
+                const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(finalPrompt)}?width=${w}&height=${h}&model=flux&seed=${seed}&nologo=true&t=${Date.now()}`;
 
-    // ====== Generate Flow ======
-    const btnGen = $('#btn-generate');
-    const btnClear = $('#btn-clear');
-    const btnZip = $('#btn-download-zip');
+                await new Promise((resolve) => {
+                    let attempts = 0;
+                    const loadImage = () => {
+                        attempts++;
+                        const img = new Image();
+                        img.onload = () => {
+                            generatedImages.push({ url: url, name: `image_${i+1}.jpg` });
+                            
+                            // Change to Final Card State (Screenshot Style)
+                            card.className = "bg-slate-800 rounded-xl p-3 shadow-lg border border-slate-700 flex flex-col gap-3 animate-pop group h-auto";
+                            card.innerHTML = `
+                                <div class="relative aspect-square overflow-hidden rounded-lg bg-slate-900">
+                                    <img src="${url}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onclick="window.open('${url}', '_blank')">
+                                </div>
+                                <div class="flex flex-col gap-2">
+                                    <p class="text-xs text-slate-400 truncate font-mono">image_${i+1}.png</p>
+                                    <a href="${url}" download="image_${i+1}.jpg" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-md text-sm font-bold text-center transition-colors flex items-center justify-center gap-2">
+                                        <i class="fa-solid fa-download"></i> Download
+                                    </a>
+                                </div>
+                            `;
+                            resolve();
+                        };
+                        img.onerror = () => {
+                            if(attempts < 3) setTimeout(loadImage, 2000);
+                            else {
+                                card.innerHTML = `<div class="text-red-500 text-xs">Failed</div>`;
+                                resolve();
+                            }
+                        };
+                        img.src = url;
+                    };
+                    loadImage();
+                });
+            }
 
-    btnClear.addEventListener('click', ()=>{
-      resultsEl.innerHTML = '';
-    });
-
-    $('#keyPicker').addEventListener('change', (e)=>{
-      $('#apiKey').value = e.target.value;
-    });
-    // Set default key
-    $('#apiKey').value = $('#keyPicker').value;
-
-    btnGen.addEventListener('click', async ()=>{
-      const raw = $('#prompts').value;
-      if(!raw.trim()){ alert('Please paste at least one prompt.'); return; }
-      const prompts = raw.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-      const ratio = $('#ratio').value;
-      const base = Math.max(320, Math.min(2048, parseInt($('#size').value||'768',10)));
-      const [w,h] = ratioToWH(ratio, base);
-      const wm = $('#watermark').value || '© Bulk Generator';
-      const showWm = $('#wmToggle').checked;
-      const enhance = $('#enhanceToggle').checked;
-      const apiKey = $('#apiKey').value.trim();
-
-      btnGen.disabled = true; btnGen.textContent = 'Generating…';
-      try {
-        let list = prompts;
-        if (enhance && apiKey) {
-          list = await enhancePrompts(prompts, apiKey);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Generation Complete';
+            statusText.textContent = "All Done!";
+            
+            if(generatedImages.length > 0) btnDlAll.classList.remove('hidden');
+            
+            setTimeout(() => {
+                 btn.innerHTML = '<i class="fa-solid fa-circle-plus"></i> Generate Images';
+                 statusBar.classList.add('hidden');
+            }, 3000);
         }
 
-        for (const p of list) {
-          // Render
-          const canvas = renderCanvasImage(p, w, h, wm, showWm);
-          const dataURL = canvas.toDataURL('image/png');
+        // --- DOWNLOAD ALL ---
+        async function downloadAllImages() {
+            if(generatedImages.length === 0) return alert("No images");
+            const btn = document.getElementById('btn-download-all');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<div class="spinner w-4 h-4 border-white"></div> Zipping...';
+            btn.disabled = true;
 
-          // Card
-          const card = document.createElement('div'); card.className = 'card';
-          const img = document.createElement('img'); img.className = 'thumb'; img.src = dataURL; img.alt = p.slice(0,120);
-          card.appendChild(img);
-
-          const meta = document.createElement('div'); meta.className = 'meta';
-          const left = document.createElement('div'); left.style.minWidth='0';
-          left.innerHTML = `<div class="muted" style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${p.replace(/"/g, '&quot;')}">${p}</div>
-                            <div class="muted" style="font-size:12px">${w}×${h} • ${new Date().toLocaleTimeString()}</div>`;
-          const right = document.createElement('div'); right.className='row';
-          const dl = document.createElement('button'); dl.className='btn ghost'; dl.textContent='Download';
-          dl.addEventListener('click', async ()=>{
-            const b = await (await fetch(dataURL)).blob();
-            saveAs(b, slugify(p).slice(0,60) + `_${w}x${h}.png`);
-          });
-          right.appendChild(dl);
-          meta.appendChild(left); meta.appendChild(right);
-          card.appendChild(meta);
-
-          resultsEl.prepend(card); // newest first
-          await sleep(30); // smooth
+            try {
+                const zip = new JSZip();
+                const folder = zip.folder("AI_Images");
+                const promises = generatedImages.map(async (imgObj) => {
+                    const response = await fetch(imgObj.url);
+                    const blob = await response.blob();
+                    folder.file(imgObj.name, blob);
+                });
+                await Promise.all(promises);
+                const content = await zip.generateAsync({ type: "blob" });
+                saveAs(content, "Bulk_Images.zip");
+            } catch (e) {
+                alert("Error creating zip.");
+            }
+            btn.innerHTML = originalText; btn.disabled = false;
         }
-      } finally {
-        btnGen.disabled = false; btnGen.textContent = 'Generate Images';
-      }
-    });
 
-    btnZip.addEventListener('click', async ()=>{
-      const imgs = Array.from(resultsEl.querySelectorAll('img.thumb'));
-      if(!imgs.length){ alert('No images yet. Generate first.'); return; }
-      btnZip.disabled = true; btnZip.textContent = 'Preparing ZIP…';
-      try{
-        const zip = new JSZip();
-        let idx = 1;
-        for (const img of imgs){
-          const res = await fetch(img.src);
-          const blob = await res.blob();
-          const arr = await blob.arrayBuffer();
-          const name = (img.alt ? slugify(img.alt).slice(0,60) : 'image') + '_' + String(idx).padStart(3,'0') + '.png';
-          zip.file(name, arr);
-          idx++;
+        // --- TTS ---
+        document.getElementById('tts-text').addEventListener('input', function() {
+            // optional char count
+        });
+
+        async function generateAudio() {
+            const text = document.getElementById('tts-text').value;
+            const voice = document.getElementById('tts-voice').value;
+            const status = document.getElementById('audio-status');
+            const btn = document.getElementById('play-btn');
+            const playerWrapper = document.getElementById('player-wrapper');
+            const player = document.getElementById('main-audio-player');
+            const dlBtn = document.getElementById('audio-dl-btn');
+
+            if(!text) return alert("Enter text.");
+            btn.disabled = true; btn.classList.add('opacity-75');
+            status.innerHTML = 'Generating...';
+            dlBtn.classList.add('hidden'); playerWrapper.classList.add('hidden');
+
+            const chunks = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [text];
+            const safeChunks = [];
+            let currentChunk = "";
+            for(let s of chunks) {
+                if((currentChunk + s).length < 800) { currentChunk += s; }
+                else { safeChunks.push(currentChunk); currentChunk = s; }
+            }
+            if(currentChunk) safeChunks.push(currentChunk);
+
+            try {
+                const blobs = await Promise.all(safeChunks.map(async (chunk) => {
+                     const res = await fetch(`https://api.streamelements.com/kappa/v2/speech?voice=${voice}&text=${encodeURIComponent(chunk)}`);
+                     if(!res.ok) throw new Error("Failed");
+                     return await res.blob();
+                }));
+                const url = URL.createObjectURL(new Blob(blobs, { type: 'audio/mp3' }));
+                player.src = url; playerWrapper.classList.remove('hidden');
+                dlBtn.href = url; dlBtn.download = `voiceover_${Date.now()}.mp3`; dlBtn.classList.remove('hidden');
+                player.play(); status.innerHTML = 'Ready';
+            } catch(e) {
+                status.innerHTML = 'Error';
+            }
+            btn.disabled = false; btn.classList.remove('opacity-75');
         }
-        const content = await zip.generateAsync({type:'blob'});
-        saveAs(content, 'bulk_images.zip');
-      } finally {
-        btnZip.disabled = false; btnZip.textContent = 'Download All as ZIP';
-      }
-    });
-
-    function slugify(s){
-      return (s||'image')
-        .toLowerCase()
-        .replace(/[^\w\s-]/g,'')
-        .trim()
-        .replace(/\s+/g,'-');
-    }
-  </script>
+    </script>
 </body>
 </html>

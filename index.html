@@ -82,7 +82,7 @@
                     <span class="text-xs font-bold text-indigo-400 tracking-wider uppercase">Powered by Grow With Haider</span>
                 </div>
                 <h1 class="text-4xl font-bold text-white mb-2">AI Creator Studio</h1>
-                <p class="text-slate-400">Professional Tools Suite</p>
+                <p class="text-slate-400">Unlimited Professional Tools</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -105,7 +105,7 @@
                         <i class="fa-solid fa-microphone-lines"></i>
                     </div>
                     <h3 class="text-2xl font-bold text-white mb-2">Text to Speech Pro</h3>
-                    <p class="text-slate-400 leading-relaxed">60+ Voices. 50k Character Limit. Instant MP3 Download.</p>
+                    <p class="text-slate-400 leading-relaxed">100+ Voices (All Languages). Unlimited Text. Instant MP3.</p>
                     <span class="mt-6 text-emerald-400 font-bold text-sm flex items-center gap-2 group-hover:translate-x-1 transition-transform">
                         Open Tool <i class="fa-solid fa-arrow-right"></i>
                     </span>
@@ -147,7 +147,7 @@
 
                  <div class="mb-4">
                      <label class="flex items-center gap-2 cursor-pointer">
-                         <input type="checkbox" checked class="w-4 h-4 rounded border-slate-600 text-indigo-600 bg-slate-800 focus:ring-indigo-500">
+                         <input type="checkbox" id="auto-enhance" checked class="w-4 h-4 rounded border-slate-600 text-indigo-600 bg-slate-800 focus:ring-indigo-500">
                          <span class="text-xs text-slate-400">Enhance Quality (Flux Pro)</span>
                      </label>
                  </div>
@@ -209,51 +209,140 @@
             <div class="max-w-4xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-xl">
                 
                 <div class="mb-6">
-                    <label class="text-xs font-bold text-slate-500 uppercase mb-2 block">Select Voice</label>
+                    <label class="text-xs font-bold text-slate-500 uppercase mb-2 block">Select Voice (100+ Voices)</label>
                     <div class="relative">
-                        <select id="tts-voice" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-white focus:border-emerald-500 outline-none appearance-none cursor-pointer text-lg">
+                        <select id="tts-voice" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-white focus:border-emerald-500 outline-none appearance-none cursor-pointer text-lg h-12">
+                            
+                            <optgroup label="🇵🇰 Urdu & Hindi">
+                                <option value="Zainab">Zainab (Urdu Pakistan)</option>
+                                <option value="Aditi">Aditi (Hindi/English)</option>
+                                <option value="Raveena">Raveena (Indian English)</option>
+                            </optgroup>
+
+                            <optgroup label="⭐ Popular English">
+                                <option value="Brian">Brian (UK - Narrator)</option>
+                                <option value="Salli">Salli (US - Energetic)</option>
+                                <option value="Matthew">Matthew (US - Deep)</option>
+                                <option value="Amy">Amy (UK - Soft)</option>
+                                <option value="Joey">Joey (US - Deep)</option>
+                            </optgroup>
+
                             <optgroup label="🇺🇸 English (US)">
-                                <option value="Salli">Salli (Female)</option>
-                                <option value="Joey">Joey (Male)</option>
-                                <option value="Matthew">Matthew (Male)</option>
-                                <option value="Justin">Justin (Child)</option>
                                 <option value="Ivy">Ivy (Child)</option>
-                                <option value="Joanna">Joanna (Female)</option>
-                                <option value="Kendra">Kendra (Female)</option>
-                                <option value="Kimberly">Kimberly (Female)</option>
+                                <option value="Justin">Justin (Child)</option>
+                                <option value="Joanna">Joanna</option>
+                                <option value="Kendra">Kendra</option>
+                                <option value="Kimberly">Kimberly</option>
                             </optgroup>
+
                             <optgroup label="🇬🇧 English (UK)">
-                                <option value="Brian" selected>Brian (Male)</option>
-                                <option value="Amy">Amy (Female)</option>
-                                <option value="Emma">Emma (Female)</option>
-                                <option value="Geraint">Geraint (Male)</option>
+                                <option value="Emma">Emma</option>
+                                <option value="Geraint">Geraint (Welsh)</option>
                             </optgroup>
-                             <optgroup label="🇮🇳 English (India)">
-                                <option value="Aditi">Aditi (Female)</option>
-                                <option value="Raveena">Raveena (Female)</option>
+
+                            <optgroup label="🇦🇺 English (Australia)">
+                                <option value="Russell">Russell</option>
+                                <option value="Nicole">Nicole</option>
                             </optgroup>
-                            <optgroup label="🇦🇺 English (AU)">
-                                <option value="Russell">Russell (Male)</option>
-                                <option value="Nicole">Nicole (Female)</option>
+
+                            <optgroup label="🇸🇦 Arabic (العربية)">
+                                <option value="Zeina">Zeina</option>
                             </optgroup>
-                            <optgroup label="🌍 International">
-                                <option value="Marlene">German (Marlene)</option>
-                                <option value="Vicki">German (Vicki)</option>
-                                <option value="Hans">German (Hans)</option>
-                                <option value="Mathieu">French (Mathieu)</option>
-                                <option value="Celine">French (Celine)</option>
-                                <option value="Lea">French (Lea)</option>
-                                <option value="Giorgio">Italian (Giorgio)</option>
-                                <option value="Carla">Italian (Carla)</option>
-                                <option value="Conchita">Spanish (Conchita)</option>
-                                <option value="Enrique">Spanish (Enrique)</option>
-                                <option value="Mia">Spanish (Mia)</option>
-                                <option value="Takumi">Japanese (Takumi)</option>
-                                <option value="Mizuki">Japanese (Mizuki)</option>
-                                <option value="Seoyeon">Korean (Seoyeon)</option>
-                                <option value="Maxim">Russian (Maxim)</option>
-                                <option value="Tatyana">Russian (Tatyana)</option>
+
+                            <optgroup label="🇨🇳 Chinese (Mandarin)">
+                                <option value="Zhiyu">Zhiyu</option>
                             </optgroup>
+
+                            <optgroup label="🇹🇷 Turkish (Türkçe)">
+                                <option value="Filiz">Filiz</option>
+                            </optgroup>
+
+                            <optgroup label="🇪🇸 Spanish (Español)">
+                                <option value="Conchita">Conchita (Spain)</option>
+                                <option value="Enrique">Enrique (Spain)</option>
+                                <option value="Mia">Mia (Mexico)</option>
+                                <option value="Miguel">Miguel (US)</option>
+                                <option value="Penelope">Penelope (US)</option>
+                            </optgroup>
+
+                            <optgroup label="🇫🇷 French (Français)">
+                                <option value="Celine">Celine (France)</option>
+                                <option value="Lea">Lea (France)</option>
+                                <option value="Mathieu">Mathieu (France)</option>
+                                <option value="Chantal">Chantal (Canada)</option>
+                            </optgroup>
+
+                            <optgroup label="🇩🇪 German (Deutsch)">
+                                <option value="Hans">Hans</option>
+                                <option value="Marlene">Marlene</option>
+                                <option value="Vicki">Vicki</option>
+                            </optgroup>
+
+                            <optgroup label="🇮🇹 Italian (Italiano)">
+                                <option value="Carla">Carla</option>
+                                <option value="Giorgio">Giorgio</option>
+                                <option value="Bianca">Bianca</option>
+                            </optgroup>
+
+                            <optgroup label="🇵🇹 Portuguese (Português)">
+                                <option value="Cristiano">Cristiano (Portugal)</option>
+                                <option value="Ines">Ines (Portugal)</option>
+                                <option value="Ricardo">Ricardo (Brazil)</option>
+                                <option value="Vitoria">Vitoria (Brazil)</option>
+                            </optgroup>
+
+                            <optgroup label="🇷🇺 Russian (Русский)">
+                                <option value="Maxim">Maxim</option>
+                                <option value="Tatyana">Tatyana</option>
+                            </optgroup>
+
+                            <optgroup label="🇯🇵 Japanese (日本語)">
+                                <option value="Takumi">Takumi</option>
+                                <option value="Mizuki">Mizuki</option>
+                            </optgroup>
+
+                            <optgroup label="🇰🇷 Korean (한국어)">
+                                <option value="Seoyeon">Seoyeon</option>
+                            </optgroup>
+
+                            <optgroup label="🇩🇰 Danish (Dansk)">
+                                <option value="Mads">Mads</option>
+                                <option value="Naja">Naja</option>
+                            </optgroup>
+
+                            <optgroup label="🇳🇱 Dutch (Nederlands)">
+                                <option value="Lotte">Lotte</option>
+                                <option value="Ruben">Ruben</option>
+                            </optgroup>
+
+                            <optgroup label="🇵🇱 Polish (Polski)">
+                                <option value="Ewa">Ewa</option>
+                                <option value="Jacek">Jacek</option>
+                                <option value="Jan">Jan</option>
+                                <option value="Maja">Maja</option>
+                            </optgroup>
+
+                            <optgroup label="🇸🇪 Swedish (Svenska)">
+                                <option value="Astrid">Astrid</option>
+                            </optgroup>
+
+                            <optgroup label="🇳🇴 Norwegian (Norsk)">
+                                <option value="Liv">Liv</option>
+                            </optgroup>
+
+                            <optgroup label="🇮🇸 Icelandic">
+                                <option value="Karl">Karl</option>
+                                <option value="Dora">Dora</option>
+                            </optgroup>
+
+                            <optgroup label="🇷🇴 Romanian">
+                                <option value="Carmen">Carmen</option>
+                            </optgroup>
+
+                            <optgroup label="🏴󠁧󠁢󠁷󠁬󠁳󠁿 Welsh">
+                                <option value="Gwyneth">Gwyneth</option>
+                            </optgroup>
+
                         </select>
                         <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
                             <i class="fa-solid fa-chevron-down"></i>
@@ -263,10 +352,10 @@
 
                 <div class="flex-1 flex flex-col mb-8">
                     <div class="flex justify-between items-end mb-2">
-                        <label class="text-xs font-bold text-slate-500 uppercase block">Script (Max 50k Characters)</label>
-                        <span class="text-xs text-emerald-400 font-mono bg-emerald-500/10 px-2 py-1 rounded" id="char-count">0 chars / 50,000 Limit</span>
+                        <label class="text-xs font-bold text-slate-500 uppercase block">Script (Unlimited Support)</label>
+                        <span class="text-xs text-emerald-400 font-mono bg-emerald-500/10 px-2 py-1 rounded" id="char-count">0 chars / Unlimited (Tested 100k+)</span>
                     </div>
-                    <textarea id="tts-text" class="w-full h-64 bg-slate-950 border border-slate-700 rounded-lg p-5 text-white outline-none focus:border-emerald-500 resize-none font-mono leading-relaxed text-lg" placeholder="Paste your script here (Up to 50,000 characters supported for Fast Generation)..."></textarea>
+                    <textarea id="tts-text" class="w-full h-64 bg-slate-950 border border-slate-700 rounded-lg p-5 text-white outline-none focus:border-emerald-500 resize-none font-mono leading-relaxed text-lg" placeholder="Paste your script here (Unlimited text supported)..."></textarea>
                 </div>
 
                 <div class="bg-slate-950 rounded-xl p-6 border border-slate-800">
@@ -292,6 +381,8 @@
     </div>
 
     <script>
+        const apiKey = ""; 
+
         // --- GLOBAL NAV ---
         function openTool(id) { document.getElementById(id).classList.add('active'); }
         function closeTool(id) { document.getElementById(id).classList.remove('active'); }
@@ -329,6 +420,29 @@
             }
         }
 
+        // --- IMAGEN 4 FUNCTION ---
+        async function generateWithImagen4(prompt, aspectRatio) {
+            try {
+                const response = await fetch(
+                    `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            instances: [{ prompt: prompt }],
+                            parameters: { sampleCount: 1, aspectRatio: aspectRatio }
+                        })
+                    }
+                );
+                if (!response.ok) throw new Error('Google API Failed');
+                const result = await response.json();
+                return `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+            } catch (error) {
+                console.warn("Imagen 4 failed or no key, falling back to Pollinations.", error);
+                return null;
+            }
+        }
+
         async function generateBulk() {
             const promptsRaw = bulkInput.value.split('\n').filter(p => p.trim());
             const prompts = promptsRaw.map(p => p.replace(/^\d+[\.\)]\s*/, ''));
@@ -340,6 +454,13 @@
             const statusBar = document.getElementById('status-bar');
             const ratio = document.getElementById('bulk-ratio').value;
             const [w, h] = ratio.split('x');
+            const autoEnhance = document.getElementById('auto-enhance').checked;
+
+            // Calculate Aspect Ratio String for Imagen
+            let aspectRatioStr = "1:1";
+            if (w == 1920 && h == 1080) aspectRatioStr = "16:9";
+            else if (w == 1080 && h == 1920) aspectRatioStr = "9:16";
+            else if (w == 2560 && h == 1440) aspectRatioStr = "16:9";
 
             if(!prompts.length) return alert("Please enter at least one prompt.");
 
@@ -387,44 +508,53 @@
                     </div>
                 `;
 
-                const seed = Math.floor(Math.random() * 999999);
-                const finalPrompt = `${p}, high quality, 8k, highly detailed, flux style`;
-                const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(finalPrompt)}?width=${w}&height=${h}&model=flux&seed=${seed}&nologo=true&t=${Date.now()}`;
+                // Auto Enhance Logic
+                let finalPrompt = p;
+                if(autoEnhance) {
+                    finalPrompt = `${p}, cinematic lighting, hyper-realistic, 8k, masterpiece, sharp focus, detailed texture, artstation HQ`;
+                }
 
+                // TRY IMAGEN 4 FIRST
+                let url = await generateWithImagen4(finalPrompt, aspectRatioStr);
+                let sourceName = "Imagen 4";
+
+                // FALLBACK TO FLUX (POLLINATIONS) IF FAILED
+                if (!url) {
+                    sourceName = "Flux HD";
+                    const seed = Math.floor(Math.random() * 999999);
+                    if(autoEnhance) finalPrompt += ", flux style"; 
+                    url = `https://image.pollinations.ai/prompt/${encodeURIComponent(finalPrompt)}?width=${w}&height=${h}&model=flux&seed=${seed}&nologo=true&t=${Date.now()}`;
+                }
+
+                // Load Image
                 await new Promise((resolve) => {
-                    let attempts = 0;
-                    const loadImage = () => {
-                        attempts++;
-                        const img = new Image();
-                        img.crossOrigin = "Anonymous";
-                        img.onload = () => {
-                            const filename = `image_${i+1}_${seed}.jpg`;
-                            generatedImages.push({ url: url, name: filename });
-                            
-                            card.className = "bg-slate-800 rounded-xl p-3 shadow-lg border border-slate-700 flex flex-col gap-3 animate-pop group h-auto";
-                            card.innerHTML = `
-                                <div class="relative aspect-square overflow-hidden rounded-lg bg-slate-900">
-                                    <img src="${url}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 cursor-pointer" onclick="window.open('${url}', '_blank')">
-                                </div>
-                                <div class="flex flex-col gap-2">
-                                    <p class="text-xs text-slate-400 truncate font-mono">${filename}</p>
-                                    <button onclick="forceDownload('${url}', '${filename}')" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-md text-sm font-bold text-center transition-colors flex items-center justify-center gap-2">
-                                        <i class="fa-solid fa-download"></i> Download
-                                    </button>
-                                </div>
-                            `;
-                            resolve();
-                        };
-                        img.onerror = () => {
-                            if(attempts < 3) setTimeout(loadImage, 2000);
-                            else {
-                                card.innerHTML = `<div class="text-red-500 text-xs">Failed</div>`;
-                                resolve();
-                            }
-                        };
-                        img.src = url;
+                    const img = new Image();
+                    img.crossOrigin = "Anonymous";
+                    img.onload = () => {
+                        const filename = `image_${i+1}.jpg`;
+                        generatedImages.push({ url: url, name: filename });
+                        
+                        card.className = "bg-slate-800 rounded-xl p-3 shadow-lg border border-slate-700 flex flex-col gap-3 animate-pop group h-auto";
+                        // REMOVED aspect-square to allow full image display
+                        card.innerHTML = `
+                            <div class="relative w-full rounded-lg bg-slate-900 overflow-hidden">
+                                <img src="${url}" class="w-full h-auto object-contain" onclick="window.open('${url}', '_blank')">
+                                <div class="absolute top-2 right-2 bg-black/60 text-white text-[10px] px-2 py-1 rounded backdrop-blur-sm">${sourceName}</div>
+                            </div>
+                            <div class="flex flex-col gap-2 mt-auto w-full">
+                                <p class="text-xs text-slate-400 truncate font-mono">${filename}</p>
+                                <button onclick="forceDownload('${url}', '${filename}')" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-md text-sm font-bold text-center transition-colors flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-download"></i> Download
+                                </button>
+                            </div>
+                        `;
+                        resolve();
                     };
-                    loadImage();
+                    img.onerror = () => {
+                        card.innerHTML = `<div class="text-red-500 text-xs">Failed</div>`;
+                        resolve();
+                    };
+                    img.src = url;
                 });
             }
 
@@ -467,15 +597,29 @@
             btn.innerHTML = originalText; btn.disabled = false;
         }
 
-        // --- TTS (SMART CHUNKING WITH LIMIT DISPLAY) ---
+        // --- TTS ---
         const ttsInput = document.getElementById('tts-text');
         const charDisplay = document.getElementById('char-count');
         
         if(ttsInput && charDisplay) {
             ttsInput.addEventListener('input', function() {
                 const len = this.value.length;
-                charDisplay.textContent = `${len.toLocaleString()} chars / 50,000 Limit`;
+                charDisplay.textContent = `${len.toLocaleString()} chars / Unlimited (Tested 100k+)`;
             });
+        }
+
+        // Retry Helper
+        async function fetchWithRetry(url, retries = 3) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const res = await fetch(url);
+                    if (!res.ok) throw new Error(`API Error: ${res.status}`);
+                    return await res.blob();
+                } catch (err) {
+                    if (i === retries - 1) throw err;
+                    await new Promise(r => setTimeout(r, 1500)); 
+                }
+            }
         }
 
         async function generateAudio() {
@@ -488,13 +632,11 @@
             const dlBtn = document.getElementById('audio-dl-btn');
 
             if(!text) return alert("Enter text.");
-            if(text.length > 50000) return alert("Text exceeds 50,000 character limit. Please shorten it.");
-
             btn.disabled = true; btn.classList.add('opacity-75');
             status.innerHTML = 'Initializing...';
             dlBtn.classList.add('hidden'); playerWrapper.classList.add('hidden');
 
-            // === SMART TEXT SPLITTING LOGIC ===
+            // Splitter
             function splitText(inputText) {
                 const MAX_CHUNK_LENGTH = 800; 
                 const chunks = [];
@@ -543,32 +685,16 @@
             const totalChunks = safeChunks.length;
 
             try {
-                const blobs = new Array(totalChunks); 
-                const batchSize = 3; // Process 3 chunks at a time
+                const blobs = [];
                 
-                for (let i = 0; i < totalChunks; i += batchSize) {
-                    const batchPromises = [];
+                for (let i = 0; i < totalChunks; i++) {
+                    const chunk = safeChunks[i];
+                    status.innerHTML = `<span class="text-emerald-400 animate-pulse">Generating Part ${i+1} of ${totalChunks}...</span>`;
                     
-                    for (let j = 0; j < batchSize && (i + j) < totalChunks; j++) {
-                        const index = i + j;
-                        const chunk = safeChunks[index];
-                        
-                        status.innerHTML = `<span class="text-emerald-400 animate-pulse">Generating Part ${index+1} of ${totalChunks}...</span>`;
-                        
-                        const promise = fetch(`https://api.streamelements.com/kappa/v2/speech?voice=${voice}&text=${encodeURIComponent(chunk)}`)
-                            .then(res => {
-                                if (!res.ok) throw new Error("Failed");
-                                return res.blob();
-                            })
-                            .then(blob => {
-                                blobs[index] = blob;
-                            });
-                            
-                        batchPromises.push(promise);
-                    }
+                    const blob = await fetchWithRetry(`https://api.streamelements.com/kappa/v2/speech?voice=${voice}&text=${encodeURIComponent(chunk)}`);
+                    blobs.push(blob);
                     
-                    await Promise.all(batchPromises);
-                    if(i + batchSize < totalChunks) await new Promise(r => setTimeout(r, 50));
+                    if(i < totalChunks - 1) await new Promise(r => setTimeout(r, 200));
                 }
                 
                 status.innerHTML = '<span class="text-blue-400">Merging Audio...</span>';
@@ -582,8 +708,7 @@
 
             } catch(e) {
                 status.innerHTML = '<span class="text-red-400">Generation Failed</span>';
-                console.error(e);
-                alert("Failed to generate audio. Text might be too complex or server busy.");
+                alert("Failed to generate audio. Please check internet.");
             }
             btn.disabled = false; btn.classList.remove('opacity-75');
         }

@@ -161,11 +161,14 @@
                     
                     <div class="text-xs text-slate-400 leading-relaxed space-y-2 z-10">
                         <p>Records system audio directly.</p>
-                        <ul class="list-disc list-inside text-slate-500">
-                            <li>Free & Unlimited</li>
-                            <li>Requires HTTPS</li>
-                            <li>Check "Share Audio"</li>
-                        </ul>
+                        <div class="bg-slate-800 p-2 rounded-lg border border-slate-600">
+                             <p class="text-[10px] text-yellow-400 font-bold mb-1">⚠️ IMPORTANCE NOTICE:</p>
+                             <ul class="list-disc list-inside text-[10px] text-slate-300">
+                                <li>Select <strong>"Chrome Tab"</strong> (or "This Tab")</li>
+                                <li>Check <strong>"Share Audio"</strong> box</li>
+                                <li>Requires HTTPS / Localhost</li>
+                            </ul>
+                        </div>
                     </div>
 
                     <button id="recordBtn" class="mt-auto py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-bold flex justify-center items-center gap-2 border border-slate-600 z-10 transition-all active:scale-95">
@@ -586,6 +589,17 @@
         async function startRecordingLogic() {
             const text = elements.textInput.value.trim();
             if (!text) return;
+            
+            // STRICT CONFIRMATION
+            const confirmed = confirm(
+                "AUDIO RECORDING INSTRUCTIONS:\n\n" +
+                "1. In the popup window, select the 'Chrome Tab' (or 'This Tab') option.\n" +
+                "2. IMPORTANT: Check the 'Share Audio' box at the bottom-left.\n" +
+                "3. Click Share.\n\n" +
+                "If you don't check 'Share Audio', the file will be silent."
+            );
+            if (!confirmed) return;
+
             showError(null);
             elements.recordDownloadLinkContainer.classList.add('hidden');
 
@@ -595,23 +609,41 @@
             }
 
             try {
-                const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true, preferCurrentTab: true });
+                const stream = await navigator.mediaDevices.getDisplayMedia({ 
+                    video: true, 
+                    audio: true, // Crucial
+                    preferCurrentTab: true,
+                    selfBrowserSurface: "include" 
+                });
+                
+                // Audio Track Check
                 const audioTrack = stream.getAudioTracks()[0];
                 if (!audioTrack) {
                     stream.getTracks().forEach(t => t.stop());
-                    showError("Please check 'Share Audio' in the browser popup.");
+                    showError("NO AUDIO DETECTED! You did not check the 'Share Audio' box. Please try again.");
                     return;
                 }
 
                 streamRef = stream;
-                mediaRecorder = new MediaRecorder(new MediaStream([audioTrack]), { mimeType: 'audio/webm' });
+                
+                // Fallback MIME types
+                let options = { mimeType: 'audio/webm' };
+                if (!MediaRecorder.isTypeSupported('audio/webm')) {
+                     if (MediaRecorder.isTypeSupported('audio/mp4')) options = { mimeType: 'audio/mp4' };
+                     else if (MediaRecorder.isTypeSupported('video/webm')) options = { mimeType: 'video/webm' }; // Fallback to video container if needed
+                }
+
+                mediaRecorder = new MediaRecorder(new MediaStream([audioTrack]), options);
                 audioChunks = [];
 
                 mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunks.push(e.data); };
                 mediaRecorder.onstop = () => {
-                    const blob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const blob = new Blob(audioChunks, { type: options.mimeType });
                     elements.recordDownloadLink.href = URL.createObjectURL(blob);
-                    elements.recordDownloadLink.download = `tts-recording.webm`;
+                    // Dynamically set extension
+                    const ext = options.mimeType.includes('mp4') ? 'mp4' : 'webm';
+                    elements.recordDownloadLink.download = `tts-recording.${ext}`;
+                    
                     elements.recordDownloadLinkContainer.classList.remove('hidden');
                     if (streamRef) streamRef.getTracks().forEach(t => t.stop());
                     isRecording = false;

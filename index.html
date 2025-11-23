@@ -3,51 +3,248 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Creator Studio - TTS Pro</title>
-    
+    <title>AI Creator Studio - Ultra Fast</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-
     <style>
         /* Custom Scrollbar */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+        
+        /* Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none; 
+            background: transparent; 
         }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #1e293b; 
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #10b981; /* Emerald-500 */
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #475569; 
-            border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #64748b; 
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #334155;
+            border-radius: 2px;
         }
         
-        /* Animation Classes */
-        .fade-in {
-            animation: fadeIn 0.3s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Audio Player Customization */
+        audio {
+            filter: invert(1) hue-rotate(180deg);
+            opacity: 0.9;
+            border-radius: 0.5rem;
         }
     </style>
 </head>
-<body class="bg-[#0B1120] text-white font-sans min-h-screen">
+<body class="bg-[#0B1120] text-white font-sans h-screen flex flex-col overflow-hidden">
 
-    <!-- APP CONTAINER -->
-    <div id="app-root"></div>
+    <!-- ================= VIEWS CONTAINER ================= -->
+    <div id="app-container" class="w-full h-full relative">
 
-    <!-- MAIN SCRIPT -->
+        <!-- 1. LANDING PAGE VIEW -->
+        <div id="landing-view" class="absolute inset-0 flex flex-col items-center justify-center p-6 z-10 transition-opacity duration-500">
+            
+            <!-- Background Glows -->
+            <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-indigo-900/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-emerald-900/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <!-- Badge -->
+            <div class="bg-[#1E293B] border border-slate-700/50 px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest text-indigo-300 uppercase mb-6 shadow-lg">
+                Powered by Grow with Haider
+            </div>
+
+            <!-- Title -->
+            <div class="text-center mb-16 space-y-2">
+                <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-white">
+                    AI Creator Studio
+                </h1>
+                <p class="text-slate-400 text-lg font-medium">
+                    Professional Tools Suite
+                </p>
+            </div>
+
+            <!-- Card -->
+            <div class="w-full max-w-md">
+                <div id="open-tool-btn" class="group relative bg-[#162032] border border-slate-800 rounded-3xl p-10 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-900/20 cursor-pointer transform hover:-translate-y-1">
+                    <div class="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl"></div>
+                    
+                    <div class="flex flex-col items-center text-center space-y-8 relative z-10">
+                        <div class="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform duration-300">
+                            <i data-lucide="mic" class="w-10 h-10 text-white"></i>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <h3 class="text-2xl font-bold text-white">Text to Speech Pro</h3>
+                            <p class="text-slate-400 text-base leading-relaxed">
+                                30+ Premium Voices. Unlimited Text. <br/>Instant WAV Download.
+                            </p>
+                        </div>
+
+                        <button class="flex items-center gap-2 px-6 py-2 bg-emerald-500/10 text-emerald-400 rounded-full text-sm font-bold group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                            Open Tool <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. TOOL VIEW (Hidden Initially) -->
+        <div id="tool-view" class="absolute inset-0 flex flex-col bg-[#0B1120] hidden opacity-0 transition-opacity duration-500">
+            
+            <!-- Navbar -->
+            <div class="border-b border-slate-800 bg-[#0F172A]/80 backdrop-blur-md sticky top-0 z-20">
+                <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+                    <button id="back-btn" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+                        <i data-lucide="chevron-left" class="w-5 h-5"></i> Back
+                    </button>
+                    <h1 class="text-lg font-bold text-white flex items-center gap-2">
+                        <span class="bg-emerald-500/10 text-emerald-400 p-1.5 rounded-lg"><i data-lucide="mic" class="w-4 h-4"></i></span>
+                        Text to Speech Pro
+                    </h1>
+                    <button id="settings-btn" class="p-2 rounded-full hover:bg-slate-800 text-slate-400 transition-colors relative">
+                        <i data-lucide="settings" class="w-5 h-5"></i>
+                        <span id="key-indicator" class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tool Content -->
+            <div class="flex-1 p-4 md:p-8 max-w-6xl mx-auto w-full grid lg:grid-cols-2 gap-6 overflow-y-auto">
+                
+                <!-- Left: Input -->
+                <div class="flex flex-col gap-4 h-full">
+                    <div class="bg-[#1E293B] border border-slate-700 rounded-3xl p-1 flex-1 flex flex-col shadow-xl min-h-[300px]">
+                        <textarea id="text-input" class="flex-1 w-full bg-transparent text-lg p-6 resize-none outline-none text-slate-200 placeholder:text-slate-600" placeholder="Paste your script here (Unlimited)..."></textarea>
+                        <div class="px-6 py-3 border-t border-slate-700/50 text-right text-xs text-slate-500 font-mono">
+                            <span id="char-count">0</span> characters
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Controls -->
+                <div class="flex flex-col gap-4">
+                    
+                    <!-- Voice Selector -->
+                    <div class="bg-[#1E293B] border border-slate-700 rounded-3xl overflow-hidden flex flex-col h-[450px] shadow-xl">
+                        <div class="px-6 py-4 border-b border-slate-700 bg-[#1E293B] sticky top-0 z-10 flex justify-between items-center">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Controls</span>
+                            <i data-lucide="sliders-horizontal" class="w-4 h-4 text-slate-500"></i>
+                        </div>
+
+                        <!-- Sliders -->
+                        <div class="p-6 space-y-6 bg-[#162032] border-b border-slate-700">
+                            <div>
+                                <div class="flex justify-between mb-2 text-xs font-medium">
+                                    <span class="text-slate-400 uppercase">Speed (Preview Only)</span>
+                                    <span id="speed-val" class="text-emerald-400">1.0x</span>
+                                </div>
+                                <input type="range" id="speed-range" min="0.5" max="2.0" step="0.1" value="1.0" class="w-full">
+                            </div>
+                        </div>
+
+                        <div class="px-6 py-2 bg-[#1E293B] text-xs font-bold text-slate-400 uppercase tracking-wider">
+                            Voices
+                        </div>
+
+                        <div id="voice-list" class="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar">
+                            <!-- JS will populate this -->
+                        </div>
+                    </div>
+
+                    <!-- Action Box -->
+                    <div class="bg-[#1E293B] border border-slate-700 rounded-3xl p-6 shadow-xl relative overflow-hidden">
+                        <div class="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl"></div>
+                        
+                        <div class="relative z-10 space-y-4">
+                            <!-- Progress -->
+                            <div id="progress-container" class="hidden space-y-2">
+                                <div class="flex justify-between text-xs font-bold text-emerald-400">
+                                    <span id="progress-text">Initializing...</span>
+                                    <span id="progress-pct">0%</span>
+                                </div>
+                                <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
+                                    <div id="progress-bar" class="h-full bg-emerald-500 transition-all duration-300 w-0"></div>
+                                </div>
+                            </div>
+
+                            <!-- Generate Button -->
+                            <button id="generate-btn" class="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-[#0B1120] font-bold rounded-xl shadow-lg shadow-emerald-900/20 transition-all active:scale-95 flex items-center justify-center gap-2">
+                                <i data-lucide="wand-2" class="w-5 h-5"></i> Generate Audio
+                            </button>
+
+                            <!-- Result Area -->
+                            <div id="result-container" class="hidden animate-in fade-in slide-in-from-bottom-2 space-y-3 pt-2">
+                                <div class="bg-slate-900/50 p-2 rounded-xl border border-slate-700">
+                                    <audio id="audio-player" controls class="w-full h-8"></audio>
+                                </div>
+                                <a id="download-link" href="#" download class="flex items-center justify-center gap-2 w-full py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-medium transition-colors">
+                                    <i data-lucide="download" class="w-4 h-4"></i> Download File
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div id="settings-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-start justify-center pt-20 hidden">
+        <div class="bg-[#1E293B] border border-slate-700 rounded-2xl p-6 w-full max-w-md shadow-2xl transform transition-all scale-100">
+            <h3 class="text-white font-bold mb-4 flex items-center gap-2">
+                <i data-lucide="key" class="w-4 h-4 text-indigo-400"></i> API Key Manager
+            </h3>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                    <label class="text-xs text-slate-400">Paste Gemini API Key</label>
+                    <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 hover:underline">
+                        Get API Key <i data-lucide="external-link" class="w-3 h-3"></i>
+                    </a>
+                </div>
+                <input id="api-key-input" type="password" placeholder="Paste Gemini API Key..." class="w-full bg-[#0B1120] border border-slate-700 rounded-xl px-4 py-3 text-sm outline-none focus:border-indigo-500 text-white">
+                <div class="flex gap-2">
+                    <button id="save-key-btn" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-xl text-sm font-bold">Add Key</button>
+                    <button id="close-settings-btn" class="px-4 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-sm">Close</button>
+                </div>
+                <div class="text-xs text-slate-500 pt-2 flex justify-between items-center">
+                    <span id="active-keys-count">Active Keys: 0</span>
+                    <button id="clear-keys-btn" class="text-red-400 hover:underline">Clear All</button>
+                </div>
+                <p class="text-[10px] text-slate-500 italic">*Add multiple keys to bypass daily limits automatically.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ERROR TOAST -->
+    <div id="error-toast" class="fixed bottom-6 right-6 max-w-sm bg-[#1E293B] border-l-4 border-red-500 shadow-2xl rounded-lg p-4 hidden z-50">
+        <div class="flex items-start gap-3">
+            <i data-lucide="alert-circle" class="w-5 h-5 text-red-500 mt-0.5"></i>
+            <div>
+                <h3 class="font-bold text-red-400 text-sm">Error</h3>
+                <p id="error-msg" class="text-xs text-slate-300 mt-1">Something went wrong.</p>
+            </div>
+            <button id="close-toast" class="ml-auto text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-        // --- CONFIGURATION ---
+        // --- CONSTANTS ---
         const TTS_MODEL = "gemini-2.5-flash-preview-tts";
-        const CHUNK_SIZE = 4000;
-        
+        // Safe chunk size
+        const CHUNK_SIZE = 4500;
         const VOICES = [
             { id: "Fenrir", gender: "Male", desc: "Deep & Calm" },
             { id: "Kore", gender: "Female", desc: "Soothing & Clear" },
@@ -61,345 +258,249 @@
             { id: "Iapetus", gender: "Male", desc: "Serious & Deep" }
         ];
 
-        // --- STATE MANAGEMENT ---
-        const state = {
-            view: 'home', // 'home' | 'tts'
+        // --- STATE ---
+        let state = {
             text: "",
             selectedVoiceId: "Fenrir",
+            apiKeys: [],
+            currentKeyIndex: 0,
             isGenerating: false,
-            audioUrl: null,
             previewAudio: null,
-            apiKeys: JSON.parse(localStorage.getItem("multi_api_keys") || "[]"),
-            showSettings: false,
-            progress: 0,
-            error: null,
-            speed: 1.0,
-            currentKeyIndex: 0
+            speed: 1.0
         };
 
-        // --- RENDER FUNCTIONS ---
+        // --- ELEMENTS ---
+        const els = {
+            landingView: document.getElementById('landing-view'),
+            toolView: document.getElementById('tool-view'),
+            openToolBtn: document.getElementById('open-tool-btn'),
+            backBtn: document.getElementById('back-btn'),
+            settingsBtn: document.getElementById('settings-btn'),
+            settingsModal: document.getElementById('settings-modal'),
+            apiKeyInput: document.getElementById('api-key-input'),
+            saveKeyBtn: document.getElementById('save-key-btn'),
+            closeSettingsBtn: document.getElementById('close-settings-btn'),
+            clearKeysBtn: document.getElementById('clear-keys-btn'),
+            activeKeysCount: document.getElementById('active-keys-count'),
+            keyIndicator: document.getElementById('key-indicator'),
+            textInput: document.getElementById('text-input'),
+            charCount: document.getElementById('char-count'),
+            voiceList: document.getElementById('voice-list'),
+            speedRange: document.getElementById('speed-range'),
+            speedVal: document.getElementById('speed-val'),
+            generateBtn: document.getElementById('generate-btn'),
+            progressContainer: document.getElementById('progress-container'),
+            progressBar: document.getElementById('progress-bar'),
+            progressText: document.getElementById('progress-text'),
+            progressPct: document.getElementById('progress-pct'),
+            resultContainer: document.getElementById('result-container'),
+            audioPlayer: document.getElementById('audio-player'),
+            downloadLink: document.getElementById('download-link'),
+            errorToast: document.getElementById('error-toast'),
+            errorMsg: document.getElementById('error-msg'),
+            closeToast: document.getElementById('close-toast')
+        };
 
+        // --- INIT ---
         function init() {
-            render();
-        }
-
-        function render() {
-            const root = document.getElementById('app-root');
-            root.innerHTML = '';
-
-            if (state.view === 'home') {
-                root.innerHTML = renderLandingPage();
-            } else if (state.view === 'tts') {
-                root.innerHTML = renderTTSProTool();
-                // Re-attach event listeners for TTS page specifically if needed for inputs
-                const textarea = document.getElementById('text-input');
-                if(textarea) {
-                    textarea.value = state.text;
-                    textarea.addEventListener('input', (e) => {
-                        state.text = e.target.value;
-                        document.getElementById('char-count').innerText = `${state.text.length} characters`;
-                    });
-                }
+            lucide.createIcons();
+            renderVoices();
+            
+            const storedKeys = localStorage.getItem("multi_api_keys");
+            if (storedKeys) {
+                state.apiKeys = JSON.parse(storedKeys);
+                updateKeysCount();
             }
 
-            // Initialize Icons
-            lucide.createIcons();
+            // Event Listeners
+            els.openToolBtn.onclick = () => switchView('tool');
+            els.backBtn.onclick = () => switchView('landing');
+            els.settingsBtn.onclick = () => toggleSettings(true);
+            els.closeSettingsBtn.onclick = () => toggleSettings(false);
+            els.saveKeyBtn.onclick = saveKey;
+            els.clearKeysBtn.onclick = clearKeys;
+            els.textInput.oninput = (e) => {
+                state.text = e.target.value;
+                els.charCount.innerText = state.text.length;
+            };
+            els.speedRange.oninput = (e) => {
+                state.speed = parseFloat(e.target.value);
+                els.speedVal.innerText = state.speed + 'x';
+            };
+            els.generateBtn.onclick = generateAudio;
+            els.closeToast.onclick = () => els.errorToast.classList.add('hidden');
         }
 
-        // --- HTML TEMPLATES ---
-
-        function renderLandingPage() {
-            return `
-            <div class="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden fade-in">
-                <!-- Background Glows -->
-                <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-indigo-900/20 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-emerald-900/20 rounded-full blur-3xl pointer-events-none"></div>
-
-                <!-- Header Badge -->
-                <div class="bg-[#1E293B] border border-slate-700/50 px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest text-indigo-300 uppercase mb-6 shadow-lg">
-                    Powered by Grow with Haider
-                </div>
-
-                <!-- Title -->
-                <div class="text-center mb-16 space-y-2">
-                    <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-white">AI Creator Studio</h1>
-                    <p class="text-slate-400 text-lg font-medium">Professional Tools Suite</p>
-                </div>
-
-                <!-- Card -->
-                <div class="w-full max-w-md">
-                    <div onclick="navigate('tts')" class="group relative bg-[#162032] border border-slate-800 rounded-3xl p-10 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-900/20 cursor-pointer transform hover:-translate-y-1">
-                        <div class="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl"></div>
-                        <div class="flex flex-col items-center text-center space-y-8 relative z-10">
-                            <div class="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform duration-300">
-                                <i data-lucide="mic" class="w-10 h-10 text-white"></i>
-                            </div>
-                            <div class="space-y-3">
-                                <h3 class="text-2xl font-bold text-white">Text to Speech Pro</h3>
-                                <p class="text-slate-400 text-base leading-relaxed">30+ Premium Voices. Unlimited Text. <br/>Instant WAV Download.</p>
-                            </div>
-                            <button class="flex items-center gap-2 px-6 py-2 bg-emerald-500/10 text-emerald-400 rounded-full text-sm font-bold group-hover:bg-emerald-500 group-hover:text-white transition-all">
-                                Open Tool <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>`;
+        // --- UI LOGIC ---
+        function switchView(view) {
+            if (view === 'tool') {
+                els.landingView.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => els.landingView.classList.add('hidden'), 300);
+                
+                els.toolView.classList.remove('hidden');
+                setTimeout(() => els.toolView.classList.remove('opacity-0'), 50);
+            } else {
+                els.toolView.classList.add('opacity-0');
+                setTimeout(() => els.toolView.classList.add('hidden'), 300);
+                
+                els.landingView.classList.remove('hidden');
+                setTimeout(() => els.landingView.classList.remove('opacity-0', 'pointer-events-none'), 50);
+            }
         }
 
-        function renderTTSProTool() {
-            // Helper to render Voice List
-            const voicesHtml = VOICES.map(voice => `
-                <div onclick="selectVoice('${voice.id}')" 
-                     class="p-3 rounded-xl cursor-pointer transition-all flex items-center justify-between group ${state.selectedVoiceId === voice.id ? 'bg-emerald-600/20 border border-emerald-500/50' : 'hover:bg-slate-800 border border-transparent'}">
+        function toggleSettings(show) {
+            if(show) els.settingsModal.classList.remove('hidden');
+            else els.settingsModal.classList.add('hidden');
+        }
+
+        function renderVoices() {
+            els.voiceList.innerHTML = '';
+            VOICES.forEach(voice => {
+                const div = document.createElement('div');
+                const isActive = state.selectedVoiceId === voice.id;
+                
+                div.className = `p-3 rounded-xl cursor-pointer transition-all flex items-center justify-between group ${isActive ? 'bg-emerald-600/20 border border-emerald-500/50' : 'hover:bg-slate-800 border border-transparent'}`;
+                div.innerHTML = `
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${state.selectedVoiceId === voice.id ? 'bg-emerald-500 text-white' : 'bg-slate-700 text-slate-400'}">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${isActive ? 'bg-emerald-500 text-white' : 'bg-slate-700 text-slate-400'}">
                             ${voice.id[0]}
                         </div>
                         <div>
-                            <h4 class="text-sm font-bold ${state.selectedVoiceId === voice.id ? 'text-emerald-400' : 'text-slate-300'}">${voice.id}</h4>
+                            <h4 class="text-sm font-bold ${isActive ? 'text-emerald-400' : 'text-slate-300'}">${voice.id}</h4>
                             <p class="text-[10px] text-slate-500">${voice.gender} • ${voice.desc}</p>
                         </div>
                     </div>
-                    <button onclick="event.stopPropagation(); previewVoice('${voice.id}')" class="p-2 rounded-full hover:bg-slate-700 text-slate-400 hover:text-emerald-400 transition-colors">
+                    <button class="preview-btn p-2 rounded-full hover:bg-slate-700 text-slate-400 hover:text-emerald-400 transition-colors">
                         <i data-lucide="play" class="w-3 h-3 fill-current"></i>
                     </button>
-                </div>
-            `).join('');
+                `;
 
-            return `
-            <div class="min-h-screen bg-[#0B1120] text-slate-200 font-sans flex flex-col fade-in">
-                <!-- Navbar -->
-                <div class="border-b border-slate-800 bg-[#0F172A]/80 backdrop-blur-md sticky top-0 z-20">
-                    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-                        <button onclick="navigate('home')" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
-                            <i data-lucide="chevron-left" class="w-5 h-5"></i> Back
-                        </button>
-                        <h1 class="text-lg font-bold text-white flex items-center gap-2">
-                            <span class="bg-emerald-500/10 text-emerald-400 p-1.5 rounded-lg"><i data-lucide="mic" class="w-4 h-4"></i></span>
-                            Text to Speech Pro
-                        </h1>
-                        <button onclick="toggleSettings()" class="p-2 rounded-full hover:bg-slate-800 text-slate-400 transition-colors">
-                            <i data-lucide="settings" class="w-5 h-5"></i>
-                        </button>
-                    </div>
-                </div>
+                // Click Selection
+                div.onclick = () => {
+                    state.selectedVoiceId = voice.id;
+                    renderVoices();
+                };
 
-                <!-- Settings Modal -->
-                ${state.showSettings ? `
-                <div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-center pt-20 fade-in">
-                    <div class="bg-[#1E293B] border border-slate-700 rounded-2xl p-6 w-full max-w-md shadow-2xl">
-                        <h3 class="text-white font-bold mb-4 flex items-center gap-2"><i data-lucide="key" class="w-4 h-4 text-indigo-400"></i> API Key Manager</h3>
-                        <div class="space-y-3">
-                            <input id="api-key-input" type="password" placeholder="Paste Gemini API Key..." class="w-full bg-[#0B1120] border border-slate-700 rounded-xl px-4 py-3 text-sm outline-none focus:border-indigo-500 text-white" />
-                            <div class="flex gap-2">
-                                <button onclick="saveKey()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-xl text-sm font-bold">Add Key</button>
-                                <button onclick="toggleSettings()" class="px-4 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-sm">Close</button>
-                            </div>
-                            <div class="text-xs text-slate-500 pt-2">
-                                Active Keys: ${state.apiKeys.length} (Auto-rotate enabled)
-                                ${state.apiKeys.length > 0 ? `<button onclick="clearKeys()" class="text-red-400 ml-2 hover:underline">Clear All</button>` : ''}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                ` : ''}
+                // Preview Click
+                const prevBtn = div.querySelector('.preview-btn');
+                prevBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    playPreview(voice.id);
+                };
 
-                <!-- Main Grid -->
-                <div class="flex-1 p-4 md:p-8 max-w-5xl mx-auto w-full grid lg:grid-cols-2 gap-6">
-                    
-                    <!-- Left: Input -->
-                    <div class="flex flex-col gap-4">
-                        <div class="bg-[#1E293B] border border-slate-700 rounded-3xl p-1 flex-1 flex flex-col shadow-xl">
-                            <textarea id="text-input" placeholder="Paste your script here..." class="flex-1 w-full bg-transparent text-lg p-6 resize-none outline-none text-slate-200 placeholder:text-slate-600 custom-scrollbar">${state.text}</textarea>
-                            <div class="px-6 py-3 border-t border-slate-700/50 text-right text-xs text-slate-500 font-mono">
-                                <span id="char-count">${state.text.length} characters</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Right: Controls -->
-                    <div class="flex flex-col gap-4">
-                        <div class="bg-[#1E293B] border border-slate-700 rounded-3xl overflow-hidden flex flex-col h-[450px] shadow-xl">
-                            <!-- Header -->
-                            <div class="px-6 py-4 border-b border-slate-700 bg-[#1E293B] sticky top-0 z-10 flex justify-between items-center">
-                                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Controls</span>
-                                <i data-lucide="sliders" class="w-4 h-4 text-slate-500"></i>
-                            </div>
-
-                            <!-- Speed Slider -->
-                            <div class="p-6 space-y-6 bg-[#162032] border-b border-slate-700">
-                                <div>
-                                    <div class="flex justify-between mb-2 text-xs font-medium">
-                                        <span class="text-slate-400 uppercase">Speed (Preview Only)</span>
-                                        <span class="text-emerald-400" id="speed-display">${state.speed}x</span>
-                                    </div>
-                                    <input type="range" min="0.5" max="2.0" step="0.1" value="${state.speed}" oninput="updateSpeed(this.value)" class="w-full h-1 bg-slate-700 rounded-full appearance-none cursor-pointer accent-emerald-500">
-                                </div>
-                            </div>
-
-                            <div class="px-6 py-2 bg-[#1E293B] text-xs font-bold text-slate-400 uppercase tracking-wider">Voices</div>
-                            <div class="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar">
-                                ${voicesHtml}
-                            </div>
-                        </div>
-
-                        <!-- Action Box -->
-                        <div class="bg-[#1E293B] border border-slate-700 rounded-3xl p-6 shadow-xl relative overflow-hidden">
-                            <div class="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl"></div>
-                            
-                            <div class="relative z-10 space-y-4">
-                                ${state.isGenerating ? `
-                                <div class="space-y-2">
-                                    <div class="flex justify-between text-xs font-bold text-emerald-400">
-                                        <span>Generating...</span>
-                                        <span>${state.progress}%</span>
-                                    </div>
-                                    <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
-                                        <div class="h-full bg-emerald-500 transition-all duration-300" style="width: ${state.progress}%"></div>
-                                    </div>
-                                </div>
-                                ` : `
-                                <button onclick="generateAudio()" class="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-[#0B1120] font-bold rounded-xl shadow-lg shadow-emerald-900/20 transition-all active:scale-95 flex items-center justify-center gap-2">
-                                    <i data-lucide="wand-2" class="w-5 h-5"></i> Generate Audio
-                                </button>
-                                `}
-
-                                ${state.audioUrl && !state.isGenerating ? `
-                                <div class="animate-in fade-in slide-in-from-bottom-2 space-y-3 pt-2">
-                                    <div class="bg-slate-900/50 p-2 rounded-xl border border-slate-700">
-                                        <audio controls src="${state.audioUrl}" class="w-full h-8 opacity-80"></audio>
-                                    </div>
-                                    <a href="${state.audioUrl}" download="tts-${state.selectedVoiceId}-${Date.now()}.wav" class="flex items-center justify-center gap-2 w-full py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-medium transition-colors">
-                                        <i data-lucide="download" class="w-4 h-4"></i> Download File
-                                    </a>
-                                </div>
-                                ` : ''}
-
-                                ${state.error ? `
-                                <div class="bg-red-500/10 border border-red-500/20 p-3 rounded-xl flex gap-2 items-start text-xs text-red-400">
-                                    <i data-lucide="alert-circle" class="w-4 h-4 flex-shrink-0 mt-0.5"></i>
-                                    <p>${state.error}</p>
-                                </div>
-                                ` : ''}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            `;
+                els.voiceList.appendChild(div);
+            });
+            lucide.createIcons();
         }
 
-        // --- ACTIONS & LOGIC ---
-
-        function navigate(view) {
-            state.view = view;
-            render();
-        }
-
-        function toggleSettings() {
-            state.showSettings = !state.showSettings;
-            render();
-        }
-
+        // --- KEY MANAGEMENT ---
         function saveKey() {
-            const input = document.getElementById('api-key-input');
-            const key = input.value.trim();
-            if (key) {
+            const key = els.apiKeyInput.value.trim();
+            if(key) {
                 state.apiKeys.push(key);
                 localStorage.setItem("multi_api_keys", JSON.stringify(state.apiKeys));
+                els.apiKeyInput.value = "";
+                updateKeysCount();
                 alert("Key Added!");
-                render();
             }
         }
 
         function clearKeys() {
-            state.apiKeys = [];
-            localStorage.removeItem("multi_api_keys");
-            render();
+            if(confirm("Remove all saved keys?")) {
+                state.apiKeys = [];
+                localStorage.removeItem("multi_api_keys");
+                updateKeysCount();
+            }
         }
 
-        function selectVoice(id) {
-            state.selectedVoiceId = id;
-            render();
+        function updateKeysCount() {
+            els.activeKeysCount.innerText = `Active Keys: ${state.apiKeys.length}`;
+            if(state.apiKeys.length > 0) {
+                els.keyIndicator.classList.remove('bg-red-500');
+                els.keyIndicator.classList.add('bg-green-500');
+            } else {
+                els.keyIndicator.classList.add('bg-red-500');
+                els.keyIndicator.classList.remove('bg-green-500');
+            }
         }
 
-        function updateSpeed(val) {
-            state.speed = val;
-            document.getElementById('speed-display').innerText = val + 'x';
-        }
-
-        // --- AUDIO GENERATION LOGIC ---
-
-        async function previewVoice(voiceId) {
+        // --- CORE GENERATION (PARALLEL) ---
+        async function generateAudio() {
+            if (!state.text.trim()) return showError("Please enter some text.");
             if (state.apiKeys.length === 0) {
-                state.showSettings = true;
-                render();
-                return;
+                toggleSettings(true);
+                return showError("Please add an API Key first!");
+            }
+
+            setIsGenerating(true);
+            
+            try {
+                const chunks = chunkText(state.text);
+                
+                // PARALLEL REQUESTS LOGIC
+                let completed = 0;
+                const promises = chunks.map(async (chunk, index) => {
+                    const buffer = await fetchWithRotation(chunk, state.selectedVoiceId);
+                    
+                    completed++;
+                    const pct = Math.round((completed / chunks.length) * 100);
+                    // Safe UI Update
+                    requestAnimationFrame(() => {
+                        els.progressBar.style.width = `${pct}%`;
+                        els.progressPct.innerText = `${pct}%`;
+                    });
+                    
+                    return { index, buffer };
+                });
+
+                const results = await Promise.all(promises);
+                
+                // Re-order
+                results.sort((a, b) => a.index - b.index);
+                const buffers = results.map(r => r.buffer);
+
+                // Merge
+                const finalBlob = mergeBuffers(buffers);
+                const url = URL.createObjectURL(finalBlob);
+                
+                // Update Result UI
+                els.audioPlayer.src = url;
+                els.downloadLink.href = url;
+                els.downloadLink.download = `tts-${state.selectedVoiceId}-${Date.now()}.wav`;
+                els.resultContainer.classList.remove('hidden');
+
+            } catch (err) {
+                showError(err.message);
+            } finally {
+                setIsGenerating(false);
+            }
+        }
+
+        async function playPreview(voiceId) {
+            if (state.apiKeys.length === 0) {
+                toggleSettings(true);
+                return showError("Please add an API Key to preview.");
             }
 
             if (state.previewAudio) {
                 state.previewAudio.pause();
-                state.previewAudio = null;
             }
 
             try {
-                const buffer = await fetchWithRotation("Hello, testing voice.", voiceId);
+                const buffer = await fetchWithRotation("Hello.", voiceId);
                 const blob = createWavFromBuffer(buffer);
                 const url = URL.createObjectURL(blob);
                 const audio = new Audio(url);
-                audio.playbackRate = state.speed;
                 
-                audio.play().catch(e => {
-                    console.error("Play error", e);
-                    state.error = "Playback failed: " + e.message;
-                    render();
-                });
+                audio.playbackRate = state.speed;
+                audio.play();
                 state.previewAudio = audio;
             } catch (err) {
-                state.error = "Preview failed: " + err.message;
-                render();
+                showError("Preview Error: " + err.message);
             }
         }
 
-        async function generateAudio() {
-            if (!state.text.trim()) return;
-            if (state.apiKeys.length === 0) {
-                state.showSettings = true;
-                state.error = "Please add an API Key first!";
-                render();
-                return;
-            }
-
-            state.isGenerating = true;
-            state.progress = 0;
-            state.error = null;
-            state.audioUrl = null;
-            render();
-
-            try {
-                const chunks = chunkText(state.text);
-                const buffers = [];
-
-                for (let i = 0; i < chunks.length; i++) {
-                    const chunk = chunks[i];
-                    const buffer = await fetchWithRotation(chunk, state.selectedVoiceId);
-                    buffers.push(buffer);
-                    state.progress = Math.round(((i + 1) / chunks.length) * 100);
-                    render();
-                }
-
-                const finalBlob = mergeBuffers(buffers);
-                state.audioUrl = URL.createObjectURL(finalBlob);
-
-            } catch (err) {
-                state.error = err.message;
-            } finally {
-                state.isGenerating = false;
-                render();
-            }
-        }
-
+        // --- API LOGIC ---
         async function fetchWithRotation(text, voiceId) {
             let attempts = 0;
             while (attempts < state.apiKeys.length) {
@@ -414,10 +515,8 @@
                             contents: [{ parts: [{ text }] }],
                             generationConfig: {
                                 responseModalities: ["AUDIO"],
-                                speechConfig: {
-                                    voiceConfig: {
-                                        prebuiltVoiceConfig: { voiceName: voiceId }
-                                    }
+                                speechConfig: { 
+                                    voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceId } } 
                                 }
                             }
                         })
@@ -434,7 +533,7 @@
 
                     const data = await response.json();
                     const b64 = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-                    if (!b64) throw new Error("No audio returned");
+                    if (!b64) throw new Error("No audio data returned.");
 
                     const bin = atob(b64);
                     const bytes = new Uint8Array(bin.length);
@@ -453,8 +552,7 @@
             throw new Error("All API Keys exhausted.");
         }
 
-        // --- UTILS (WAV Processing) ---
-
+        // --- WAV & UTILS ---
         function chunkText(str) {
             const chunks = [];
             let current = "";
@@ -470,36 +568,31 @@
         function isWav(buffer) {
             if (buffer.byteLength < 4) return false;
             const view = new DataView(buffer);
-            return view.getUint32(0, false) === 0x52494646; // 'RIFF'
+            return view.getUint32(0, false) === 0x52494646; 
         }
 
         function findDataOffset(buffer) {
             const bytes = new Uint8Array(buffer);
             for (let i = 0; i < bytes.length - 4; i++) {
                 if (bytes[i]===0x64 && bytes[i+1]===0x61 && bytes[i+2]===0x74 && bytes[i+3]===0x61) {
-                    return i + 8;
+                    return i + 8; 
                 }
             }
-            return 44;
+            return 44; 
         }
 
         function mergeBuffers(buffers) {
             if (buffers.length === 0) return new Blob([]);
-            
-            let totalDataLen = 0;
+            let totalLen = 0;
             const parts = [];
-
             buffers.forEach(b => {
                 let offset = 0;
-                if (isWav(b)) {
-                    offset = findDataOffset(b);
-                }
-                const chunkData = b.slice(offset);
-                parts.push(chunkData);
-                totalDataLen += chunkData.byteLength;
+                if (isWav(b)) offset = findDataOffset(b);
+                const part = b.slice(offset);
+                parts.push(part);
+                totalLen += part.byteLength;
             });
-            
-            const header = createWavHeader(totalDataLen);
+            const header = createWavHeader(totalLen);
             return new Blob([header, ...parts], { type: 'audio/wav' });
         }
 
@@ -532,7 +625,29 @@
             for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
         }
 
-        // --- INIT ---
+        function setIsGenerating(val) {
+            state.isGenerating = val;
+            if (val) {
+                els.generateBtn.disabled = true;
+                els.generateBtn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Generating...`;
+                els.generateBtn.classList.add('opacity-70');
+                els.progressContainer.classList.remove('hidden');
+                els.resultContainer.classList.add('hidden');
+            } else {
+                els.generateBtn.disabled = false;
+                els.generateBtn.innerHTML = `<i data-lucide="wand-2" class="w-5 h-5"></i> Generate Audio`;
+                els.generateBtn.classList.remove('opacity-70');
+            }
+            lucide.createIcons();
+        }
+
+        function showError(msg) {
+            els.errorMsg.innerText = msg;
+            els.errorToast.classList.remove('hidden');
+            setTimeout(() => els.errorToast.classList.add('hidden'), 8000);
+        }
+
+        // Start App
         init();
 
     </script>

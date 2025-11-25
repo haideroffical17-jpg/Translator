@@ -3,25 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Creator Studio - Final Pro</title>
+    <title>AI Creator Studio - Pro Admin</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- FIREBASE SDKs -->
+    <!-- FIREBASE SDKs (Compat Version for Stability in Single File) -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <style>
-        /* Custom Scrollbar */
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
         
-        /* Animations */
         @keyframes pulse-emerald {
             0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
             70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
@@ -33,16 +31,29 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-up { animation: fade-in-up 0.3s ease-out forwards; }
+        
+        .playing-wave { display: flex; align-items: center; gap: 2px; height: 20px; }
+        .playing-wave span { display: block; width: 3px; background: #34d399; animation: wave 1s infinite ease-in-out; }
+        .playing-wave span:nth-child(1) { animation-delay: 0.1s; height: 40%; }
+        .playing-wave span:nth-child(2) { animation-delay: 0.2s; height: 100%; }
+        .playing-wave span:nth-child(3) { animation-delay: 0.3s; height: 60%; }
+        .playing-wave span:nth-child(4) { animation-delay: 0.4s; height: 80%; }
+        @keyframes wave { 0%, 100% { transform: scaleY(0.5); } 50% { transform: scaleY(1); } }
     </style>
 </head>
 <body class="bg-[#0B1120] text-white font-sans h-screen flex flex-col overflow-hidden">
 
+    <!-- GLOBAL ANNOUNCEMENT BANNER -->
+    <div id="global-announcement" class="hidden bg-gradient-to-r from-red-600 to-orange-600 text-white px-4 py-2 text-sm font-bold text-center shadow-lg z-[100] relative animate-fade-up flex justify-center items-center gap-2">
+        <i data-lucide="megaphone" class="w-4 h-4"></i>
+        <span id="announcement-text"></span>
+    </div>
+
     <!-- ================= VIEWS CONTAINER ================= -->
-    <div id="app-container" class="w-full h-full relative">
+    <div id="app-container" class="flex-1 w-full h-full relative">
 
         <!-- 1. LANDING PAGE VIEW -->
         <div id="landing-view" class="absolute inset-0 flex flex-col items-center justify-center p-6 z-10 transition-opacity duration-500">
-            
             <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-indigo-900/20 rounded-full blur-3xl pointer-events-none"></div>
             <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-emerald-900/20 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -64,7 +75,7 @@
                         </div>
                         <div class="space-y-3">
                             <h3 class="text-2xl font-bold text-white">Text to Speech Pro</h3>
-                            <p class="text-slate-400 text-base leading-relaxed">30+ Premium Voices. Unlimited Text. <br/>Instant WAV Download.</p>
+                            <p class="text-slate-400 text-base leading-relaxed">Instant Streaming. <br/>No Waiting.</p>
                         </div>
                         <button class="flex items-center gap-2 px-6 py-2 bg-emerald-500/10 text-emerald-400 rounded-full text-sm font-bold group-hover:bg-emerald-500 group-hover:text-white transition-all">
                             Start Generating <i data-lucide="arrow-right" class="w-4 h-4"></i>
@@ -86,12 +97,9 @@
                         Text to Speech Pro
                     </h1>
                     <div class="flex items-center gap-3">
-                        <!-- Admin Shortcut -->
                         <button id="admin-shortcut-btn" class="hidden px-3 py-1.5 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg text-xs font-bold hover:bg-red-500/20 flex items-center gap-2">
                             <i data-lucide="shield" class="w-3 h-3"></i> Admin
                         </button>
-
-                        <!-- User Logout -->
                         <button id="user-logout-btn" class="p-2 text-xs text-slate-400 hover:text-white border border-slate-700 rounded-lg hover:bg-slate-800 transition-colors" title="Logout">
                             <i data-lucide="log-out" class="w-4 h-4"></i>
                         </button>
@@ -138,24 +146,30 @@
                     <div class="bg-[#1E293B] border border-slate-700 rounded-3xl p-6 shadow-xl relative overflow-hidden">
                         <div class="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl"></div>
                         <div class="relative z-10 space-y-4">
-                            <div id="progress-container" class="hidden space-y-2">
-                                <div class="flex justify-between text-xs font-bold text-emerald-400">
-                                    <span id="progress-text">Initializing...</span>
-                                    <span id="progress-pct">0%</span>
+                            <!-- New Playback UI -->
+                            <div id="playback-status" class="hidden bg-slate-800/80 rounded-xl p-4 border border-slate-700">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center gap-3">
+                                        <div id="wave-anim" class="playing-wave hidden"><span></span><span></span><span></span><span></span></div>
+                                        <span id="status-text" class="text-sm font-bold text-white">Generating...</span>
+                                    </div>
+                                    <span id="chunk-counter" class="text-xs text-slate-500 font-mono">0/0</span>
                                 </div>
-                                <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
-                                    <div id="progress-bar" class="h-full bg-emerald-500 transition-all duration-300 w-0"></div>
+                                <div class="h-1.5 bg-slate-700 rounded-full overflow-hidden w-full">
+                                    <div id="buffer-bar" class="h-full bg-indigo-500 transition-all duration-300 w-0"></div>
                                 </div>
                             </div>
+
                             <button id="generate-btn" class="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-[#0B1120] font-bold rounded-xl shadow-lg shadow-emerald-900/20 transition-all active:scale-95 flex items-center justify-center gap-2">
-                                <i data-lucide="wand-2" class="w-5 h-5"></i> Generate Audio
+                                <i data-lucide="play" class="w-5 h-5"></i> Start Speaking
                             </button>
-                            <div id="result-container" class="hidden animate-in fade-in slide-in-from-bottom-2 space-y-3 pt-2">
-                                <div class="bg-slate-900/50 p-2 rounded-xl border border-slate-700">
-                                    <audio id="audio-player" controls class="w-full h-8"></audio>
-                                </div>
+                            
+                            <!-- Hidden Audio Player for Logic -->
+                            <audio id="main-audio" class="hidden"></audio>
+
+                            <div id="download-section" class="hidden animate-in fade-in slide-in-from-bottom-2 pt-2">
                                 <a id="download-link" href="#" download class="flex items-center justify-center gap-2 w-full py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-medium transition-colors">
-                                    <i data-lucide="download" class="w-4 h-4"></i> Download File
+                                    <i data-lucide="download" class="w-4 h-4"></i> Download Full Audio
                                 </a>
                             </div>
                         </div>
@@ -164,144 +178,162 @@
             </div>
         </div>
 
-        <!-- 3. USER AUTH MODAL (UNIFIED LOGIN) -->
+        <!-- 3. USER AUTH MODAL -->
         <div id="user-auth-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] flex items-center justify-center hidden opacity-0 transition-opacity">
             <div class="w-full max-w-md bg-[#1E293B] border border-slate-700 rounded-3xl shadow-2xl p-8 relative">
                 <button onclick="toggleUserAuth(false)" class="absolute top-4 right-4 text-slate-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
-                
                 <div class="text-center mb-6">
                     <h2 class="text-2xl font-bold text-white">Welcome Back</h2>
                     <p class="text-slate-400 text-sm mt-1">Login to access the Studio</p>
                 </div>
-
                 <div class="flex bg-[#0B1120] p-1 rounded-xl mb-6">
                     <button id="tab-login" onclick="switchAuthTab('login')" class="flex-1 py-2 text-sm font-bold rounded-lg text-white bg-slate-700 transition-all">Login</button>
                     <button id="tab-signup" onclick="switchAuthTab('signup')" class="flex-1 py-2 text-sm font-bold rounded-lg text-slate-400 hover:text-white transition-all">Sign Up</button>
                 </div>
-
                 <div class="space-y-4">
                     <input type="email" id="user-email" placeholder="Email Address" class="w-full bg-[#0B1120] border border-slate-700 rounded-xl px-4 py-3 text-white outline-none focus:border-emerald-500">
                     <input type="password" id="user-pass" placeholder="Password" class="w-full bg-[#0B1120] border border-slate-700 rounded-xl px-4 py-3 text-white outline-none focus:border-emerald-500">
-                    
-                    <button id="auth-action-btn" onclick="handleUserAuth()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-900/20 transition-all flex justify-center items-center gap-2">
-                        Login
-                    </button>
+                    <button id="auth-action-btn" onclick="handleUserAuth()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-900/20 transition-all flex justify-center items-center gap-2">Login</button>
                 </div>
                 <p id="auth-msg" class="text-center text-red-400 text-xs mt-4 h-4"></p>
             </div>
         </div>
 
-        <!-- 4. ADMIN DASHBOARD VIEW -->
+        <!-- 4. ADMIN DASHBOARD VIEW (UPDATED) -->
         <div id="admin-dashboard-view" class="absolute inset-0 bg-[#0B1120] flex flex-col hidden opacity-0 transition-opacity z-50">
-            <!-- Admin Nav -->
             <div class="border-b border-red-900/30 bg-[#1E293B] px-6 py-4 flex justify-between items-center sticky top-0 z-10">
                 <div class="flex items-center gap-3">
                     <span class="bg-red-500/10 text-red-500 p-2 rounded-lg"><i data-lucide="layout-dashboard" class="w-5 h-5"></i></span>
                     <div>
                         <h1 class="font-bold text-white">Admin Console</h1>
-                        <p class="text-[10px] text-emerald-400 uppercase tracking-wider flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> Live Connection
-                        </p>
+                        <div class="flex items-center gap-2">
+                            <p class="text-[10px] text-emerald-400 uppercase tracking-wider flex items-center gap-1"><span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> Live</p>
+                            <span id="db-status" class="text-[10px] text-slate-500 font-mono">Connecting...</span>
+                        </div>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
+                    <button onclick="loadAdminDashboardData()" class="px-4 py-2 bg-blue-900/20 hover:bg-blue-900/40 text-blue-400 rounded-lg text-xs font-bold flex items-center gap-2 border border-blue-900/30">
+                        <i data-lucide="refresh-cw" class="w-3 h-3"></i> Refresh
+                    </button>
                     <button onclick="switchView('tool')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold flex items-center gap-2 border border-slate-700">
                         <i data-lucide="mic" class="w-4 h-4"></i> Go to Tool
                     </button>
                     <button onclick="handleUserLogout()" class="px-4 py-2 bg-red-900/20 hover:bg-red-900/40 text-red-400 rounded-lg text-xs font-bold flex items-center gap-2 border border-red-900/30">
-                        <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- Admin Content -->
             <div class="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full overflow-y-auto">
-                
-                <!-- LIVE STATS GRID -->
+                <!-- STATS GRID -->
                 <div class="grid md:grid-cols-4 gap-4 mb-8">
                     <div class="bg-[#162032] border border-slate-700 p-5 rounded-2xl">
-                        <div class="flex justify-between items-start mb-2">
-                            <p class="text-slate-400 text-[10px] uppercase tracking-wider font-bold">Registered Users</p>
-                            <i data-lucide="users" class="w-4 h-4 text-indigo-400"></i>
-                        </div>
+                        <div class="flex justify-between items-start mb-2"><p class="text-slate-400 text-[10px] uppercase font-bold">Registered Users</p><i data-lucide="users" class="w-4 h-4 text-indigo-400"></i></div>
                         <h3 id="stat-total-users" class="text-3xl font-bold text-white">0</h3>
-                        <p class="text-[10px] text-slate-500 mt-1">Total Accounts</p>
                     </div>
                     <div class="bg-[#162032] border border-slate-700 p-5 rounded-2xl">
-                        <div class="flex justify-between items-start mb-2">
-                            <p class="text-slate-400 text-[10px] uppercase tracking-wider font-bold">Total Voices</p>
-                            <i data-lucide="mic-2" class="w-4 h-4 text-emerald-400"></i>
-                        </div>
+                        <div class="flex justify-between items-start mb-2"><p class="text-slate-400 text-[10px] uppercase font-bold">Total Voices</p><i data-lucide="mic-2" class="w-4 h-4 text-emerald-400"></i></div>
                         <h3 id="stat-total-gens" class="text-3xl font-bold text-white">0</h3>
                         <p class="text-[10px] text-slate-500 mt-1">Audio Files Created</p>
                     </div>
-                    <div class="bg-[#162032] border border-slate-700 p-5 rounded-2xl">
+                    <!-- PROCESSING CARD WITH RESET -->
+                    <div class="bg-[#162032] border border-slate-700 p-5 rounded-2xl relative group">
                         <div class="flex justify-between items-start mb-2">
-                            <p class="text-slate-400 text-[10px] uppercase tracking-wider font-bold">Processing Now</p>
-                            <i data-lucide="loader-2" class="w-4 h-4 text-yellow-400 animate-spin"></i>
+                            <p class="text-slate-400 text-[10px] uppercase font-bold">Processing Now</p>
+                            <div class="flex gap-2">
+                                <button onclick="resetPendingStats()" class="text-slate-600 hover:text-white transition-colors" title="Reset Counter"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
+                                <i data-lucide="loader-2" class="w-4 h-4 text-yellow-400 animate-spin"></i>
+                            </div>
                         </div>
                         <h3 id="stat-pending" class="text-3xl font-bold text-yellow-400">0</h3>
                         <p class="text-[10px] text-slate-500 mt-1">Live requests</p>
                     </div>
                     <div class="bg-[#162032] border border-slate-700 p-5 rounded-2xl">
-                        <div class="flex justify-between items-start mb-2">
-                            <p class="text-slate-400 text-[10px] uppercase tracking-wider font-bold">API Keys</p>
-                            <i data-lucide="key" class="w-4 h-4 text-slate-400"></i>
-                        </div>
+                        <div class="flex justify-between items-start mb-2"><p class="text-slate-400 text-[10px] uppercase font-bold">System Keys</p><i data-lucide="lock" class="w-4 h-4 text-slate-400"></i></div>
                         <h3 id="stat-keys-count" class="text-3xl font-bold text-white">0</h3>
-                        <p class="text-[10px] text-slate-500 mt-1">Active System Keys</p>
                     </div>
                 </div>
 
+                <!-- MAIN CONTENT GRID -->
                 <div class="grid lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-2 bg-[#1E293B] border border-slate-700 rounded-2xl overflow-hidden shadow-xl flex flex-col h-[400px]">
-                        <div class="px-6 py-4 border-b border-slate-700 bg-[#1E293B] sticky top-0 flex justify-between items-center">
-                            <h2 class="text-sm font-bold text-white flex items-center gap-2">
-                                <span class="w-2 h-2 bg-emerald-500 rounded-full admin-pulse"></span> Live Activity Feed
-                            </h2>
-                            <span class="text-[10px] text-slate-500">Real-time</span>
+                    <!-- LEFT COLUMN: Activity & Users -->
+                    <div class="lg:col-span-2 space-y-6">
+                        
+                        <!-- 1. Activity Feed -->
+                        <div class="bg-[#1E293B] border border-slate-700 rounded-2xl overflow-hidden shadow-xl flex flex-col h-[350px]">
+                            <div class="px-6 py-4 border-b border-slate-700 bg-[#1E293B] sticky top-0 flex justify-between items-center">
+                                <h2 class="text-sm font-bold text-white flex items-center gap-2"><span class="w-2 h-2 bg-emerald-500 rounded-full admin-pulse"></span> Live Activity</h2>
+                            </div>
+                            <div class="flex-1 overflow-y-auto p-0 custom-scrollbar">
+                                <table class="w-full text-left text-sm text-slate-400">
+                                    <thead class="bg-slate-800/50 text-xs uppercase sticky top-0">
+                                        <tr><th class="px-6 py-3">User / Time</th><th class="px-6 py-3">Status</th><th class="px-6 py-3">Content</th></tr>
+                                    </thead>
+                                    <tbody id="activity-log-list" class="divide-y divide-slate-700/50">
+                                        <tr><td colspan="3" class="px-6 py-8 text-center italic text-slate-600">Waiting...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                        <div class="flex-1 overflow-y-auto p-0 custom-scrollbar">
-                            <table class="w-full text-left text-sm text-slate-400">
-                                <tbody id="activity-log-list" class="divide-y divide-slate-700/50">
-                                    <tr><td class="px-6 py-8 text-center italic text-slate-600">Waiting for activity...</td></tr>
-                                </tbody>
-                            </table>
+
+                        <!-- 2. USER LIST (NEW) -->
+                        <div class="bg-[#1E293B] border border-slate-700 rounded-2xl overflow-hidden shadow-xl flex flex-col h-[350px]">
+                            <div class="px-6 py-4 border-b border-slate-700 bg-[#1E293B] sticky top-0 flex justify-between items-center">
+                                <h2 class="text-sm font-bold text-white flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-indigo-400"></i> All Users</h2>
+                            </div>
+                            <div class="flex-1 overflow-y-auto p-0 custom-scrollbar">
+                                <table class="w-full text-left text-sm text-slate-400">
+                                    <thead class="bg-slate-800/50 text-xs uppercase sticky top-0">
+                                        <tr><th class="px-6 py-3">Email</th><th class="px-6 py-3">Joined</th><th class="px-6 py-3">Gens</th></tr>
+                                    </thead>
+                                    <tbody id="user-list-body" class="divide-y divide-slate-700/50">
+                                        <tr><td colspan="3" class="px-6 py-8 text-center italic text-slate-600">Loading Users...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
+
                     </div>
-                    <!-- ... Keys Panel ... -->
-                    <div class="bg-[#1E293B] border border-slate-700 rounded-2xl overflow-hidden shadow-xl h-fit">
-                        <div class="px-6 py-4 border-b border-slate-700 bg-[#1E293B]">
-                            <h2 class="text-sm font-bold text-white">Manage Keys</h2>
-                        </div>
-                        <div class="p-6 space-y-4">
+
+                    <!-- RIGHT COLUMN: Controls -->
+                    <div class="space-y-6">
+                        <!-- Announcement Box -->
+                        <div class="bg-[#1E293B] border border-slate-700 rounded-2xl p-6">
+                            <h3 class="text-sm font-bold text-white mb-4 flex items-center gap-2"><i data-lucide="megaphone" class="w-4 h-4 text-orange-400"></i> Global Alert</h3>
+                            <textarea id="admin-announcement-input" class="w-full bg-[#0B1120] border border-slate-700 rounded-lg p-3 text-xs text-white mb-3 h-24 resize-none" placeholder="Type alert message for all users..."></textarea>
                             <div class="flex gap-2">
-                                <input id="new-sys-key" type="text" placeholder="Paste Gemini API Key" class="flex-1 bg-[#0B1120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-emerald-500 outline-none">
-                                <button onclick="addSystemKey()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg">
-                                    <i data-lucide="plus" class="w-4 h-4"></i>
-                                </button>
+                                <button onclick="saveAnnouncement()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-2 rounded-lg text-xs font-bold">Save & Show</button>
+                                <button onclick="deleteAnnouncement()" class="bg-red-600 hover:bg-red-500 text-white px-3 py-2 rounded-lg"><i data-lucide="trash" class="w-4 h-4"></i></button>
                             </div>
-                            <div class="text-xs text-slate-500 font-mono max-h-48 overflow-y-auto custom-scrollbar">
-                                <ul id="system-keys-mini-list" class="space-y-2"></ul>
+                        </div>
+
+                        <!-- Key Management -->
+                        <div class="bg-[#1E293B] border border-slate-700 rounded-2xl p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-sm font-bold text-white">System Keys</h3>
+                                <span id="stat-keys-count" class="text-xs bg-slate-700 px-2 py-0.5 rounded text-white">0</span>
                             </div>
+                            <div class="flex gap-2 mb-4">
+                                <input id="new-sys-key" type="text" placeholder="Paste Key" class="flex-1 bg-[#0B1120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white">
+                                <button onclick="addSystemKey()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 rounded-lg"><i data-lucide="plus" class="w-4 h-4"></i></button>
+                            </div>
+                            <ul id="system-keys-mini-list" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar text-xs font-mono"></ul>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 
-    <!-- SETTINGS & TOAST -->
+    <!-- SETTINGS MODAL -->
     <div id="settings-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-start justify-center pt-20 hidden">
         <div class="bg-[#1E293B] border border-slate-700 rounded-2xl p-6 w-full max-w-md shadow-2xl">
             <h3 class="text-white font-bold mb-4 flex items-center gap-2"><i data-lucide="key" class="w-4 h-4 text-indigo-400"></i> Personal API Key</h3>
             <div class="space-y-4">
                 <div class="flex justify-between items-center mb-1">
                     <label class="text-xs text-slate-400">Paste Your Gemini API Key</label>
-                    <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 hover:underline">
-                        Get Key <i data-lucide="external-link" class="w-3 h-3"></i>
-                    </a>
+                    <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 hover:underline">Get Key <i data-lucide="external-link" class="w-3 h-3"></i></a>
                 </div>
                 <input id="api-key-input" type="password" placeholder="Paste Key Here..." class="w-full bg-[#0B1120] border border-slate-700 rounded-xl px-4 py-3 text-sm outline-none focus:border-indigo-500 text-white">
                 <div class="flex gap-2">
@@ -316,23 +348,16 @@
         </div>
     </div>
     
-    <!-- UNIFIED TOAST (Error, Success, Info) -->
+    <!-- TOAST -->
     <div id="toast-container" class="fixed bottom-6 right-6 max-w-sm z-[70] hidden">
         <div id="toast-box" class="flex items-start gap-3 p-4 rounded-lg border-l-4 shadow-2xl transition-all">
             <i id="toast-icon" class="w-5 h-5 mt-0.5"></i>
-            <div>
-                <h3 id="toast-title" class="font-bold text-sm"></h3>
-                <p id="toast-msg" class="text-xs text-slate-300 mt-1"></p>
-            </div>
+            <div><h3 id="toast-title" class="font-bold text-sm"></h3><p id="toast-msg" class="text-xs text-slate-300 mt-1"></p></div>
             <button onclick="hideToast()" class="ml-auto text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
     <script>
-        // ==========================================
-        //  USER CONFIG
-        // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyBAbtakEQ9vl9Khz91D8HD8uDeQR8nUHa4",
             authDomain: "creator-studio-new.firebaseapp.com",
@@ -342,67 +367,37 @@
             appId: "1:512739989726:web:84b798168ca876ff628a4f",
             measurementId: "G-T81R12D3KY"
         };
-
         const ADMIN_EMAIL = "haideroffical16@gmail.com"; 
+        // APP ID Variable from environment or fallback
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'creator-studio-new';
 
-        let app, auth, db;
-        let isFirebaseActive = false;
-        let systemKeys = []; 
+        let app, auth, db, isFirebaseActive = false, systemKeys = [];
 
         try {
-            if (typeof firebase !== 'undefined') {
-                app = firebase.initializeApp(firebaseConfig);
-                auth = firebase.auth();
-                db = firebase.firestore();
-                isFirebaseActive = true;
-                console.log("Firebase Connected");
-            } else {
-                showToast("Firebase SDK not loaded.", "error");
-            }
+            app = firebase.initializeApp(firebaseConfig);
+            auth = firebase.auth();
+            db = firebase.firestore();
+            isFirebaseActive = true;
         } catch (e) { console.error(e); }
 
         const TTS_MODEL = "gemini-2.5-flash-preview-tts";
-        const CHUNK_SIZE = 4500;
+        const CHUNK_SIZE = 3000; 
         const VOICES = [
-            { id: "Fenrir", gender: "Male", desc: "Deep & Calm" },
-            { id: "Kore", gender: "Female", desc: "Soothing & Clear" },
-            { id: "Puck", gender: "Male", desc: "Energetic" },
-            { id: "Aoede", gender: "Female", desc: "Warm & Friendly" },
-            { id: "Charon", gender: "Male", desc: "Deep & Authoritative" },
-            { id: "Zephyr", gender: "Male", desc: "Smooth & Balanced" },
-            { id: "Leda", gender: "Female", desc: "Soft & Gentle" },
-            { id: "Orus", gender: "Male", desc: "Confident" },
-            { id: "Umbriel", gender: "Male", desc: "Steady & Neutral" },
-            { id: "Iapetus", gender: "Male", desc: "Serious & Deep" }
+            { id: "Fenrir", gender: "Male", desc: "Deep & Calm" }, { id: "Kore", gender: "Female", desc: "Soothing" },
+            { id: "Puck", gender: "Male", desc: "Energetic" }, { id: "Aoede", gender: "Female", desc: "Warm" },
+            { id: "Charon", gender: "Male", desc: "Authoritative" }, { id: "Zephyr", gender: "Male", desc: "Smooth" },
+            { id: "Leda", gender: "Female", desc: "Soft" }, { id: "Orus", gender: "Male", desc: "Confident" },
+            { id: "Umbriel", gender: "Male", desc: "Neutral" }, { id: "Iapetus", gender: "Male", desc: "Deep" }
         ];
 
-        let state = {
-            text: "",
-            selectedVoiceId: "Fenrir",
-            localKeys: [],
-            currentKeyIndex: 0,
-            isGenerating: false,
-            speed: 1.0,
-            currentUser: null,
-            authMode: 'login', 
-            isAdmin: false,
-            previewAudio: null
-        };
-
-        const els = {
-            landingView: document.getElementById('landing-view'),
-            toolView: document.getElementById('tool-view'),
-            adminDashboardView: document.getElementById('admin-dashboard-view'),
-            userAuthModal: document.getElementById('user-auth-modal'),
-            adminShortcutBtn: document.getElementById('admin-shortcut-btn')
-        };
+        let state = { text: "", selectedVoiceId: "Fenrir", localKeys: [], speed: 1.0, currentUser: null, authMode: 'login', isAdmin: false, previewAudio: null, audioQueue: [], currentPlayingIndex: -1, isPlaying: false, fullAudioBlobs: [], currentLogId: null };
+        const els = { landingView: document.getElementById('landing-view'), toolView: document.getElementById('tool-view'), adminDashboardView: document.getElementById('admin-dashboard-view'), userAuthModal: document.getElementById('user-auth-modal'), adminShortcutBtn: document.getElementById('admin-shortcut-btn'), mainAudio: document.getElementById('main-audio'), announcementBanner: document.getElementById('global-announcement'), announcementText: document.getElementById('announcement-text') };
 
         function getEl(id) { return document.getElementById(id); }
 
         function init() {
             lucide.createIcons();
             renderVoices();
-            
             const storedKeys = localStorage.getItem("local_api_keys");
             if (storedKeys) state.localKeys = JSON.parse(storedKeys);
             updateKeysUI();
@@ -412,11 +407,34 @@
                 auth.onAuthStateChanged((user) => {
                     state.currentUser = user;
                     if (user) {
-                        state.isAdmin = (user.email === ADMIN_EMAIL);
-                        if (state.isAdmin) els.adminShortcutBtn.classList.remove('hidden');
-                        else els.adminShortcutBtn.classList.add('hidden');
+                        // Case-Insensitive Admin Check + Trim
+                        const normalizedUserEmail = user.email.trim().toLowerCase();
+                        const normalizedAdminEmail = ADMIN_EMAIL.trim().toLowerCase();
+                        
+                        state.isAdmin = (normalizedUserEmail === normalizedAdminEmail);
+                        els.adminShortcutBtn.classList.toggle('hidden', !state.isAdmin);
+                        
+                        setupListeners(user);
+                        if(state.isAdmin) {
+                            loadAdminDashboardData();
+                            // Auto-bootstrap stats if empty
+                            getRef('stats').doc('global').get().then(d => {
+                                if(!d.exists) {
+                                    getRef('stats').doc('global').set({total_users: 0, total_generations: 0, total_user_keys: 0, failed_generations: 0});
+                                }
+                            });
+                        }
                     }
                 });
+                // Listen for announcements
+                getRef('system_config').doc('announcement').onSnapshot(doc => {
+                    if(doc.exists && doc.data().active && doc.data().message) {
+                        els.announcementBanner.classList.remove('hidden');
+                        els.announcementText.innerText = doc.data().message;
+                    } else {
+                        els.announcementBanner.classList.add('hidden');
+                    }
+                }, (e)=>{});
             }
 
             getEl('open-tool-btn').onclick = checkAuthAndStart;
@@ -427,340 +445,328 @@
             getEl('clear-keys-btn').onclick = clearLocalKeys;
             getEl('user-logout-btn').onclick = handleUserLogout;
             getEl('admin-shortcut-btn').onclick = () => switchView('admin-dashboard');
-            
-            getEl('text-input').oninput = (e) => {
-                state.text = e.target.value;
-                getEl('char-count').innerText = state.text.length;
-            };
-            getEl('speed-range').oninput = (e) => {
-                state.speed = parseFloat(e.target.value);
-                getEl('speed-val').innerText = state.speed + 'x';
-            };
-            getEl('generate-btn').onclick = generateAudio;
+            getEl('text-input').oninput = (e) => { state.text = e.target.value; getEl('char-count').innerText = state.text.length; };
+            getEl('speed-range').oninput = (e) => { state.speed = parseFloat(e.target.value); getEl('speed-val').innerText = state.speed + 'x'; if(els.mainAudio) els.mainAudio.playbackRate = state.speed; };
+            getEl('generate-btn').onclick = startStreamingGeneration;
+            els.mainAudio.onended = playNextInQueue;
         }
 
-        // --- TOAST SYSTEM ---
+        // --- HELPER FOR PATHS (CRITICAL FIX: RESTORED ROOT PATHS) ---
+        function getRef(collectionName) {
+            // Using root collections to match user's existing data structure
+            return db.collection(collectionName);
+        }
+        
+        // --- LISTENER SETUP ---
+        function setupListeners(user) {
+            // Currently mostly handled in init or on-demand to save resources
+        }
+
+        // --- CORE UI ---
         function showToast(msg, type = 'error') {
-            const container = getEl('toast-container');
-            const box = getEl('toast-box');
-            const title = getEl('toast-title');
-            const text = getEl('toast-msg');
-            const icon = getEl('toast-icon');
-            
-            let bgClass, borderClass, titleClass, iconClass, iconName, titleText;
-
-            if(type === 'error') {
-                bgClass = 'bg-[#1E293B]'; borderClass = 'border-red-500';
-                titleClass = 'text-red-400'; iconClass = 'text-red-500';
-                iconName = 'alert-circle'; titleText = 'Error';
-            } else if (type === 'success') {
-                bgClass = 'bg-[#1E293B]'; borderClass = 'border-emerald-500';
-                titleClass = 'text-emerald-400'; iconClass = 'text-emerald-500';
-                iconName = 'check-circle'; titleText = 'Success';
-            } else { // Info
-                bgClass = 'bg-[#1E293B]'; borderClass = 'border-blue-500';
-                titleClass = 'text-blue-400'; iconClass = 'text-blue-500';
-                iconName = 'info'; titleText = 'Info';
-            }
-
-            box.className = `flex items-start gap-3 p-4 rounded-lg border-l-4 shadow-2xl transition-all ${bgClass} ${borderClass}`;
-            title.className = `font-bold text-sm ${titleClass}`;
-            icon.className = `w-5 h-5 mt-0.5 ${iconClass}`;
-            
-            title.innerText = titleText;
-            text.innerText = msg;
-            icon.setAttribute('data-lucide', iconName);
-            
-            container.classList.remove('hidden');
-            lucide.createIcons();
-
-            if(type !== 'error') setTimeout(hideToast, 3000);
+            const container = getEl('toast-container'), box = getEl('toast-box'), title = getEl('toast-title'), text = getEl('toast-msg'), icon = getEl('toast-icon');
+            let bgClass = type === 'error' ? 'bg-[#1E293B] border-red-500' : (type === 'success' ? 'bg-[#1E293B] border-emerald-500' : 'bg-[#1E293B] border-blue-500');
+            let titleColor = type === 'error' ? 'text-red-400' : (type === 'success' ? 'text-emerald-400' : 'text-blue-400');
+            let iconName = type === 'error' ? 'alert-circle' : (type === 'success' ? 'check-circle' : 'info');
+            box.className = `flex items-start gap-3 p-4 rounded-lg border-l-4 shadow-2xl transition-all ${bgClass}`;
+            title.className = `font-bold text-sm ${titleColor}`; title.innerText = type === 'error' ? 'Error' : (type === 'success' ? 'Success' : 'Info');
+            text.innerText = msg; icon.setAttribute('data-lucide', iconName); icon.className = `w-5 h-5 mt-0.5 ${titleColor}`;
+            container.classList.remove('hidden'); lucide.createIcons();
+            if(type !== 'error') setTimeout(() => container.classList.add('hidden'), 3000);
         }
-
         function hideToast() { getEl('toast-container').classList.add('hidden'); }
-
-        // --- CORE LOGIC ---
-        function checkAuthAndStart() {
-            if (state.currentUser) switchView('tool');
-            else toggleUserAuth(true);
-        }
-
-        function toggleUserAuth(show) {
-            if(show) {
-                els.userAuthModal.classList.remove('hidden');
-                setTimeout(() => els.userAuthModal.classList.remove('opacity-0'), 10);
-            } else {
-                els.userAuthModal.classList.add('opacity-0');
-                setTimeout(() => els.userAuthModal.classList.add('hidden'), 300);
-            }
-        }
-
-        function switchAuthTab(mode) {
-            state.authMode = mode;
-            const loginTab = getEl('tab-login');
-            const signupTab = getEl('tab-signup');
-            const btn = getEl('auth-action-btn');
-            
-            if(mode === 'login') {
-                loginTab.className = "flex-1 py-2 text-sm font-bold rounded-lg text-white bg-slate-700 transition-all";
-                signupTab.className = "flex-1 py-2 text-sm font-bold rounded-lg text-slate-400 hover:text-white transition-all";
-                btn.innerText = "Login";
-            } else {
-                signupTab.className = "flex-1 py-2 text-sm font-bold rounded-lg text-white bg-slate-700 transition-all";
-                loginTab.className = "flex-1 py-2 text-sm font-bold rounded-lg text-slate-400 hover:text-white transition-all";
-                btn.innerText = "Create Account";
-            }
-        }
-
+        function checkAuthAndStart() { if (state.currentUser) switchView('tool'); else toggleUserAuth(true); }
+        function toggleUserAuth(show) { const m = els.userAuthModal; if(show){m.classList.remove('hidden'); setTimeout(()=>m.classList.remove('opacity-0'),10);}else{m.classList.add('opacity-0'); setTimeout(()=>m.classList.add('hidden'),300);} }
+        function switchAuthTab(mode) { state.authMode=mode; getEl('tab-login').className=mode==='login'?"flex-1 py-2 text-sm font-bold rounded-lg text-white bg-slate-700":"flex-1 py-2 text-sm font-bold rounded-lg text-slate-400 hover:text-white"; getEl('tab-signup').className=mode==='signup'?"flex-1 py-2 text-sm font-bold rounded-lg text-white bg-slate-700":"flex-1 py-2 text-sm font-bold rounded-lg text-slate-400 hover:text-white"; getEl('auth-action-btn').innerText=mode==='login'?"Login":"Create Account"; }
+        
         async function handleUserAuth() {
-            const email = getEl('user-email').value;
-            const pass = getEl('user-pass').value;
-            const msg = getEl('auth-msg');
-            
-            if(!email || !pass) { msg.innerText = "Please enter email and password"; return; }
-            if(!isFirebaseActive) { msg.innerText = "Error: Database not connected"; return; }
-
-            msg.innerText = "Processing...";
+            const email=getEl('user-email').value, pass=getEl('user-pass').value, msg=getEl('auth-msg');
+            if(!email||!pass){msg.innerText="Enter details";return;}
+            msg.innerText="Processing...";
             try {
-                let userCredential;
-                if(state.authMode === 'signup') {
-                    userCredential = await auth.createUserWithEmailAndPassword(email, pass);
-                    db.collection('stats').doc('global').update({ total_users: firebase.firestore.FieldValue.increment(1) }).catch(() => {
-                        db.collection('stats').doc('global').set({ total_users: 1 }, { merge: true });
+                const cred = state.authMode==='signup' ? await auth.createUserWithEmailAndPassword(email,pass) : await auth.signInWithEmailAndPassword(email,pass);
+                
+                // --- SAVE USER PROFILE (New Feature) ---
+                if(cred.user) {
+                    const userRef = getRef('users').doc(cred.user.uid);
+                    userRef.get().then((doc) => {
+                        if (!doc.exists) {
+                            userRef.set({
+                                email: cred.user.email,
+                                joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                                generationCount: 0
+                            });
+                            // Initial Bootstrapping for Stats if needed
+                            getRef('stats').doc('global').set({total_users:firebase.firestore.FieldValue.increment(1)},{merge:true});
+                        } else {
+                            userRef.update({lastLogin: firebase.firestore.FieldValue.serverTimestamp()});
+                        }
                     });
-                } else {
-                    userCredential = await auth.signInWithEmailAndPassword(email, pass);
                 }
+
+                const cleanEmail = cred.user.email.trim().toLowerCase();
+                const cleanAdmin = ADMIN_EMAIL.trim().toLowerCase();
+                switchView(cleanEmail===cleanAdmin?'admin-dashboard':'tool');
                 
-                const user = userCredential.user;
-                if (user.email === ADMIN_EMAIL) switchView('admin-dashboard');
-                else switchView('tool');
-                
-                msg.innerText = "";
-                getEl('user-email').value = "";
-                getEl('user-pass').value = "";
-                toggleUserAuth(false);
-
-            } catch (e) { msg.innerText = e.message.replace("Firebase:", "").trim(); }
+                toggleUserAuth(false); getEl('user-email').value=""; getEl('user-pass').value=""; msg.innerText="";
+            } catch(e){msg.innerText=e.message.replace("Firebase:","").trim();}
         }
+        function handleUserLogout(){auth.signOut();switchView('landing');}
+        function switchView(v){ [els.landingView,els.toolView,els.adminDashboardView].forEach(e=>{e.classList.add('hidden','opacity-0');e.classList.remove('z-50');}); if(v==='landing')showEl(els.landingView); else if(v==='tool')showEl(els.toolView); else if(v==='admin-dashboard'){showEl(els.adminDashboardView);els.adminDashboardView.classList.add('z-50');if(isFirebaseActive && state.isAdmin)loadAdminDashboardData();} }
+        function showEl(e){e.classList.remove('hidden');setTimeout(()=>e.classList.remove('opacity-0'),50);}
+        function toggleSettings(s){const m=getEl('settings-modal'); s?m.classList.remove('hidden'):m.classList.add('hidden');}
+        function renderVoices(){const l=getEl('voice-list');l.innerHTML='';VOICES.forEach(v=>{const a=state.selectedVoiceId===v.id;const d=document.createElement('div');d.className=`p-3 rounded-xl cursor-pointer flex justify-between group ${a?'bg-emerald-600/20 border border-emerald-500/50':'hover:bg-slate-800 border border-transparent'}`;d.innerHTML=`<div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${a?'bg-emerald-500 text-white':'bg-slate-700 text-slate-400'}">${v.id[0]}</div><div><h4 class="text-sm font-bold ${a?'text-emerald-400':'text-slate-300'}">${v.id}</h4><p class="text-[10px] text-slate-500">${v.gender} • ${v.desc}</p></div></div><button class="p-2 rounded-full hover:bg-slate-700 text-slate-400 hover:text-emerald-400" onclick="event.stopPropagation();playPreview('${v.id}')"><i data-lucide="play" class="w-3 h-3 fill-current"></i></button>`;d.onclick=()=>{state.selectedVoiceId=v.id;renderVoices();};l.appendChild(d);});lucide.createIcons();}
 
-        function handleUserLogout() { auth.signOut(); switchView('landing'); }
-
-        function switchView(viewName) {
-            [els.landingView, els.toolView, els.adminDashboardView].forEach(el => {
-                el.classList.add('hidden', 'opacity-0');
-                el.classList.remove('z-50');
-            });
-            if(viewName === 'landing') showEl(els.landingView);
-            else if (viewName === 'tool') showEl(els.toolView);
-            else if (viewName === 'admin-dashboard') {
-                showEl(els.adminDashboardView);
-                els.adminDashboardView.classList.add('z-50');
-                if(isFirebaseActive) loadAdminDashboardData();
-            }
-        }
-
-        function showEl(el) { el.classList.remove('hidden'); setTimeout(() => el.classList.remove('opacity-0'), 50); }
-        function toggleSettings(show) { const modal = getEl('settings-modal'); if(show) modal.classList.remove('hidden'); else modal.classList.add('hidden'); }
-
-        function renderVoices() {
-            const list = getEl('voice-list'); list.innerHTML = '';
-            VOICES.forEach(voice => {
-                const isActive = state.selectedVoiceId === voice.id;
-                const div = document.createElement('div');
-                div.className = `p-3 rounded-xl cursor-pointer transition-all flex items-center justify-between group ${isActive ? 'bg-emerald-600/20 border border-emerald-500/50' : 'hover:bg-slate-800 border border-transparent'}`;
-                div.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${isActive ? 'bg-emerald-500 text-white' : 'bg-slate-700 text-slate-400'}">${voice.id[0]}</div>
-                        <div>
-                            <h4 class="text-sm font-bold ${isActive ? 'text-emerald-400' : 'text-slate-300'}">${voice.id}</h4>
-                            <p class="text-[10px] text-slate-500">${voice.gender} • ${voice.desc}</p>
-                        </div>
-                    </div>
-                    <button class="preview-btn p-2 rounded-full hover:bg-slate-700 text-slate-400 hover:text-emerald-400 transition-colors" title="Play Preview">
-                        <i data-lucide="play" class="w-3 h-3 fill-current"></i>
-                    </button>
-                `;
-                div.onclick = () => { state.selectedVoiceId = voice.id; renderVoices(); };
-                const btn = div.querySelector('.preview-btn');
-                btn.onclick = (e) => { e.stopPropagation(); playPreview(voice.id); };
-                list.appendChild(div);
-            });
-            lucide.createIcons();
-        }
-
-        async function playPreview(voiceId) {
-            let activeKeyPool = state.localKeys.length > 0 ? state.localKeys : systemKeys;
-            if (activeKeyPool.length === 0) {
-                toggleSettings(true);
-                return showToast("Please add an API Key to preview voices.", "error");
-            }
-
-            if (state.previewAudio) state.previewAudio.pause();
-
-            try {
-                showToast("Loading preview...", "info"); // Blue Toast
-                const text = "Hello! This is a preview of my voice.";
-                const buffer = await fetchWithRotation(text, voiceId, activeKeyPool);
-                const blob = createWavFromBuffer(buffer);
-                const url = URL.createObjectURL(blob);
-                const audio = new Audio(url);
-                audio.playbackRate = state.speed;
-                audio.play();
-                state.previewAudio = audio;
-                hideToast(); // Hide loading on success
-            } catch (err) {
-                showToast(err.message, "error");
-            }
-        }
-
-        async function generateAudio() {
-            if(!state.currentUser) {
-                showToast("Session expired. Please login again.", "error");
-                switchView('landing');
-                toggleUserAuth(true);
-                return;
-            }
-            const hasLocal = state.localKeys.length > 0;
-            const hasSystem = systemKeys.length > 0;
-            if (!state.text.trim()) return showToast("Please enter some text.", "error");
-            
-            let activeKeyPool = hasLocal ? state.localKeys : (hasSystem ? systemKeys : []);
-            if (activeKeyPool.length === 0) {
-                toggleSettings(true);
-                return showToast("No API Keys found.", "error");
-            }
+        // --- AUDIO LOGIC ---
+        async function startStreamingGeneration() {
+            if(!state.currentUser){showToast("Please login first","error");switchView('landing');toggleUserAuth(true);return;}
+            const keys = state.localKeys.length>0 ? state.localKeys : systemKeys;
+            if(!state.text.trim() || keys.length===0){showToast(!state.text.trim()?"Enter Text":"No API Keys","error");if(keys.length===0)toggleSettings(true);return;}
 
             setIsGenerating(true);
-            incrementPending();
+            state.audioQueue=[]; state.fullAudioBlobs=[]; state.currentPlayingIndex=-1; state.isPlaying=false;
+            getEl('playback-status').classList.remove('hidden'); getEl('download-section').classList.add('hidden'); getEl('buffer-bar').style.width='0%'; getEl('status-text').innerText="Initializing..."; getEl('wave-anim').classList.add('hidden');
+
+            state.currentLogId = await logActivityStart(state.selectedVoiceId, state.text);
 
             try {
                 const chunks = chunkText(state.text);
+                getEl('chunk-counter').innerText = `0/${chunks.length}`;
+                state.audioQueue = new Array(chunks.length).fill(null);
                 let completed = 0;
-                const promises = chunks.map(async (chunk, index) => {
-                    const buffer = await fetchWithRotation(chunk, state.selectedVoiceId, activeKeyPool);
-                    completed++;
-                    requestAnimationFrame(() => {
-                        const pct = Math.round((completed / chunks.length) * 100);
-                        getEl('progress-bar').style.width = `${pct}%`;
-                        getEl('progress-pct').innerText = `${pct}%`;
-                    });
-                    return { index, buffer };
-                });
 
-                const results = await Promise.all(promises);
-                results.sort((a, b) => a.index - b.index);
-                const finalBlob = mergeBuffers(results.map(r => r.buffer));
-                const url = URL.createObjectURL(finalBlob);
-                
-                getEl('audio-player').src = url;
-                getEl('download-link').href = url;
-                getEl('download-link').download = `tts-${Date.now()}.wav`;
-                getEl('result-container').classList.remove('hidden');
-
+                for (let i = 0; i < chunks.length; i++) {
+                    try {
+                        const buffer = await fetchWithRotation(chunks[i], state.selectedVoiceId, keys);
+                        const blob = createWavFromBuffer(buffer);
+                        state.audioQueue[i] = blob; state.fullAudioBlobs[i] = buffer;
+                        completed++;
+                        getEl('buffer-bar').style.width = `${Math.round((completed/chunks.length)*100)}%`;
+                        getEl('chunk-counter').innerText = `${completed}/${chunks.length}`;
+                        checkAndPlayQueue();
+                    } catch (e) {
+                        console.error(e); 
+                        // Show specific error from API
+                        showToast(e.message.substring(0, 50) + "...", "error"); 
+                        setIsGenerating(false); 
+                        logActivityEnd(state.currentLogId, "failed");
+                        logGenerationFail();
+                        return;
+                    }
+                    if (i < chunks.length - 1) await new Promise(r => setTimeout(r, 100));
+                }
+                prepareDownloadLink();
+                logActivityEnd(state.currentLogId, "completed");
                 logGenerationSuccess(state.selectedVoiceId, state.text);
-                showToast("Generation Complete!", "success");
-
-            } catch (err) {
-                showToast(err.message, "error");
+            } catch (e) {
+                showToast(e.message, "error");
+                logActivityEnd(state.currentLogId, "failed");
                 logGenerationFail();
-            } finally {
                 setIsGenerating(false);
             }
         }
 
         async function fetchWithRotation(text, voiceId, keyPool) {
-            let attempts = 0; let tempIndex = 0;
-            while (attempts < keyPool.length) {
+            let attempts = 0, tempIndex = 0;
+            let lastError = null;
+
+            while (attempts < keyPool.length * 2) {
                 const key = keyPool[tempIndex % keyPool.length];
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/${TTS_MODEL}:generateContent?key=${key}`;
+                if(!key){tempIndex++; attempts++; continue;}
+                
                 try {
-                    const response = await fetch(url, {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ contents: [{ parts: [{ text }] }], generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceId } } } } })
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${TTS_MODEL}:generateContent?key=${key}`, {
+                        method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ contents: [{parts: [{text}]}], generationConfig: {responseModalities: ["AUDIO"], speechConfig: {voiceConfig: {prebuiltVoiceConfig: {voiceName: voiceId}}}}})
                     });
-                    if (!response.ok) { 
-                        if (response.status === 429) { tempIndex++; attempts++; continue; } 
-                        // Extract cleaner error message
-                        let errMsg = await response.text();
-                        try { errMsg = JSON.parse(errMsg).error.message; } catch(e){}
-                        throw new Error(errMsg);
+
+                    if (!res.ok) {
+                        const errText = await res.text();
+                        console.error("API Raw Error:", errText);
+
+                        // CRITICAL: Stop if Bad Request (Invalid Payload/Text)
+                        if (res.status === 400) {
+                            throw new Error(`Invalid Request (400): ${errText}`);
+                        }
+                        
+                        if (res.status === 403) { 
+                            console.warn("Key Invalid/Expired (403). Rotating...");
+                            tempIndex++; attempts++; continue; 
+                        }
+                        if (res.status === 429) { 
+                            console.warn("Rate Limit (429). Waiting...");
+                            tempIndex++; attempts++; 
+                            await new Promise(r => setTimeout(r, 2000)); 
+                            continue; 
+                        }
+                        throw new Error(`API Error: ${res.status} ${errText}`);
                     }
-                    const data = await response.json();
+
+                    const data = await res.json();
                     const b64 = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-                    if (!b64) throw new Error("No audio returned.");
+                    if (!b64) throw new Error("No audio data received from API");
+                    
                     const bin = atob(b64); const bytes = new Uint8Array(bin.length);
-                    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+                    for(let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
                     return bytes.buffer;
-                } catch (e) { tempIndex++; attempts++; if(attempts >= keyPool.length) throw e; }
+
+                } catch (e) { 
+                    lastError = e;
+                    // Don't rotate on 400 errors, just fail
+                    if(e.message.includes("(400)")) throw e;
+
+                    console.warn("Fetch attempt failed:", e); 
+                    tempIndex++; attempts++; 
+                    if(attempts>=keyPool.length*2) break; 
+                }
             }
-            throw new Error("All API Keys exhausted or invalid.");
+            throw new Error(lastError ? lastError.message : "All API Keys failed. Check Quota.");
         }
 
-        function chunkText(s) { const c=[]; let cur=""; (s.match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[s]).forEach(x=>{if(cur.length+x.length<CHUNK_SIZE)cur+=x;else{if(cur)c.push(cur);cur=x;}});if(cur)c.push(cur);return c;}
-        function mergeBuffers(b){if(b.length===0)return new Blob([]);let l=0,p=[];b.forEach(v=>{const d=new DataView(v),o=d.getUint32(0)===0x52494646?44:0;const s=v.slice(o);p.push(s);l+=s.byteLength;});const h=createWavHeader(l);return new Blob([h,...p],{type:'audio/wav'});}
-        
-        // --- MISSING FUNCTION RE-ADDED ---
-        function createWavFromBuffer(buffer) {
-            // Check if already WAV (RIFF header)
-            if (buffer.byteLength > 44 && new DataView(buffer).getUint32(0, false) === 0x52494646) {
-                return new Blob([buffer], { type: 'audio/wav' });
-            }
-            // Otherwise add header
-            return new Blob([createWavHeader(buffer.byteLength), buffer], { type: 'audio/wav' });
-        }
-
+        // --- UTILS ---
+        function chunkText(s) { const c=[]; while(s.length>0){let l=s.lastIndexOf(' ',CHUNK_SIZE); if(l===-1||s.length<=CHUNK_SIZE)l=Math.min(s.length,CHUNK_SIZE); c.push(s.substring(0,l)); s=s.substring(l).trim();} return c; }
+        function createWavFromBuffer(b){if(b.byteLength>44&&new DataView(b).getUint32(0,false)===0x52494646)return new Blob([b],{type:'audio/wav'});return new Blob([createWavHeader(b.byteLength),b],{type:'audio/wav'});}
         function createWavHeader(l){const b=new ArrayBuffer(44),v=new DataView(b),w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};w(0,'RIFF');v.setUint32(4,36+l,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,24000,true);v.setUint32(28,48000,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,l,true);return b;}
+        function mergeBuffers(b){let l=0,p=[];b.forEach(v=>{const o=new DataView(v).getUint32(0)===0x52494646?44:0;const s=v.slice(o);p.push(s);l+=s.byteLength;});return new Blob([createWavHeader(l),...p],{type:'audio/wav'});}
+        function checkAndPlayQueue(){if(!state.isPlaying)playNextInQueue();}
+        function playNextInQueue(){
+            const n=state.currentPlayingIndex+1;
+            if(state.audioQueue[n]){
+                const u=URL.createObjectURL(state.audioQueue[n]); els.mainAudio.src=u; els.mainAudio.playbackRate=state.speed; els.mainAudio.play();
+                state.isPlaying=true; state.currentPlayingIndex=n; getEl('status-text').innerText="Speaking..."; getEl('wave-anim').classList.remove('hidden');
+            } else if(n>=state.audioQueue.length && state.audioQueue.length>0 && n>=state.fullAudioBlobs.length) {
+                state.isPlaying=false; getEl('status-text').innerText="Finished"; getEl('wave-anim').classList.add('hidden'); setIsGenerating(false);
+            } else { state.isPlaying=false; getEl('status-text').innerText="Buffering..."; getEl('wave-anim').classList.add('hidden'); }
+        }
+        function prepareDownloadLink(){
+            if(state.fullAudioBlobs.length){const b=state.fullAudioBlobs.filter(x=>x);if(b.length){const u=URL.createObjectURL(mergeBuffers(b));getEl('download-link').href=u;getEl('download-link').download=`tts-${Date.now()}.wav`;getEl('download-section').classList.remove('hidden');showToast("Ready to Download!","success");}}
+        }
+        async function playPreview(vid){
+            const k=state.localKeys.length?state.localKeys:systemKeys; if(!k.length){showToast("No Keys","error");return;}
+            if(state.previewAudio)state.previewAudio.pause(); showToast("Loading preview...","info");
+            try{const b=await fetchWithRotation("Hello preview",vid,k);const u=URL.createObjectURL(createWavFromBuffer(b));const a=new Audio(u);a.playbackRate=state.speed;a.play();state.previewAudio=a;hideToast();}catch(e){showToast(e.message,"error");}
+        }
 
-        // --- FIREBASE LISTENERS ---
+        // --- FIREBASE ADMIN & LOGS (FIXED PATHS) ---
+        async function saveLocalKey() { 
+            const k=getEl('api-key-input').value.trim(); 
+            if(k){
+                state.localKeys.push(k); localStorage.setItem("local_api_keys",JSON.stringify(state.localKeys));
+                getEl('api-key-input').value=""; updateKeysUI(); showToast("Key Saved","success");
+                if(state.currentUser) getRef('stats').doc('global').update({total_user_keys: firebase.firestore.FieldValue.increment(1)}).catch(()=>{});
+            } 
+        }
+        function clearLocalKeys() { if(confirm("Clear?")){state.localKeys=[];localStorage.removeItem("local_api_keys");updateKeysUI();} }
+        function updateKeysUI() { getEl('active-keys-count').innerText=`Local Keys: ${state.localKeys.length}`; getEl('key-indicator').className=state.localKeys.length?"absolute top-2 right-2 w-2 h-2 bg-green-500 rounded-full":(systemKeys.length?"absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full animate-pulse":"absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"); getEl('system-key-badge').classList.toggle('hidden',state.localKeys.length>0||!systemKeys.length); }
+        function setIsGenerating(v) { state.isGenerating=v; getEl('generate-btn').disabled=v; getEl('generate-btn').innerHTML=v?`<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Processing...`:`<i data-lucide="play" class="w-5 h-5"></i> Start Speaking`; lucide.createIcons(); }
+
+        async function fetchSystemKeysForUser() { try{const s=await getRef('system_keys').orderBy('addedAt','desc').get();systemKeys=s.docs.map(d=>d.data().key);updateKeysUI();}catch(e){} }
+        async function addSystemKey() { const k=getEl('new-sys-key').value.trim(); if(!k)return; await getRef('system_keys').add({key:k,addedAt:firebase.firestore.FieldValue.serverTimestamp()}); getEl('new-sys-key').value=""; }
+        function logGenerationFail() { if(isFirebaseActive) getRef('stats').doc('global').update({failed_generations: firebase.firestore.FieldValue.increment(1)}).catch(()=>{}); }
+        function logGenerationSuccess(v,t) {} 
+
+        // Activity Logs (Uses strict Paths)
+        async function logActivityStart(voice, text) {
+            if(!isFirebaseActive) return null;
+            const ref = await getRef('activity_logs').add({
+                voice: voice, fullText: text, snippet: text.substring(0, 30) + "...", status: 'processing',
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(), userEmail: state.currentUser ? state.currentUser.email : 'Anonymous'
+            });
+            return ref.id;
+        }
+        function logActivityEnd(id, status) {
+            if(!isFirebaseActive || !id) return;
+            getRef('activity_logs').doc(id).update({ status: status });
+            if(status === 'completed') {
+                getRef('stats').doc('global').update({total_generations: firebase.firestore.FieldValue.increment(1)});
+                // Update user specific count
+                if(state.currentUser) {
+                    getRef('users').doc(state.currentUser.uid).update({generationCount: firebase.firestore.FieldValue.increment(1)}).catch(()=>{});
+                }
+            }
+        }
+        
+        // --- RESET PENDING STATS ---
+        async function resetPendingStats() {
+            if(confirm("Reset pending counter to 0?")) {
+                await getRef('stats').doc('global').update({pending_generations: 0});
+                showToast("Counter Reset", "success");
+            }
+        }
+
+        // Admin Functions (Fixed Paths with Safety Checks)
         function loadAdminDashboardData() {
-            db.collection('stats').doc('global').onSnapshot(doc => {
-                if (doc.exists) {
-                    const data = doc.data();
-                    getEl('stat-total-users').innerText = data.total_users || 0;
-                    getEl('stat-total-gens').innerText = data.total_generations || 0;
-                    getEl('stat-pending').innerText = data.pending_generations || 0;
+            if(document.getElementById('db-status')) document.getElementById('db-status').innerText = "Connected";
+            
+            getRef('stats').doc('global').onSnapshot(d => {
+                if(d.exists){
+                    const da=d.data();
+                    if(getEl('stat-total-users')) getEl('stat-total-users').innerText = da.total_users||0;
+                    if(getEl('stat-total-gens')) getEl('stat-total-gens').innerText = da.total_generations||0;
+                    if(getEl('stat-user-keys')) getEl('stat-user-keys').innerText = da.total_user_keys||0;
+                    if(getEl('stat-failed')) getEl('stat-failed').innerText = da.failed_generations||0;
+                    if(getEl('stat-pending')) getEl('stat-pending').innerText = da.pending_generations||0;
                 }
             });
-            db.collection('system_keys').orderBy('addedAt', 'desc').onSnapshot(snap => {
-                getEl('stat-keys-count').innerText = snap.size;
-                const miniList = getEl('system-keys-mini-list');
-                miniList.innerHTML = "";
-                snap.forEach(doc => {
-                    const k = doc.data().key;
-                    const mask = k.substr(0,4) + "..." + k.substr(-4);
-                    miniList.innerHTML += `<li class="flex justify-between items-center bg-slate-800 p-2 rounded border border-slate-700"><span>${mask}</span><button onclick="deleteSystemKey('${doc.id}')" class="text-red-400 hover:text-red-300"><i data-lucide="trash" class="w-3 h-3"></i></button></li>`;
-                });
-                lucide.createIcons();
+            getRef('system_keys').onSnapshot(s => {
+                if(getEl('stat-keys-count')) getEl('stat-keys-count').innerText = s.size;
+                const l=getEl('system-keys-mini-list'); 
+                if(l) {
+                    l.innerHTML="";
+                    s.forEach(d => l.innerHTML+=`<li class="flex justify-between bg-slate-800 p-2 rounded border border-slate-700 mb-1"><span>${d.data().key.substr(0,6)}...</span><button onclick="deleteSystemKey('${d.id}')" class="text-red-400 hover:text-red-300"><i data-lucide="trash" class="w-3 h-3"></i></button></li>`);
+                    lucide.createIcons();
+                }
             });
-            db.collection('activity_logs').orderBy('timestamp', 'desc').limit(20).onSnapshot(snap => {
-                const list = getEl('activity-log-list');
-                list.innerHTML = "";
-                if(snap.empty) { list.innerHTML = `<tr><td class="px-6 py-8 text-center italic text-slate-600">No recent activity.</td></tr>`; return; }
-                snap.forEach(doc => {
-                    const data = doc.data();
-                    const time = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleTimeString() : 'Just now';
-                    list.innerHTML += `<tr class="border-b border-slate-700/50 animate-fade-up"><td class="px-6 py-3"><div class="flex items-center gap-2"><span class="text-xs text-emerald-400 font-mono">${time}</span><span class="text-sm text-white font-bold">${data.voice}</span></div><div class="text-[10px] text-slate-500 truncate max-w-[200px]">${data.preview}</div></td><td class="px-6 py-3 text-right"><span class="text-xs text-indigo-300 block mb-1">${data.userEmail ? data.userEmail.split('@')[0] : 'User'}</span><span class="text-[10px] bg-slate-700 px-1.5 py-0.5 rounded text-slate-400">${data.charCount} chars</span></td></tr>`;
-                });
+            getRef('activity_logs').orderBy('timestamp', 'desc').limit(20).onSnapshot(s => {
+                const l = getEl('activity-log-list'); 
+                if(l) {
+                    l.innerHTML = "";
+                    if(s.empty) { l.innerHTML=`<tr><td colspan="3" class="px-6 py-8 text-center text-slate-600">No logs</td></tr>`; return; }
+                    s.forEach(d => {
+                        const dat = d.data();
+                        const time = dat.timestamp ? new Date(dat.timestamp.seconds*1000).toLocaleTimeString() : '...';
+                        const email = dat.userEmail.split('@')[0];
+                        const statusColor = dat.status==='processing' ? 'text-yellow-400 animate-pulse' : (dat.status==='failed'?'text-red-400':'text-emerald-400');
+                        
+                        // Safe text replacement for JSON compatibility in onclick
+                        const safeText = (dat.fullText || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;").replace(/\n/g, "<br>");
+                        
+                        l.innerHTML += `<tr class="border-b border-slate-700/50 hover:bg-slate-800/30 transition-colors"><td class="px-6 py-3"><div class="text-xs text-white font-bold">${email}</div><div class="text-[10px] text-slate-500">${time}</div></td><td class="px-6 py-3 font-bold text-xs uppercase ${statusColor}">${dat.status}</td><td class="px-6 py-3"><div class="text-xs text-slate-300 max-h-20 overflow-y-auto custom-scrollbar whitespace-pre-wrap">${safeText}</div></td></tr>`;
+                    });
+                }
+            });
+            
+            // --- FETCH USERS LIST ---
+            getRef('users').orderBy('joinedAt', 'desc').limit(20).onSnapshot(s => {
+                const ul = getEl('user-list-body'); 
+                if(ul) {
+                    ul.innerHTML = "";
+                    if(s.empty) { ul.innerHTML=`<tr><td colspan="3" class="px-6 py-8 text-center text-slate-600">No registered users found</td></tr>`; return; }
+                    s.forEach(doc => {
+                        const u = doc.data();
+                        const joinDate = u.joinedAt ? new Date(u.joinedAt.seconds*1000).toLocaleDateString() : '-';
+                        ul.innerHTML += `
+                            <tr class="border-b border-slate-700/50 hover:bg-slate-800/30">
+                                <td class="px-6 py-3 text-xs text-white font-bold">${u.email}</td>
+                                <td class="px-6 py-3 text-xs text-slate-400">${joinDate}</td>
+                                <td class="px-6 py-3 text-xs text-emerald-400 font-bold">${u.generationCount || 0}</td>
+                            </tr>`;
+                    });
+                }
             });
         }
-
-        function incrementPending() { if(!isFirebaseActive) return; const ref = db.collection('stats').doc('global'); ref.update({ pending_generations: firebase.firestore.FieldValue.increment(1) }).catch(e => { ref.set({ total_users: 0, total_generations: 0, pending_generations: 1 }, { merge: true }); }); }
-        function logGenerationSuccess(voiceId, text) {
-            if(!isFirebaseActive) return;
-            const batch = db.batch();
-            batch.update(db.collection('stats').doc('global'), { pending_generations: firebase.firestore.FieldValue.increment(-1), total_generations: firebase.firestore.FieldValue.increment(1) });
-            batch.set(db.collection('activity_logs').doc(), { voice: voiceId, charCount: text.length, preview: text.substring(0, 50) + (text.length > 50 ? "..." : ""), timestamp: firebase.firestore.FieldValue.serverTimestamp(), userEmail: state.currentUser ? state.currentUser.email : 'Anonymous', userId: state.currentUser ? state.currentUser.uid : 'anon' });
-            batch.commit().catch(console.error);
+        async function deleteSystemKey(id) { if(confirm("Delete?")) await getRef('system_keys').doc(id).delete(); }
+        async function saveAnnouncement() {
+            const txt = getEl('admin-announcement-input').value;
+            await getRef('system_config').doc('announcement').set({message: txt, active: true});
+            showToast("Announcement Posted", "success");
         }
-        function logGenerationFail() { if(!isFirebaseActive) return; db.collection('stats').doc('global').update({ pending_generations: firebase.firestore.FieldValue.increment(-1) }).catch(console.error); }
-        async function fetchSystemKeysForUser() { if(!isFirebaseActive) return; try { const snap = await db.collection('system_keys').orderBy('addedAt', 'desc').get(); systemKeys = snap.docs.map(doc => doc.data().key); updateKeysUI(); } catch (e) { console.log("Error fetching keys"); } }
-        async function addSystemKey() { const k = getEl('new-sys-key').value.trim(); if(!k) return; try { await db.collection('system_keys').add({ key: k, addedAt: firebase.firestore.FieldValue.serverTimestamp() }); getEl('new-sys-key').value = ""; showToast("Key Added", "success"); } catch (e) { showToast(e.message, "error"); } }
-        async function deleteSystemKey(id) { if(confirm("Delete Key?")) await db.collection('system_keys').doc(id).delete(); }
-        function saveLocalKey() { const k=getEl('api-key-input').value.trim(); if(k){state.localKeys.push(k);localStorage.setItem("local_api_keys",JSON.stringify(state.localKeys));getEl('api-key-input').value="";updateKeysUI();showToast("Key Saved Locally", "success");} }
-        function clearLocalKeys() { if(confirm("Clear?")){state.localKeys=[];localStorage.removeItem("local_api_keys");updateKeysUI();} }
-        function updateKeysUI() { getEl('active-keys-count').innerText = `Local Keys: ${state.localKeys.length}`; const hasLocal = state.localKeys.length > 0, hasSystem = systemKeys.length > 0; getEl('key-indicator').className = hasLocal ? "absolute top-2 right-2 w-2 h-2 bg-green-500 rounded-full" : (hasSystem ? "absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full animate-pulse" : "absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"); getEl('system-key-badge').classList.toggle('hidden', hasLocal || !hasSystem); }
-        function setIsGenerating(val) { state.isGenerating = val; getEl('generate-btn').disabled = val; getEl('generate-btn').innerHTML = val ? `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Generating...` : `<i data-lucide="wand-2" class="w-5 h-5"></i> Generate Audio`; if(val){ getEl('progress-container').classList.remove('hidden'); getEl('result-container').classList.add('hidden'); } lucide.createIcons(); }
+        async function deleteAnnouncement() {
+            await getRef('system_config').doc('announcement').update({active: false});
+            getEl('admin-announcement-input').value = "";
+            showToast("Announcement Removed", "success");
+        }
 
         init();
     </script>

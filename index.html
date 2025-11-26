@@ -3,13 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Creator Studio - Pro Admin</title>
-    <!-- Tailwind CSS -->
+    <title>AI Creator Studio - Hybrid Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- FIREBASE SDKs (Compat Version for Stability in Single File) -->
+    <!-- FIREBASE SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -20,753 +17,473 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
         
-        @keyframes pulse-emerald {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
-        }
+        @keyframes pulse-emerald { 0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } }
         .admin-pulse { animation: pulse-emerald 2s infinite; }
-        
-        @keyframes fade-in-up {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
         .animate-fade-up { animation: fade-in-up 0.3s ease-out forwards; }
-        
-        .playing-wave { display: flex; align-items: center; gap: 2px; height: 20px; }
-        .playing-wave span { display: block; width: 3px; background: #34d399; animation: wave 1s infinite ease-in-out; }
-        .playing-wave span:nth-child(1) { animation-delay: 0.1s; height: 40%; }
-        .playing-wave span:nth-child(2) { animation-delay: 0.2s; height: 100%; }
-        .playing-wave span:nth-child(3) { animation-delay: 0.3s; height: 60%; }
-        .playing-wave span:nth-child(4) { animation-delay: 0.4s; height: 80%; }
-        @keyframes wave { 0%, 100% { transform: scaleY(0.5); } 50% { transform: scaleY(1); } }
+        @keyframes fade-in-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="bg-[#0B1120] text-white font-sans h-screen flex flex-col overflow-hidden">
 
-    <!-- GLOBAL ANNOUNCEMENT BANNER -->
+    <!-- GLOBAL ANNOUNCEMENT -->
     <div id="global-announcement" class="hidden bg-gradient-to-r from-red-600 to-orange-600 text-white px-4 py-2 text-sm font-bold text-center shadow-lg z-[100] relative animate-fade-up flex justify-center items-center gap-2">
-        <i data-lucide="megaphone" class="w-4 h-4"></i>
-        <span id="announcement-text"></span>
+        <i data-lucide="megaphone" class="w-4 h-4"></i> <span id="announcement-text"></span>
     </div>
 
-    <!-- ================= VIEWS CONTAINER ================= -->
+    <!-- APP CONTAINER -->
     <div id="app-container" class="flex-1 w-full h-full relative">
-
-        <!-- 1. LANDING PAGE VIEW -->
+        
+        <!-- LANDING -->
         <div id="landing-view" class="absolute inset-0 flex flex-col items-center justify-center p-6 z-10 transition-opacity duration-500">
             <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-indigo-900/20 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-emerald-900/20 rounded-full blur-3xl pointer-events-none"></div>
-
-            <div class="bg-[#1E293B] border border-slate-700/50 px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest text-indigo-300 uppercase mb-6 shadow-lg">
-                Powered by Grow with Haider
-            </div>
-
-            <div class="text-center mb-16 space-y-2">
-                <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-white">AI Creator Studio</h1>
-                <p class="text-slate-400 text-lg font-medium">Professional Tools Suite</p>
-            </div>
-
-            <div class="w-full max-w-md relative">
-                <div id="open-tool-btn" class="group relative bg-[#162032] border border-slate-800 rounded-3xl p-10 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-900/20 cursor-pointer transform hover:-translate-y-1">
-                    <div class="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl"></div>
-                    <div class="flex flex-col items-center text-center space-y-8 relative z-10">
-                        <div class="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform duration-300">
-                            <i data-lucide="mic" class="w-10 h-10 text-white"></i>
-                        </div>
-                        <div class="space-y-3">
-                            <h3 class="text-2xl font-bold text-white">Text to Speech Pro</h3>
-                            <p class="text-slate-400 text-base leading-relaxed">Instant Streaming. <br/>No Waiting.</p>
-                        </div>
-                        <button class="flex items-center gap-2 px-6 py-2 bg-emerald-500/10 text-emerald-400 rounded-full text-sm font-bold group-hover:bg-emerald-500 group-hover:text-white transition-all">
-                            Start Generating <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <div class="bg-[#1E293B] border border-slate-700/50 px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest text-indigo-300 uppercase mb-6 shadow-lg">Powered by Grow with Haider</div>
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-10 text-center">AI Creator Studio<br/><span class="text-emerald-400 text-2xl font-medium">Hybrid Edition</span></h1>
+            
+            <button onclick="checkAuthAndStart()" class="group relative bg-[#162032] border border-slate-800 rounded-3xl p-10 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-2xl cursor-pointer transform hover:-translate-y-1 max-w-md w-full flex flex-col items-center">
+                <div class="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg mb-6"><i data-lucide="mic" class="w-10 h-10 text-white"></i></div>
+                <h3 class="text-2xl font-bold text-white mb-2">Start Generating</h3>
+                <p class="text-slate-400 text-sm mb-6">30+ Premium Voices • Unlimited Preview</p>
+                <span class="flex items-center gap-2 px-6 py-2 bg-emerald-500/10 text-emerald-400 rounded-full text-sm font-bold group-hover:bg-emerald-500 group-hover:text-white transition-all">Open Studio <i data-lucide="arrow-right" class="w-4 h-4"></i></span>
+            </button>
         </div>
 
-        <!-- 2. TOOL VIEW -->
+        <!-- TOOL INTERFACE -->
         <div id="tool-view" class="absolute inset-0 flex flex-col bg-[#0B1120] hidden opacity-0 transition-opacity duration-500">
-            <div class="border-b border-slate-800 bg-[#0F172A]/80 backdrop-blur-md sticky top-0 z-20">
-                <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-                    <button id="back-btn" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
-                        <i data-lucide="chevron-left" class="w-5 h-5"></i> Back
-                    </button>
-                    <h1 class="text-lg font-bold text-white flex items-center gap-2">
-                        <span class="bg-emerald-500/10 text-emerald-400 p-1.5 rounded-lg"><i data-lucide="mic" class="w-4 h-4"></i></span>
-                        Text to Speech Pro
-                    </h1>
-                    <div class="flex items-center gap-3">
-                        <button id="admin-shortcut-btn" class="hidden px-3 py-1.5 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg text-xs font-bold hover:bg-red-500/20 flex items-center gap-2">
-                            <i data-lucide="shield" class="w-3 h-3"></i> Admin
-                        </button>
-                        <button id="user-logout-btn" class="p-2 text-xs text-slate-400 hover:text-white border border-slate-700 rounded-lg hover:bg-slate-800 transition-colors" title="Logout">
-                            <i data-lucide="log-out" class="w-4 h-4"></i>
-                        </button>
-                        <button id="settings-btn" class="p-2 rounded-full hover:bg-slate-800 text-slate-400 transition-colors relative">
-                            <i data-lucide="settings" class="w-5 h-5"></i>
-                            <span id="key-indicator" class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
-                        </button>
-                    </div>
+            <div class="border-b border-slate-800 bg-[#0F172A]/80 backdrop-blur-md sticky top-0 z-20 px-4 py-3 flex justify-between items-center">
+                <button onclick="switchView('landing')" class="text-slate-400 hover:text-white flex gap-2 items-center"><i data-lucide="chevron-left" class="w-5 h-5"></i> Back</button>
+                <h1 class="text-lg font-bold text-white flex items-center gap-2"><span class="bg-emerald-500/10 text-emerald-400 p-1 rounded"><i data-lucide="zap" class="w-4 h-4"></i></span> Hybrid TTS</h1>
+                <div class="flex items-center gap-3">
+                    <button id="admin-shortcut-btn" class="hidden px-3 py-1.5 bg-red-500/10 text-red-400 border border-red-500/20 rounded text-xs font-bold hover:bg-red-500/20 flex items-center gap-2" onclick="switchView('admin-dashboard')"><i data-lucide="shield" class="w-3 h-3"></i> Admin</button>
+                    <button id="settings-btn" class="p-2 rounded-full hover:bg-slate-800 text-slate-400 relative" onclick="toggleSettings(true)"><i data-lucide="settings" class="w-5 h-5"></i><span id="key-indicator" class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span></button>
                 </div>
             </div>
 
             <div class="flex-1 p-4 md:p-8 max-w-6xl mx-auto w-full grid lg:grid-cols-2 gap-6 overflow-y-auto">
-                <!-- Left: Input -->
                 <div class="flex flex-col gap-4 h-full">
                     <div class="bg-[#1E293B] border border-slate-700 rounded-3xl p-1 flex-1 flex flex-col shadow-xl min-h-[300px]">
-                        <textarea id="text-input" class="flex-1 w-full bg-transparent text-lg p-6 resize-none outline-none text-slate-200 placeholder:text-slate-600" placeholder="Paste your script here (Unlimited)..."></textarea>
-                        <div class="px-6 py-3 border-t border-slate-700/50 flex justify-between items-center text-xs text-slate-500 font-mono">
-                            <span id="system-key-badge" class="hidden text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">⚡ System Key Active</span>
-                            <span><span id="char-count">0</span> characters</span>
+                        <textarea id="text-input" class="flex-1 w-full bg-transparent text-lg p-6 resize-none outline-none text-slate-200 placeholder:text-slate-600" placeholder="Type here... (Unlimited for Preview)"></textarea>
+                        <div class="px-6 py-3 border-t border-slate-700/50 flex justify-between text-xs text-slate-500 font-mono">
+                            <span id="system-key-badge" class="hidden text-emerald-400">⚡ Shared API Active</span>
+                            <span><span id="char-count">0</span> chars</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right: Controls -->
                 <div class="flex flex-col gap-4">
-                    <div class="bg-[#1E293B] border border-slate-700 rounded-3xl overflow-hidden flex flex-col h-[450px] shadow-xl">
-                        <div class="px-6 py-4 border-b border-slate-700 bg-[#1E293B] sticky top-0 z-10 flex justify-between items-center">
-                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Controls</span>
-                            <i data-lucide="sliders-horizontal" class="w-4 h-4 text-slate-500"></i>
-                        </div>
-                        <div class="p-6 space-y-6 bg-[#162032] border-b border-slate-700">
+                    <div class="bg-[#1E293B] border border-slate-700 rounded-3xl overflow-hidden">
+                        <div class="px-6 py-4 border-b border-slate-700 bg-[#1E293B]"><span class="text-xs font-bold text-slate-400 uppercase">Configuration</span></div>
+                        <div class="p-6 space-y-6">
                             <div>
-                                <div class="flex justify-between mb-2 text-xs font-medium">
-                                    <span class="text-slate-400 uppercase">Speed</span>
-                                    <span id="speed-val" class="text-emerald-400">1.0x</span>
-                                </div>
-                                <input type="range" id="speed-range" min="0.5" max="2.0" step="0.1" value="1.0" class="w-full">
+                                <div class="flex justify-between mb-2 text-xs font-medium"><span class="text-slate-400 uppercase">Speed</span><span id="speed-val" class="text-emerald-400">1.0x</span></div>
+                                <input type="range" id="speed-range" min="0.5" max="2.0" step="0.1" value="1.0" class="w-full accent-emerald-500">
+                            </div>
+                            <div class="grid grid-cols-1 gap-2">
+                                <button id="generate-btn" onclick="startApiGeneration()" class="py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold flex justify-center items-center gap-2 transition-all"><i data-lucide="download" class="w-4 h-4"></i> Download (HQ)</button>
                             </div>
                         </div>
-                        <div class="px-6 py-2 bg-[#1E293B] text-xs font-bold text-slate-400 uppercase tracking-wider">Voices</div>
-                        <div id="voice-list" class="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar"></div>
+                        <div class="px-6 py-2 bg-[#1E293B] text-xs font-bold text-slate-400 uppercase flex justify-between">
+                            <span>Select Voice & Preview</span>
+                            <span class="text-[10px] text-slate-500">30+ Models</span>
+                        </div>
+                        <div id="voice-list" class="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar h-64"></div>
                     </div>
-
-                    <div class="bg-[#1E293B] border border-slate-700 rounded-3xl p-6 shadow-xl relative overflow-hidden">
-                        <div class="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl"></div>
-                        <div class="relative z-10 space-y-4">
-                            <!-- New Playback UI -->
-                            <div id="playback-status" class="hidden bg-slate-800/80 rounded-xl p-4 border border-slate-700">
-                                <div class="flex items-center justify-between mb-2">
-                                    <div class="flex items-center gap-3">
-                                        <div id="wave-anim" class="playing-wave hidden"><span></span><span></span><span></span><span></span></div>
-                                        <span id="status-text" class="text-sm font-bold text-white">Generating...</span>
-                                    </div>
-                                    <span id="chunk-counter" class="text-xs text-slate-500 font-mono">0/0</span>
-                                </div>
-                                <div class="h-1.5 bg-slate-700 rounded-full overflow-hidden w-full">
-                                    <div id="buffer-bar" class="h-full bg-indigo-500 transition-all duration-300 w-0"></div>
-                                </div>
-                            </div>
-
-                            <button id="generate-btn" class="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-[#0B1120] font-bold rounded-xl shadow-lg shadow-emerald-900/20 transition-all active:scale-95 flex items-center justify-center gap-2">
-                                <i data-lucide="play" class="w-5 h-5"></i> Start Speaking
-                            </button>
-                            
-                            <!-- Hidden Audio Player for Logic -->
-                            <audio id="main-audio" class="hidden"></audio>
-
-                            <div id="download-section" class="hidden animate-in fade-in slide-in-from-bottom-2 pt-2">
-                                <a id="download-link" href="#" download class="flex items-center justify-center gap-2 w-full py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-medium transition-colors">
-                                    <i data-lucide="download" class="w-4 h-4"></i> Download Full Audio
-                                </a>
-                            </div>
-                        </div>
+                    
+                    <!-- DOWNLOAD CARD -->
+                    <div id="download-card" class="hidden bg-[#1E293B] border border-slate-700 rounded-3xl p-6 shadow-xl animate-fade-up">
+                         <div class="flex justify-between items-center mb-4">
+                             <span class="text-sm font-bold text-emerald-400">Generation Complete!</span>
+                             <button onclick="document.getElementById('download-card').classList.add('hidden')" class="text-slate-500 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+                         </div>
+                         <a id="download-link" href="#" download class="flex items-center justify-center gap-2 w-full py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-medium transition-colors">
+                             <i data-lucide="download" class="w-4 h-4"></i> Save .WAV File
+                         </a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 3. USER AUTH MODAL -->
-        <div id="user-auth-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] flex items-center justify-center hidden opacity-0 transition-opacity">
-            <div class="w-full max-w-md bg-[#1E293B] border border-slate-700 rounded-3xl shadow-2xl p-8 relative">
-                <button onclick="toggleUserAuth(false)" class="absolute top-4 right-4 text-slate-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
-                <div class="text-center mb-6">
-                    <h2 class="text-2xl font-bold text-white">Welcome Back</h2>
-                    <p class="text-slate-400 text-sm mt-1">Login to access the Studio</p>
-                </div>
-                <div class="flex bg-[#0B1120] p-1 rounded-xl mb-6">
-                    <button id="tab-login" onclick="switchAuthTab('login')" class="flex-1 py-2 text-sm font-bold rounded-lg text-white bg-slate-700 transition-all">Login</button>
-                    <button id="tab-signup" onclick="switchAuthTab('signup')" class="flex-1 py-2 text-sm font-bold rounded-lg text-slate-400 hover:text-white transition-all">Sign Up</button>
-                </div>
-                <div class="space-y-4">
-                    <input type="email" id="user-email" placeholder="Email Address" class="w-full bg-[#0B1120] border border-slate-700 rounded-xl px-4 py-3 text-white outline-none focus:border-emerald-500">
-                    <input type="password" id="user-pass" placeholder="Password" class="w-full bg-[#0B1120] border border-slate-700 rounded-xl px-4 py-3 text-white outline-none focus:border-emerald-500">
-                    <button id="auth-action-btn" onclick="handleUserAuth()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-900/20 transition-all flex justify-center items-center gap-2">Login</button>
-                </div>
-                <p id="auth-msg" class="text-center text-red-400 text-xs mt-4 h-4"></p>
-            </div>
-        </div>
-
-        <!-- 4. ADMIN DASHBOARD VIEW (UPDATED) -->
+        <!-- ADMIN DASHBOARD -->
         <div id="admin-dashboard-view" class="absolute inset-0 bg-[#0B1120] flex flex-col hidden opacity-0 transition-opacity z-50">
             <div class="border-b border-red-900/30 bg-[#1E293B] px-6 py-4 flex justify-between items-center sticky top-0 z-10">
                 <div class="flex items-center gap-3">
                     <span class="bg-red-500/10 text-red-500 p-2 rounded-lg"><i data-lucide="layout-dashboard" class="w-5 h-5"></i></span>
-                    <div>
-                        <h1 class="font-bold text-white">Admin Console</h1>
-                        <div class="flex items-center gap-2">
-                            <p class="text-[10px] text-emerald-400 uppercase tracking-wider flex items-center gap-1"><span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> Live</p>
-                            <span id="db-status" class="text-[10px] text-slate-500 font-mono">Connecting...</span>
-                        </div>
-                    </div>
+                    <div><h1 class="font-bold text-white">Admin Console</h1><p class="text-[10px] text-emerald-400 uppercase tracking-wider flex items-center gap-1"><span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> Live</p></div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <button onclick="loadAdminDashboardData()" class="px-4 py-2 bg-blue-900/20 hover:bg-blue-900/40 text-blue-400 rounded-lg text-xs font-bold flex items-center gap-2 border border-blue-900/30">
-                        <i data-lucide="refresh-cw" class="w-3 h-3"></i> Refresh
-                    </button>
-                    <button onclick="switchView('tool')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold flex items-center gap-2 border border-slate-700">
-                        <i data-lucide="mic" class="w-4 h-4"></i> Go to Tool
-                    </button>
-                    <button onclick="handleUserLogout()" class="px-4 py-2 bg-red-900/20 hover:bg-red-900/40 text-red-400 rounded-lg text-xs font-bold flex items-center gap-2 border border-red-900/30">
-                        <i data-lucide="log-out" class="w-4 h-4"></i>
-                    </button>
-                </div>
+                <div class="flex gap-3"><button onclick="loadAdminData()" class="px-4 py-2 bg-blue-900/20 text-blue-400 rounded-lg text-xs font-bold flex items-center gap-2 border border-blue-900/30"><i data-lucide="refresh-cw" class="w-3 h-3"></i> Refresh</button><button onclick="switchView('tool')" class="px-4 py-2 bg-slate-800 text-white rounded-lg text-xs font-bold border border-slate-700">Exit</button></div>
             </div>
-
-            <div class="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full overflow-y-auto">
-                <!-- STATS GRID -->
+            <div class="flex-1 p-6 overflow-y-auto">
                 <div class="grid md:grid-cols-4 gap-4 mb-8">
                     <div class="bg-[#162032] border border-slate-700 p-5 rounded-2xl">
-                        <div class="flex justify-between items-start mb-2"><p class="text-slate-400 text-[10px] uppercase font-bold">Registered Users</p><i data-lucide="users" class="w-4 h-4 text-indigo-400"></i></div>
-                        <h3 id="stat-total-users" class="text-3xl font-bold text-white">0</h3>
+                         <p class="text-slate-400 text-[10px] uppercase font-bold">Total Users</p><h3 id="stat-total-users" class="text-3xl font-bold text-white">0</h3>
                     </div>
-                    <div class="bg-[#162032] border border-slate-700 p-5 rounded-2xl">
-                        <div class="flex justify-between items-start mb-2"><p class="text-slate-400 text-[10px] uppercase font-bold">Total Voices</p><i data-lucide="mic-2" class="w-4 h-4 text-emerald-400"></i></div>
-                        <h3 id="stat-total-gens" class="text-3xl font-bold text-white">0</h3>
-                        <p class="text-[10px] text-slate-500 mt-1">Audio Files Created</p>
-                    </div>
-                    <!-- PROCESSING CARD WITH RESET -->
-                    <div class="bg-[#162032] border border-slate-700 p-5 rounded-2xl relative group">
-                        <div class="flex justify-between items-start mb-2">
-                            <p class="text-slate-400 text-[10px] uppercase font-bold">Processing Now</p>
-                            <div class="flex gap-2">
-                                <button onclick="resetPendingStats()" class="text-slate-600 hover:text-white transition-colors" title="Reset Counter"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
-                                <i data-lucide="loader-2" class="w-4 h-4 text-yellow-400 animate-spin"></i>
-                            </div>
-                        </div>
+                    <div class="bg-[#162032] border border-slate-700 p-5 rounded-2xl relative">
+                        <div class="flex justify-between items-start mb-2"><p class="text-slate-400 text-[10px] uppercase font-bold">Processing Now</p><button onclick="resetPending()" class="text-slate-600 hover:text-white" title="Force Reset"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button></div>
                         <h3 id="stat-pending" class="text-3xl font-bold text-yellow-400">0</h3>
-                        <p class="text-[10px] text-slate-500 mt-1">Live requests</p>
                     </div>
                     <div class="bg-[#162032] border border-slate-700 p-5 rounded-2xl">
-                        <div class="flex justify-between items-start mb-2"><p class="text-slate-400 text-[10px] uppercase font-bold">System Keys</p><i data-lucide="lock" class="w-4 h-4 text-slate-400"></i></div>
-                        <h3 id="stat-keys-count" class="text-3xl font-bold text-white">0</h3>
+                         <p class="text-slate-400 text-[10px] uppercase font-bold">Total Gens</p><h3 id="stat-total-gens" class="text-3xl font-bold text-white">0</h3>
+                    </div>
+                     <div class="bg-[#162032] border border-slate-700 p-5 rounded-2xl">
+                         <p class="text-slate-400 text-[10px] uppercase font-bold">Failed</p><h3 id="stat-failed" class="text-3xl font-bold text-red-400">0</h3>
                     </div>
                 </div>
-
-                <!-- MAIN CONTENT GRID -->
                 <div class="grid lg:grid-cols-3 gap-6">
-                    <!-- LEFT COLUMN: Activity & Users -->
-                    <div class="lg:col-span-2 space-y-6">
-                        
-                        <!-- 1. Activity Feed -->
-                        <div class="bg-[#1E293B] border border-slate-700 rounded-2xl overflow-hidden shadow-xl flex flex-col h-[350px]">
-                            <div class="px-6 py-4 border-b border-slate-700 bg-[#1E293B] sticky top-0 flex justify-between items-center">
-                                <h2 class="text-sm font-bold text-white flex items-center gap-2"><span class="w-2 h-2 bg-emerald-500 rounded-full admin-pulse"></span> Live Activity</h2>
-                            </div>
-                            <div class="flex-1 overflow-y-auto p-0 custom-scrollbar">
-                                <table class="w-full text-left text-sm text-slate-400">
-                                    <thead class="bg-slate-800/50 text-xs uppercase sticky top-0">
-                                        <tr><th class="px-6 py-3">User / Time</th><th class="px-6 py-3">Status</th><th class="px-6 py-3">Content</th></tr>
-                                    </thead>
-                                    <tbody id="activity-log-list" class="divide-y divide-slate-700/50">
-                                        <tr><td colspan="3" class="px-6 py-8 text-center italic text-slate-600">Waiting...</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- 2. USER LIST (NEW) -->
-                        <div class="bg-[#1E293B] border border-slate-700 rounded-2xl overflow-hidden shadow-xl flex flex-col h-[350px]">
-                            <div class="px-6 py-4 border-b border-slate-700 bg-[#1E293B] sticky top-0 flex justify-between items-center">
-                                <h2 class="text-sm font-bold text-white flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-indigo-400"></i> All Users</h2>
-                            </div>
-                            <div class="flex-1 overflow-y-auto p-0 custom-scrollbar">
-                                <table class="w-full text-left text-sm text-slate-400">
-                                    <thead class="bg-slate-800/50 text-xs uppercase sticky top-0">
-                                        <tr><th class="px-6 py-3">Email</th><th class="px-6 py-3">Joined</th><th class="px-6 py-3">Gens</th></tr>
-                                    </thead>
-                                    <tbody id="user-list-body" class="divide-y divide-slate-700/50">
-                                        <tr><td colspan="3" class="px-6 py-8 text-center italic text-slate-600">Loading Users...</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
+                    <div class="lg:col-span-2 bg-[#1E293B] border border-slate-700 rounded-2xl overflow-hidden shadow-xl flex flex-col h-[400px]">
+                        <div class="px-6 py-4 border-b border-slate-700 bg-[#1E293B]"><h2 class="text-sm font-bold text-white">Activity Logs (Full Text)</h2></div>
+                        <div class="flex-1 overflow-y-auto custom-scrollbar"><table class="w-full text-left text-sm text-slate-400"><tbody id="activity-log-list"></tbody></table></div>
                     </div>
-
-                    <!-- RIGHT COLUMN: Controls -->
                     <div class="space-y-6">
-                        <!-- Announcement Box -->
-                        <div class="bg-[#1E293B] border border-slate-700 rounded-2xl p-6">
-                            <h3 class="text-sm font-bold text-white mb-4 flex items-center gap-2"><i data-lucide="megaphone" class="w-4 h-4 text-orange-400"></i> Global Alert</h3>
-                            <textarea id="admin-announcement-input" class="w-full bg-[#0B1120] border border-slate-700 rounded-lg p-3 text-xs text-white mb-3 h-24 resize-none" placeholder="Type alert message for all users..."></textarea>
-                            <div class="flex gap-2">
-                                <button onclick="saveAnnouncement()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-2 rounded-lg text-xs font-bold">Save & Show</button>
-                                <button onclick="deleteAnnouncement()" class="bg-red-600 hover:bg-red-500 text-white px-3 py-2 rounded-lg"><i data-lucide="trash" class="w-4 h-4"></i></button>
-                            </div>
+                         <div class="bg-[#1E293B] border border-slate-700 rounded-2xl p-6">
+                            <h3 class="text-sm font-bold text-white mb-4">Announcement</h3>
+                            <textarea id="announce-input" class="w-full bg-[#0B1120] border border-slate-700 rounded p-2 text-xs text-white mb-2 h-20" placeholder="Message..."></textarea>
+                            <button onclick="postAnnouncement()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-1.5 rounded text-xs font-bold">Post Live</button>
                         </div>
-
-                        <!-- Key Management -->
-                        <div class="bg-[#1E293B] border border-slate-700 rounded-2xl p-6">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-sm font-bold text-white">System Keys</h3>
-                                <span id="stat-keys-count" class="text-xs bg-slate-700 px-2 py-0.5 rounded text-white">0</span>
-                            </div>
-                            <div class="flex gap-2 mb-4">
-                                <input id="new-sys-key" type="text" placeholder="Paste Key" class="flex-1 bg-[#0B1120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white">
-                                <button onclick="addSystemKey()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 rounded-lg"><i data-lucide="plus" class="w-4 h-4"></i></button>
-                            </div>
-                            <ul id="system-keys-mini-list" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar text-xs font-mono"></ul>
+                         <div class="bg-[#1E293B] border border-slate-700 rounded-2xl p-6">
+                            <h3 class="text-sm font-bold text-white mb-4 flex justify-between"><span>System Keys</span> <span id="stat-keys-count" class="text-[10px] bg-slate-800 px-2 rounded pt-0.5">0</span></h3>
+                            <input id="sys-key-input" class="w-full bg-[#0B1120] border border-slate-700 rounded p-2 text-xs text-white mb-2" placeholder="Paste API Key">
+                            <button onclick="addSysKey()" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-1.5 rounded text-xs font-bold">Add Key</button>
+                            <div class="mt-3 pt-3 border-t border-slate-700 max-h-24 overflow-y-auto custom-scrollbar"><ul id="system-keys-mini-list" class="text-[10px] font-mono text-slate-500 space-y-1"></ul></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- SETTINGS MODAL -->
-    <div id="settings-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-start justify-center pt-20 hidden">
-        <div class="bg-[#1E293B] border border-slate-700 rounded-2xl p-6 w-full max-w-md shadow-2xl">
-            <h3 class="text-white font-bold mb-4 flex items-center gap-2"><i data-lucide="key" class="w-4 h-4 text-indigo-400"></i> Personal API Key</h3>
-            <div class="space-y-4">
-                <div class="flex justify-between items-center mb-1">
-                    <label class="text-xs text-slate-400">Paste Your Gemini API Key</label>
-                    <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 hover:underline">Get Key <i data-lucide="external-link" class="w-3 h-3"></i></a>
-                </div>
-                <input id="api-key-input" type="password" placeholder="Paste Key Here..." class="w-full bg-[#0B1120] border border-slate-700 rounded-xl px-4 py-3 text-sm outline-none focus:border-indigo-500 text-white">
-                <div class="flex gap-2">
-                    <button id="save-key-btn" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-xl text-sm font-bold">Save Local Key</button>
-                    <button id="close-settings-btn" class="px-4 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-sm">Close</button>
-                </div>
-                <div class="text-xs text-slate-500 pt-2 flex justify-between items-center">
-                    <span id="active-keys-count">Local Keys: 0</span>
-                    <button id="clear-keys-btn" class="text-red-400 hover:underline">Clear Local</button>
-                </div>
+        <!-- SETTINGS & AUTH MODALS -->
+        <div id="settings-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-start justify-center pt-20 hidden">
+            <div class="bg-[#1E293B] border border-slate-700 rounded-2xl p-6 w-full max-w-md relative">
+                <button onclick="toggleSettings(false)" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+                <h3 class="text-white font-bold mb-4">API Settings</h3>
+                <input id="api-key-input" type="password" placeholder="Personal API Key..." class="w-full bg-[#0B1120] border border-slate-700 rounded-xl px-4 py-3 text-sm text-white mb-4">
+                <button onclick="saveLocalKey()" class="w-full bg-emerald-600 text-white py-2 rounded-lg font-bold">Save Key</button>
+                <p class="text-[10px] text-slate-500 mt-2 text-center">If admin added keys, you don't need this.</p>
             </div>
         </div>
-    </div>
-    
-    <!-- TOAST -->
-    <div id="toast-container" class="fixed bottom-6 right-6 max-w-sm z-[70] hidden">
-        <div id="toast-box" class="flex items-start gap-3 p-4 rounded-lg border-l-4 shadow-2xl transition-all">
-            <i id="toast-icon" class="w-5 h-5 mt-0.5"></i>
-            <div><h3 id="toast-title" class="font-bold text-sm"></h3><p id="toast-msg" class="text-xs text-slate-300 mt-1"></p></div>
-            <button onclick="hideToast()" class="ml-auto text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+        
+        <div id="auth-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] flex items-center justify-center hidden">
+            <div class="bg-[#1E293B] border border-slate-700 rounded-3xl p-8 w-full max-w-md text-center">
+                <h2 class="text-2xl font-bold text-white mb-6">Login Required</h2>
+                <input id="login-email" placeholder="Email" class="w-full bg-[#0B1120] border border-slate-700 rounded-xl px-4 py-3 text-white mb-3">
+                <input id="login-pass" type="password" placeholder="Password" class="w-full bg-[#0B1120] border border-slate-700 rounded-xl px-4 py-3 text-white mb-6">
+                <button onclick="doLogin()" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl">Enter Studio</button>
+            </div>
         </div>
+        
+        <div id="toast-box" class="fixed bottom-6 right-6 bg-[#1E293B] border-l-4 border-emerald-500 text-white p-4 rounded shadow-2xl hidden z-[70]"></div>
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBAbtakEQ9vl9Khz91D8HD8uDeQR8nUHa4",
-            authDomain: "creator-studio-new.firebaseapp.com",
-            projectId: "creator-studio-new",
-            storageBucket: "creator-studio-new.firebasestorage.app",
-            messagingSenderId: "512739989726",
-            appId: "1:512739989726:web:84b798168ca876ff628a4f",
-            measurementId: "G-T81R12D3KY"
-        };
-        const ADMIN_EMAIL = "haideroffical16@gmail.com"; 
-        // APP ID Variable from environment or fallback
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'creator-studio-new';
-
-        let app, auth, db, isFirebaseActive = false, systemKeys = [];
-
-        try {
-            app = firebase.initializeApp(firebaseConfig);
-            auth = firebase.auth();
-            db = firebase.firestore();
-            isFirebaseActive = true;
-        } catch (e) { console.error(e); }
+        const firebaseConfig = {apiKey: "AIzaSyBAbtakEQ9vl9Khz91D8HD8uDeQR8nUHa4",authDomain: "creator-studio-new.firebaseapp.com",projectId: "creator-studio-new",storageBucket: "creator-studio-new.firebasestorage.app",messagingSenderId: "512739989726",appId: "1:512739989726:web:84b798168ca876ff628a4f"};
+        const ADMIN_EMAIL = "haideroffical16@gmail.com";
+        const appId = "creator-studio-new";
+        let app, auth, db, systemKeys=[];
+        let nativeVoices = [];
+        
+        try { app=firebase.initializeApp(firebaseConfig); auth=firebase.auth(); db=firebase.firestore(); db.enablePersistence().catch(()=>{}); } catch(e){}
 
         const TTS_MODEL = "gemini-2.5-flash-preview-tts";
-        const CHUNK_SIZE = 3000; 
         const VOICES = [
-            { id: "Fenrir", gender: "Male", desc: "Deep & Calm" }, { id: "Kore", gender: "Female", desc: "Soothing" },
-            { id: "Puck", gender: "Male", desc: "Energetic" }, { id: "Aoede", gender: "Female", desc: "Warm" },
-            { id: "Charon", gender: "Male", desc: "Authoritative" }, { id: "Zephyr", gender: "Male", desc: "Smooth" },
-            { id: "Leda", gender: "Female", desc: "Soft" }, { id: "Orus", gender: "Male", desc: "Confident" },
-            { id: "Umbriel", gender: "Male", desc: "Neutral" }, { id: "Iapetus", gender: "Male", desc: "Deep" }
+            {id:"Fenrir",gender:"Male"}, {id:"Kore",gender:"Female"}, {id:"Puck",gender:"Male"}, {id:"Aoede",gender:"Female"},
+            {id:"Charon",gender:"Male"}, {id:"Zephyr",gender:"Male"}, {id:"Leda",gender:"Female"}, {id:"Orus",gender:"Male"},
+            {id:"Umbriel",gender:"Male"}, {id:"Iapetus",gender:"Male"}, {id:"Callirrhoe",gender:"Female"}, {id:"Autonoe",gender:"Female"},
+            {id:"Enceladus",gender:"Male"}, {id:"Algieba",gender:"Female"}, {id:"Despina",gender:"Female"}, {id:"Erinome",gender:"Female"},
+            {id:"Algenib",gender:"Male"}, {id:"Rasalgethi",gender:"Male"}, {id:"Laomedeia",gender:"Female"}, {id:"Achernar",gender:"Male"},
+            {id:"Alnilam",gender:"Male"}, {id:"Schedar",gender:"Male"}, {id:"Gacrux",gender:"Male"}, {id:"Pulcherrima",gender:"Female"},
+            {id:"Achird",gender:"Female"}, {id:"Zubenelgenubi",gender:"Male"}, {id:"Vindemiatrix",gender:"Female"}, {id:"Sadachbia",gender:"Female"},
+            {id:"Sadaltager",gender:"Male"}, {id:"Sulafat",gender:"Female"}
         ];
+        
+        let state = { text:"", selectedVoiceId:"Fenrir", localKeys:[], speed:1.0, currentUser:null, isAdmin:false };
 
-        let state = { text: "", selectedVoiceId: "Fenrir", localKeys: [], speed: 1.0, currentUser: null, authMode: 'login', isAdmin: false, previewAudio: null, audioQueue: [], currentPlayingIndex: -1, isPlaying: false, fullAudioBlobs: [], currentLogId: null };
-        const els = { landingView: document.getElementById('landing-view'), toolView: document.getElementById('tool-view'), adminDashboardView: document.getElementById('admin-dashboard-view'), userAuthModal: document.getElementById('user-auth-modal'), adminShortcutBtn: document.getElementById('admin-shortcut-btn'), mainAudio: document.getElementById('main-audio'), announcementBanner: document.getElementById('global-announcement'), announcementText: document.getElementById('announcement-text') };
-
-        function getEl(id) { return document.getElementById(id); }
-
-        function init() {
-            lucide.createIcons();
+        function init(){
+            try{lucide.createIcons();}catch(e){}
+            
+            window.speechSynthesis.onvoiceschanged = () => { nativeVoices = window.speechSynthesis.getVoices(); };
+            // Attempt load immediately
+            nativeVoices = window.speechSynthesis.getVoices();
+            
             renderVoices();
-            const storedKeys = localStorage.getItem("local_api_keys");
-            if (storedKeys) state.localKeys = JSON.parse(storedKeys);
-            updateKeysUI();
-
-            if(isFirebaseActive) {
-                fetchSystemKeysForUser();
-                auth.onAuthStateChanged((user) => {
-                    state.currentUser = user;
-                    if (user) {
-                        // Case-Insensitive Admin Check + Trim
-                        const normalizedUserEmail = user.email.trim().toLowerCase();
-                        const normalizedAdminEmail = ADMIN_EMAIL.trim().toLowerCase();
+            const k=localStorage.getItem("local_api_keys"); if(k) state.localKeys=JSON.parse(k);
+            updateKeyStatus();
+            
+            if(auth) {
+                auth.onAuthStateChanged(u=>{
+                    state.currentUser=u;
+                    if(u){
+                        state.isAdmin=(u.email.toLowerCase().trim()===ADMIN_EMAIL.toLowerCase());
+                        if(document.getElementById('admin-shortcut-btn')) document.getElementById('admin-shortcut-btn').classList.toggle('hidden',!state.isAdmin);
+                        if(document.getElementById('auth-modal')) document.getElementById('auth-modal').classList.add('hidden');
+                        if(document.getElementById('login-btn')) document.getElementById('login-btn').classList.add('hidden');
                         
-                        state.isAdmin = (normalizedUserEmail === normalizedAdminEmail);
-                        els.adminShortcutBtn.classList.toggle('hidden', !state.isAdmin);
+                        loadSystemKeys(); 
+                        if(state.isAdmin) loadAdminData();
                         
-                        setupListeners(user);
-                        if(state.isAdmin) {
-                            loadAdminDashboardData();
-                            // Auto-bootstrap stats if empty
-                            getRef('stats').doc('global').get().then(d => {
-                                if(!d.exists) {
-                                    getRef('stats').doc('global').set({total_users: 0, total_generations: 0, total_user_keys: 0, failed_generations: 0});
-                                }
-                            });
-                        }
+                        getArtifactRef('system_config').doc('announcement').onSnapshot(d=>{
+                            if(d.exists && d.data().active){
+                                if(document.getElementById('global-announcement')) document.getElementById('global-announcement').classList.remove('hidden');
+                                if(document.getElementById('announcement-text')) document.getElementById('announcement-text').innerText=d.data().message;
+                            } else if(document.getElementById('global-announcement')) document.getElementById('global-announcement').classList.add('hidden');
+                        }, (e)=>{});
+                    } else {
+                        if(document.getElementById('auth-modal')) document.getElementById('auth-modal').classList.remove('hidden');
                     }
                 });
-                // Listen for announcements
-                getRef('system_config').doc('announcement').onSnapshot(doc => {
-                    if(doc.exists && doc.data().active && doc.data().message) {
-                        els.announcementBanner.classList.remove('hidden');
-                        els.announcementText.innerText = doc.data().message;
-                    } else {
-                        els.announcementBanner.classList.add('hidden');
-                    }
-                }, (e)=>{});
             }
-
-            getEl('open-tool-btn').onclick = checkAuthAndStart;
-            getEl('back-btn').onclick = () => switchView('landing');
-            getEl('settings-btn').onclick = () => toggleSettings(true);
-            getEl('close-settings-btn').onclick = () => toggleSettings(false);
-            getEl('save-key-btn').onclick = saveLocalKey;
-            getEl('clear-keys-btn').onclick = clearLocalKeys;
-            getEl('user-logout-btn').onclick = handleUserLogout;
-            getEl('admin-shortcut-btn').onclick = () => switchView('admin-dashboard');
-            getEl('text-input').oninput = (e) => { state.text = e.target.value; getEl('char-count').innerText = state.text.length; };
-            getEl('speed-range').oninput = (e) => { state.speed = parseFloat(e.target.value); getEl('speed-val').innerText = state.speed + 'x'; if(els.mainAudio) els.mainAudio.playbackRate = state.speed; };
-            getEl('generate-btn').onclick = startStreamingGeneration;
-            els.mainAudio.onended = playNextInQueue;
+            const txtIn = getEl('text-input'); if(txtIn) txtIn.oninput=(e)=>{state.text=e.target.value;getEl('char-count').innerText=state.text.length;};
+            const spdIn = getEl('speed-range'); if(spdIn) spdIn.oninput=(e)=>{state.speed=parseFloat(e.target.value);getEl('speed-val').innerText=state.speed+'x';};
         }
 
-        // --- HELPER FOR PATHS (CRITICAL FIX: RESTORED ROOT PATHS) ---
-        function getRef(collectionName) {
-            // Using root collections to match user's existing data structure
-            return db.collection(collectionName);
-        }
-        
-        // --- LISTENER SETUP ---
-        function setupListeners(user) {
-            // Currently mostly handled in init or on-demand to save resources
-        }
+        // --- HELPERS ---
+        function getRootRef(col){ return db.collection(col); }
+        function getArtifactRef(col){ return db.collection('artifacts').doc(appId).collection('public').doc('data').collection(col); }
 
-        // --- CORE UI ---
-        function showToast(msg, type = 'error') {
-            const container = getEl('toast-container'), box = getEl('toast-box'), title = getEl('toast-title'), text = getEl('toast-msg'), icon = getEl('toast-icon');
-            let bgClass = type === 'error' ? 'bg-[#1E293B] border-red-500' : (type === 'success' ? 'bg-[#1E293B] border-emerald-500' : 'bg-[#1E293B] border-blue-500');
-            let titleColor = type === 'error' ? 'text-red-400' : (type === 'success' ? 'text-emerald-400' : 'text-blue-400');
-            let iconName = type === 'error' ? 'alert-circle' : (type === 'success' ? 'check-circle' : 'info');
-            box.className = `flex items-start gap-3 p-4 rounded-lg border-l-4 shadow-2xl transition-all ${bgClass}`;
-            title.className = `font-bold text-sm ${titleColor}`; title.innerText = type === 'error' ? 'Error' : (type === 'success' ? 'Success' : 'Info');
-            text.innerText = msg; icon.setAttribute('data-lucide', iconName); icon.className = `w-5 h-5 mt-0.5 ${titleColor}`;
-            container.classList.remove('hidden'); lucide.createIcons();
-            if(type !== 'error') setTimeout(() => container.classList.add('hidden'), 3000);
-        }
-        function hideToast() { getEl('toast-container').classList.add('hidden'); }
-        function checkAuthAndStart() { if (state.currentUser) switchView('tool'); else toggleUserAuth(true); }
-        function toggleUserAuth(show) { const m = els.userAuthModal; if(show){m.classList.remove('hidden'); setTimeout(()=>m.classList.remove('opacity-0'),10);}else{m.classList.add('opacity-0'); setTimeout(()=>m.classList.add('hidden'),300);} }
-        function switchAuthTab(mode) { state.authMode=mode; getEl('tab-login').className=mode==='login'?"flex-1 py-2 text-sm font-bold rounded-lg text-white bg-slate-700":"flex-1 py-2 text-sm font-bold rounded-lg text-slate-400 hover:text-white"; getEl('tab-signup').className=mode==='signup'?"flex-1 py-2 text-sm font-bold rounded-lg text-white bg-slate-700":"flex-1 py-2 text-sm font-bold rounded-lg text-slate-400 hover:text-white"; getEl('auth-action-btn').innerText=mode==='login'?"Login":"Create Account"; }
-        
-        async function handleUserAuth() {
-            const email=getEl('user-email').value, pass=getEl('user-pass').value, msg=getEl('auth-msg');
-            if(!email||!pass){msg.innerText="Enter details";return;}
-            msg.innerText="Processing...";
-            try {
-                const cred = state.authMode==='signup' ? await auth.createUserWithEmailAndPassword(email,pass) : await auth.signInWithEmailAndPassword(email,pass);
-                
-                // --- SAVE USER PROFILE (New Feature) ---
-                if(cred.user) {
-                    const userRef = getRef('users').doc(cred.user.uid);
-                    userRef.get().then((doc) => {
-                        if (!doc.exists) {
-                            userRef.set({
-                                email: cred.user.email,
-                                joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                                lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
-                                generationCount: 0
-                            });
-                            // Initial Bootstrapping for Stats if needed
-                            getRef('stats').doc('global').set({total_users:firebase.firestore.FieldValue.increment(1)},{merge:true});
-                        } else {
-                            userRef.update({lastLogin: firebase.firestore.FieldValue.serverTimestamp()});
-                        }
-                    });
-                }
-
-                const cleanEmail = cred.user.email.trim().toLowerCase();
-                const cleanAdmin = ADMIN_EMAIL.trim().toLowerCase();
-                switchView(cleanEmail===cleanAdmin?'admin-dashboard':'tool');
-                
-                toggleUserAuth(false); getEl('user-email').value=""; getEl('user-pass').value=""; msg.innerText="";
-            } catch(e){msg.innerText=e.message.replace("Firebase:","").trim();}
-        }
-        function handleUserLogout(){auth.signOut();switchView('landing');}
-        function switchView(v){ [els.landingView,els.toolView,els.adminDashboardView].forEach(e=>{e.classList.add('hidden','opacity-0');e.classList.remove('z-50');}); if(v==='landing')showEl(els.landingView); else if(v==='tool')showEl(els.toolView); else if(v==='admin-dashboard'){showEl(els.adminDashboardView);els.adminDashboardView.classList.add('z-50');if(isFirebaseActive && state.isAdmin)loadAdminDashboardData();} }
-        function showEl(e){e.classList.remove('hidden');setTimeout(()=>e.classList.remove('opacity-0'),50);}
-        function toggleSettings(s){const m=getEl('settings-modal'); s?m.classList.remove('hidden'):m.classList.add('hidden');}
-        function renderVoices(){const l=getEl('voice-list');l.innerHTML='';VOICES.forEach(v=>{const a=state.selectedVoiceId===v.id;const d=document.createElement('div');d.className=`p-3 rounded-xl cursor-pointer flex justify-between group ${a?'bg-emerald-600/20 border border-emerald-500/50':'hover:bg-slate-800 border border-transparent'}`;d.innerHTML=`<div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${a?'bg-emerald-500 text-white':'bg-slate-700 text-slate-400'}">${v.id[0]}</div><div><h4 class="text-sm font-bold ${a?'text-emerald-400':'text-slate-300'}">${v.id}</h4><p class="text-[10px] text-slate-500">${v.gender} • ${v.desc}</p></div></div><button class="p-2 rounded-full hover:bg-slate-700 text-slate-400 hover:text-emerald-400" onclick="event.stopPropagation();playPreview('${v.id}')"><i data-lucide="play" class="w-3 h-3 fill-current"></i></button>`;d.onclick=()=>{state.selectedVoiceId=v.id;renderVoices();};l.appendChild(d);});lucide.createIcons();}
-
-        // --- AUDIO LOGIC ---
-        async function startStreamingGeneration() {
-            if(!state.currentUser){showToast("Please login first","error");switchView('landing');toggleUserAuth(true);return;}
-            const keys = state.localKeys.length>0 ? state.localKeys : systemKeys;
-            if(!state.text.trim() || keys.length===0){showToast(!state.text.trim()?"Enter Text":"No API Keys","error");if(keys.length===0)toggleSettings(true);return;}
-
-            setIsGenerating(true);
-            state.audioQueue=[]; state.fullAudioBlobs=[]; state.currentPlayingIndex=-1; state.isPlaying=false;
-            getEl('playback-status').classList.remove('hidden'); getEl('download-section').classList.add('hidden'); getEl('buffer-bar').style.width='0%'; getEl('status-text').innerText="Initializing..."; getEl('wave-anim').classList.add('hidden');
-
-            state.currentLogId = await logActivityStart(state.selectedVoiceId, state.text);
-
-            try {
-                const chunks = chunkText(state.text);
-                getEl('chunk-counter').innerText = `0/${chunks.length}`;
-                state.audioQueue = new Array(chunks.length).fill(null);
-                let completed = 0;
-
-                for (let i = 0; i < chunks.length; i++) {
-                    try {
-                        const buffer = await fetchWithRotation(chunks[i], state.selectedVoiceId, keys);
-                        const blob = createWavFromBuffer(buffer);
-                        state.audioQueue[i] = blob; state.fullAudioBlobs[i] = buffer;
-                        completed++;
-                        getEl('buffer-bar').style.width = `${Math.round((completed/chunks.length)*100)}%`;
-                        getEl('chunk-counter').innerText = `${completed}/${chunks.length}`;
-                        checkAndPlayQueue();
-                    } catch (e) {
-                        console.error(e); 
-                        // Show specific error from API
-                        showToast(e.message.substring(0, 50) + "...", "error"); 
-                        setIsGenerating(false); 
-                        logActivityEnd(state.currentLogId, "failed");
-                        logGenerationFail();
-                        return;
-                    }
-                    if (i < chunks.length - 1) await new Promise(r => setTimeout(r, 100));
-                }
-                prepareDownloadLink();
-                logActivityEnd(state.currentLogId, "completed");
-                logGenerationSuccess(state.selectedVoiceId, state.text);
-            } catch (e) {
-                showToast(e.message, "error");
-                logActivityEnd(state.currentLogId, "failed");
-                logGenerationFail();
-                setIsGenerating(false);
-            }
-        }
-
-        async function fetchWithRotation(text, voiceId, keyPool) {
-            let attempts = 0, tempIndex = 0;
-            let lastError = null;
-
-            while (attempts < keyPool.length * 2) {
-                const key = keyPool[tempIndex % keyPool.length];
-                if(!key){tempIndex++; attempts++; continue;}
-                
-                try {
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${TTS_MODEL}:generateContent?key=${key}`, {
-                        method: 'POST', headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ contents: [{parts: [{text}]}], generationConfig: {responseModalities: ["AUDIO"], speechConfig: {voiceConfig: {prebuiltVoiceConfig: {voiceName: voiceId}}}}})
-                    });
-
-                    if (!res.ok) {
-                        const errText = await res.text();
-                        console.error("API Raw Error:", errText);
-
-                        // CRITICAL: Stop if Bad Request (Invalid Payload/Text)
-                        if (res.status === 400) {
-                            throw new Error(`Invalid Request (400): ${errText}`);
-                        }
-                        
-                        if (res.status === 403) { 
-                            console.warn("Key Invalid/Expired (403). Rotating...");
-                            tempIndex++; attempts++; continue; 
-                        }
-                        if (res.status === 429) { 
-                            console.warn("Rate Limit (429). Waiting...");
-                            tempIndex++; attempts++; 
-                            await new Promise(r => setTimeout(r, 2000)); 
-                            continue; 
-                        }
-                        throw new Error(`API Error: ${res.status} ${errText}`);
-                    }
-
-                    const data = await res.json();
-                    const b64 = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-                    if (!b64) throw new Error("No audio data received from API");
-                    
-                    const bin = atob(b64); const bytes = new Uint8Array(bin.length);
-                    for(let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
-                    return bytes.buffer;
-
-                } catch (e) { 
-                    lastError = e;
-                    // Don't rotate on 400 errors, just fail
-                    if(e.message.includes("(400)")) throw e;
-
-                    console.warn("Fetch attempt failed:", e); 
-                    tempIndex++; attempts++; 
-                    if(attempts>=keyPool.length*2) break; 
-                }
-            }
-            throw new Error(lastError ? lastError.message : "All API Keys failed. Check Quota.");
-        }
-
-        // --- UTILS ---
-        function chunkText(s) { const c=[]; while(s.length>0){let l=s.lastIndexOf(' ',CHUNK_SIZE); if(l===-1||s.length<=CHUNK_SIZE)l=Math.min(s.length,CHUNK_SIZE); c.push(s.substring(0,l)); s=s.substring(l).trim();} return c; }
-        function createWavFromBuffer(b){if(b.byteLength>44&&new DataView(b).getUint32(0,false)===0x52494646)return new Blob([b],{type:'audio/wav'});return new Blob([createWavHeader(b.byteLength),b],{type:'audio/wav'});}
-        function createWavHeader(l){const b=new ArrayBuffer(44),v=new DataView(b),w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};w(0,'RIFF');v.setUint32(4,36+l,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,24000,true);v.setUint32(28,48000,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,l,true);return b;}
-        function mergeBuffers(b){let l=0,p=[];b.forEach(v=>{const o=new DataView(v).getUint32(0)===0x52494646?44:0;const s=v.slice(o);p.push(s);l+=s.byteLength;});return new Blob([createWavHeader(l),...p],{type:'audio/wav'});}
-        function checkAndPlayQueue(){if(!state.isPlaying)playNextInQueue();}
-        function playNextInQueue(){
-            const n=state.currentPlayingIndex+1;
-            if(state.audioQueue[n]){
-                const u=URL.createObjectURL(state.audioQueue[n]); els.mainAudio.src=u; els.mainAudio.playbackRate=state.speed; els.mainAudio.play();
-                state.isPlaying=true; state.currentPlayingIndex=n; getEl('status-text').innerText="Speaking..."; getEl('wave-anim').classList.remove('hidden');
-            } else if(n>=state.audioQueue.length && state.audioQueue.length>0 && n>=state.fullAudioBlobs.length) {
-                state.isPlaying=false; getEl('status-text').innerText="Finished"; getEl('wave-anim').classList.add('hidden'); setIsGenerating(false);
-            } else { state.isPlaying=false; getEl('status-text').innerText="Buffering..."; getEl('wave-anim').classList.add('hidden'); }
-        }
-        function prepareDownloadLink(){
-            if(state.fullAudioBlobs.length){const b=state.fullAudioBlobs.filter(x=>x);if(b.length){const u=URL.createObjectURL(mergeBuffers(b));getEl('download-link').href=u;getEl('download-link').download=`tts-${Date.now()}.wav`;getEl('download-section').classList.remove('hidden');showToast("Ready to Download!","success");}}
-        }
-        async function playPreview(vid){
-            const k=state.localKeys.length?state.localKeys:systemKeys; if(!k.length){showToast("No Keys","error");return;}
-            if(state.previewAudio)state.previewAudio.pause(); showToast("Loading preview...","info");
-            try{const b=await fetchWithRotation("Hello preview",vid,k);const u=URL.createObjectURL(createWavFromBuffer(b));const a=new Audio(u);a.playbackRate=state.speed;a.play();state.previewAudio=a;hideToast();}catch(e){showToast(e.message,"error");}
-        }
-
-        // --- FIREBASE ADMIN & LOGS (FIXED PATHS) ---
-        async function saveLocalKey() { 
-            const k=getEl('api-key-input').value.trim(); 
-            if(k){
-                state.localKeys.push(k); localStorage.setItem("local_api_keys",JSON.stringify(state.localKeys));
-                getEl('api-key-input').value=""; updateKeysUI(); showToast("Key Saved","success");
-                if(state.currentUser) getRef('stats').doc('global').update({total_user_keys: firebase.firestore.FieldValue.increment(1)}).catch(()=>{});
-            } 
-        }
-        function clearLocalKeys() { if(confirm("Clear?")){state.localKeys=[];localStorage.removeItem("local_api_keys");updateKeysUI();} }
-        function updateKeysUI() { getEl('active-keys-count').innerText=`Local Keys: ${state.localKeys.length}`; getEl('key-indicator').className=state.localKeys.length?"absolute top-2 right-2 w-2 h-2 bg-green-500 rounded-full":(systemKeys.length?"absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full animate-pulse":"absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"); getEl('system-key-badge').classList.toggle('hidden',state.localKeys.length>0||!systemKeys.length); }
-        function setIsGenerating(v) { state.isGenerating=v; getEl('generate-btn').disabled=v; getEl('generate-btn').innerHTML=v?`<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Processing...`:`<i data-lucide="play" class="w-5 h-5"></i> Start Speaking`; lucide.createIcons(); }
-
-        async function fetchSystemKeysForUser() { try{const s=await getRef('system_keys').orderBy('addedAt','desc').get();systemKeys=s.docs.map(d=>d.data().key);updateKeysUI();}catch(e){} }
-        async function addSystemKey() { const k=getEl('new-sys-key').value.trim(); if(!k)return; await getRef('system_keys').add({key:k,addedAt:firebase.firestore.FieldValue.serverTimestamp()}); getEl('new-sys-key').value=""; }
-        function logGenerationFail() { if(isFirebaseActive) getRef('stats').doc('global').update({failed_generations: firebase.firestore.FieldValue.increment(1)}).catch(()=>{}); }
-        function logGenerationSuccess(v,t) {} 
-
-        // Activity Logs (Uses strict Paths)
-        async function logActivityStart(voice, text) {
-            if(!isFirebaseActive) return null;
-            const ref = await getRef('activity_logs').add({
-                voice: voice, fullText: text, snippet: text.substring(0, 30) + "...", status: 'processing',
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(), userEmail: state.currentUser ? state.currentUser.email : 'Anonymous'
+        // --- MAIN FUNCTIONS ---
+        function renderVoices(){ 
+            const l=document.getElementById('voice-list'); if(!l)return; l.innerHTML=""; 
+            VOICES.forEach((v, i)=>{ 
+                const el=document.createElement('div'); el.className=`flex justify-between items-center p-2 rounded hover:bg-slate-800 cursor-pointer mb-1 ${state.selectedVoiceId===v.id?'bg-emerald-500/20 text-emerald-400':'text-slate-400'}`;
+                el.innerHTML=`
+                    <div class="flex-1" onclick="selectVoice('${v.id}')"><span class="font-medium">${v.id}</span> <span class="text-[10px] opacity-50 ml-2">${v.gender}</span></div>
+                    <button onclick="event.stopPropagation(); playPreviewForVoice('${v.id}', '${v.gender}', ${i})" class="p-1.5 rounded-full hover:bg-emerald-500/20 text-emerald-500" title="Instant Preview"><i data-lucide="play" class="w-3 h-3 fill-current"></i></button>
+                `;
+                l.appendChild(el);
             });
+            try{ lucide.createIcons(); }catch(e){}
+        }
+        
+        function selectVoice(id) { state.selectedVoiceId = id; renderVoices(); }
+
+        // SMART VOICE MAPPER (Fixes "Same Voice" issue by checking gender keywords AND varying pitch)
+        function playPreviewForVoice(id, gender, index) {
+            const txt = state.text || "This is a preview of " + id;
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(txt);
+            
+            // PITCH SHIFT HACK: Force different pitch for M/F to simulate difference even if system has 1 voice
+            if(gender.toLowerCase() === 'male') {
+                u.pitch = 0.8; // Deepen
+            } else {
+                u.pitch = 1.2; // Lighten
+            }
+            u.rate = state.speed; // Respect speed slider
+
+            // Try to pick best voice
+            let avail = nativeVoices;
+            const targetGender = gender.toLowerCase();
+            let genderMatch = avail.filter(v => {
+                const name = v.name.toLowerCase();
+                if(targetGender === 'female') return name.includes('female') || name.includes('zira') || name.includes('samantha');
+                if(targetGender === 'male') return name.includes('male') || name.includes('david') || name.includes('daniel');
+                return false;
+            });
+            if(genderMatch.length === 0) genderMatch = avail.filter(v => v.lang.startsWith("en")); // Fallback to any English
+            
+            if(genderMatch.length > 0) {
+                u.voice = genderMatch[index % genderMatch.length]; // Rotate voices
+            }
+            
+            window.speechSynthesis.speak(u);
+            showToast(`Previewing ${id} (${gender})...`, "info");
+        }
+
+        // --- API DOWNLOAD (Correct WAV Stitching) ---
+        async function startApiGeneration(){
+            if(!state.text){ showToast("Enter text first"); return; }
+            const keys = state.localKeys.length?state.localKeys:systemKeys;
+            if(!keys.length){ showToast("System Maintenance (No Keys).", "error"); return; }
+            
+            const btn = document.getElementById('generate-btn');
+            // Initial Loading State
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Preparing...`; 
+            btn.disabled = true;
+
+            let logId = await logActivity(state.text, "processing");
+            if(db) getArtifactRef('stats').doc('global').update({pending_generations: firebase.firestore.FieldValue.increment(1)}).catch(()=>{});
+
+            try {
+                const chunks = chunkText(state.text, 4000);
+                let audioBuffers = [];
+                
+                for(let i=0; i<chunks.length; i++){
+                    // UPDATE BUTTON TEXT WITH PROGRESS
+                    btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Processing Part ${i+1}/${chunks.length}...`;
+                    
+                    const ab = await fetchTTS(chunks[i], state.selectedVoiceId, keys);
+                    audioBuffers.push(ab);
+                }
+                
+                // STITCHING: Merge WAVs correctly by removing headers
+                const finalBlob = mergeWavBuffers(audioBuffers);
+                const url = URL.createObjectURL(finalBlob);
+                
+                document.getElementById('download-link').href = url;
+                document.getElementById('download-link').download = `tts-${Date.now()}.wav`;
+                document.getElementById('download-card').classList.remove('hidden');
+                
+                updateLog(logId, "completed");
+                if(db) getArtifactRef('stats').doc('global').update({pending_generations: firebase.firestore.FieldValue.increment(-1), total_generations: firebase.firestore.FieldValue.increment(1)});
+                showToast("Download Ready!", "success");
+
+            } catch(e){
+                console.error(e);
+                showToast("Failed: " + e.message, "error");
+                updateLog(logId, "failed");
+                if(db) getArtifactRef('stats').doc('global').update({pending_generations: firebase.firestore.FieldValue.increment(-1), failed_generations: firebase.firestore.FieldValue.increment(1)});
+            }
+            // Reset Button
+            btn.innerHTML = `<i data-lucide="download" class="w-4 h-4"></i> Download (HQ)`; 
+            btn.disabled = false; 
+            try{lucide.createIcons();}catch(e){}
+        }
+
+        // --- WAV MERGER (The Fix for Corrupt Files) ---
+        function mergeWavBuffers(buffers) {
+            if(buffers.length === 0) return new Blob([]);
+            
+            const HEADER_SIZE = 44;
+            let totalDataLen = 0;
+            
+            const dataParts = buffers.map(b => {
+                // If buffer is valid WAV, it has 'RIFF' at 0. Data starts at 44.
+                if(b.byteLength < HEADER_SIZE) return b; 
+                
+                const view = new DataView(b);
+                if(view.getUint32(0, false) === 0x52494646) { // 'RIFF'
+                    totalDataLen += (b.byteLength - HEADER_SIZE);
+                    return b.slice(HEADER_SIZE);
+                } else {
+                    totalDataLen += b.byteLength;
+                    return b;
+                }
+            });
+            
+            const header = createWavHeader(totalDataLen);
+            return new Blob([header, ...dataParts], {type: 'audio/wav'});
+        }
+        
+        function createWavHeader(dataLength) {
+            const buffer = new ArrayBuffer(44);
+            const view = new DataView(buffer);
+            
+            writeString(view, 0, 'RIFF');
+            view.setUint32(4, 36 + dataLength, true); 
+            writeString(view, 8, 'WAVE');
+            writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true); 
+            view.setUint32(24, 24000, true); view.setUint32(28, 24000 * 2, true); 
+            view.setUint16(32, 2, true); view.setUint16(34, 16, true); 
+            writeString(view, 36, 'data');
+            view.setUint32(40, dataLength, true); 
+            
+            return buffer;
+        }
+        
+        function writeString(view, offset, string) {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        }
+
+        async function fetchTTS(text, vid, keyPool){
+            let attempts=0;
+            while(attempts < keyPool.length*2){
+                const key = keyPool[attempts % keyPool.length];
+                if(!key) { attempts++; continue; }
+                try {
+                    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${TTS_MODEL}:generateContent?key=${key}`, {
+                        method:'POST', headers:{'Content-Type':'application/json'},
+                        body: JSON.stringify({contents:[{parts:[{text}]}], generationConfig:{responseModalities:["AUDIO"], speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:vid}}}}})
+                    });
+                    if(!r.ok) {
+                        if(r.status===429) { await new Promise(r=>setTimeout(r,1000)); attempts++; continue; }
+                        if(r.status===403) { attempts++; continue; }
+                        throw new Error(r.status);
+                    }
+                    const d = await r.json();
+                    const bin = atob(d.candidates[0].content.parts[0].inlineData.data);
+                    const len = bin.length; const bytes = new Uint8Array(len);
+                    for (let i=0; i<len; i++) bytes[i] = bin.charCodeAt(i);
+                    return bytes.buffer;
+                } catch(e){ attempts++; }
+            }
+            throw new Error("Server Busy / Quota Exceeded");
+        }
+
+        // --- ADMIN & DATA (HYBRID) ---
+        function loadAdminData(){
+            if(!db) return;
+            let rStats={}, aStats={};
+            const upS = () => {
+                const tU=(rStats.total_users||0)+(aStats.total_users||0);
+                const tG=(rStats.total_generations||0)+(aStats.total_generations||0);
+                const tF=(rStats.failed_generations||0)+(aStats.failed_generations||0);
+                const tP=(rStats.pending_generations||0)+(aStats.pending_generations||0);
+                if(getEl('stat-total-users')) getEl('stat-total-users').innerText=tU;
+                if(getEl('stat-total-gens')) getEl('stat-total-gens').innerText=tG;
+                if(getEl('stat-failed')) getEl('stat-failed').innerText=tF;
+                if(getEl('stat-pending')) getEl('stat-pending').innerText=tP;
+            }
+            getRootRef('stats').doc('global').onSnapshot(d=>{if(d.exists)rStats=d.data();upS();});
+            getArtifactRef('stats').doc('global').onSnapshot(d=>{if(d.exists)aStats=d.data();upS();});
+
+            getArtifactRef('activity_logs').orderBy('timestamp','desc').limit(20).onSnapshot(s=>{
+                const l=getEl('activity-log-list'); if(l){ l.innerHTML=""; s.forEach(d=>{
+                    const da=d.data(); const t=da.timestamp?new Date(da.timestamp.seconds*1000).toLocaleTimeString():'';
+                    const st=da.status==='completed'?'text-emerald-400':(da.status==='failed'?'text-red-400':'text-yellow-400');
+                    const safeText = (da.fullText || "").replace(/</g, "&lt;");
+                    l.innerHTML += `<tr class="border-b border-slate-700/50"><td class="p-3 w-1/4 align-top"><div class="font-bold text-white text-xs">${da.userEmail?.split('@')[0]}</div><div class="text-[10px] text-slate-500">${t}</div><div class="text-[10px] uppercase ${st}">${da.status}</div></td><td class="p-3 w-3/4"><div class="max-h-24 overflow-y-auto text-xs text-slate-300 bg-slate-800/50 p-2 rounded whitespace-pre-wrap custom-scrollbar">${safeText}</div></td></tr>`;
+                });}
+            });
+        }
+
+        // --- SHARED FUNCTIONS ---
+        async function logActivity(txt, st){
+            if(!db || !state.currentUser) return null;
+            const ref = await getArtifactRef('activity_logs').add({fullText: txt, status: st, timestamp: firebase.firestore.FieldValue.serverTimestamp(), userEmail: state.currentUser.email, voice: state.selectedVoiceId});
             return ref.id;
         }
-        function logActivityEnd(id, status) {
-            if(!isFirebaseActive || !id) return;
-            getRef('activity_logs').doc(id).update({ status: status });
-            if(status === 'completed') {
-                getRef('stats').doc('global').update({total_generations: firebase.firestore.FieldValue.increment(1)});
-                // Update user specific count
-                if(state.currentUser) {
-                    getRef('users').doc(state.currentUser.uid).update({generationCount: firebase.firestore.FieldValue.increment(1)}).catch(()=>{});
-                }
-            }
-        }
+        function updateLog(id, st){ if(id && db) getArtifactRef('activity_logs').doc(id).update({status:st}); }
+        function chunkText(s, len){ const r=[]; for(let i=0;i<s.length;i+=len)r.push(s.substring(i,i+len)); return r; }
         
-        // --- RESET PENDING STATS ---
-        async function resetPendingStats() {
-            if(confirm("Reset pending counter to 0?")) {
-                await getRef('stats').doc('global').update({pending_generations: 0});
-                showToast("Counter Reset", "success");
-            }
+        // Admin Actions
+        function resetPending(){ if(db) getArtifactRef('stats').doc('global').update({pending_generations:0}); showToast("Reset Done"); }
+        async function postAnnouncement(){ const t=getEl('announce-input').value; if(db) await getArtifactRef('system_config').doc('announcement').set({message:t,active:true}); showToast("Posted"); }
+        async function deleteAnnouncement(){ if(db) await getArtifactRef('system_config').doc('announcement').update({active:false}); getEl('announce-input').value=""; showToast("Deleted"); }
+        async function addSysKey(){ const k=getEl('sys-key-input').value.trim(); if(k && db) { await getArtifactRef('system_keys').add({key:k,addedAt:firebase.firestore.FieldValue.serverTimestamp()}); showToast("Key Added"); getEl('sys-key-input').value=""; } }
+        async function loadSystemKeys(){ 
+            if(!db) return; 
+            const s1 = await getRootRef('system_keys').get(); const s2 = await getArtifactRef('system_keys').get();
+            const k1 = s1.docs.map(d=>d.data().key); const k2 = s2.docs.map(d=>d.data().key);
+            systemKeys = [...new Set([...k1, ...k2])];
+            if(getEl('stat-keys-count')) getEl('stat-keys-count').innerText=systemKeys.length; 
+            const l=getEl('system-keys-mini-list'); if(l){ l.innerHTML=""; systemKeys.forEach(k=>l.innerHTML+=`<li class="truncate text-slate-500 bg-slate-800 p-1 rounded mb-1">${k.substr(0,8)}...</li>`); }
+            updateKeyStatus();
         }
 
-        // Admin Functions (Fixed Paths with Safety Checks)
-        function loadAdminDashboardData() {
-            if(document.getElementById('db-status')) document.getElementById('db-status').innerText = "Connected";
+        // Auth
+        async function doLogin(){
+            const e=getEl('login-email').value, p=getEl('login-pass').value;
+            try{ await auth.signInWithEmailAndPassword(e,p); }
+            catch(err){ try{ await auth.createUserWithEmailAndPassword(e,p); if(db) getArtifactRef('stats').doc('global').set({total_users:firebase.firestore.FieldValue.increment(1)},{merge:true}); } catch(er){ getEl('auth-msg').innerText=er.message; } }
+        }
+        function saveLocalKey(){ const k=getEl('api-key-input').value; if(k){ state.localKeys=[k]; localStorage.setItem("local_api_keys",JSON.stringify([k])); updateKeyStatus(); showToast("Saved"); toggleSettings(false); } }
+        function clearLocalKeys(){ state.localKeys=[]; localStorage.removeItem("local_api_keys"); updateKeyStatus(); showToast("Cleared"); }
+        function updateKeyStatus(){ 
+            const hasSystem = systemKeys.length > 0;
+            const hasLocal = state.localKeys.length > 0;
+            const badge = getEl('system-key-badge');
+            const ind = getEl('key-indicator');
             
-            getRef('stats').doc('global').onSnapshot(d => {
-                if(d.exists){
-                    const da=d.data();
-                    if(getEl('stat-total-users')) getEl('stat-total-users').innerText = da.total_users||0;
-                    if(getEl('stat-total-gens')) getEl('stat-total-gens').innerText = da.total_generations||0;
-                    if(getEl('stat-user-keys')) getEl('stat-user-keys').innerText = da.total_user_keys||0;
-                    if(getEl('stat-failed')) getEl('stat-failed').innerText = da.failed_generations||0;
-                    if(getEl('stat-pending')) getEl('stat-pending').innerText = da.pending_generations||0;
-                }
-            });
-            getRef('system_keys').onSnapshot(s => {
-                if(getEl('stat-keys-count')) getEl('stat-keys-count').innerText = s.size;
-                const l=getEl('system-keys-mini-list'); 
-                if(l) {
-                    l.innerHTML="";
-                    s.forEach(d => l.innerHTML+=`<li class="flex justify-between bg-slate-800 p-2 rounded border border-slate-700 mb-1"><span>${d.data().key.substr(0,6)}...</span><button onclick="deleteSystemKey('${d.id}')" class="text-red-400 hover:text-red-300"><i data-lucide="trash" class="w-3 h-3"></i></button></li>`);
-                    lucide.createIcons();
-                }
-            });
-            getRef('activity_logs').orderBy('timestamp', 'desc').limit(20).onSnapshot(s => {
-                const l = getEl('activity-log-list'); 
-                if(l) {
-                    l.innerHTML = "";
-                    if(s.empty) { l.innerHTML=`<tr><td colspan="3" class="px-6 py-8 text-center text-slate-600">No logs</td></tr>`; return; }
-                    s.forEach(d => {
-                        const dat = d.data();
-                        const time = dat.timestamp ? new Date(dat.timestamp.seconds*1000).toLocaleTimeString() : '...';
-                        const email = dat.userEmail.split('@')[0];
-                        const statusColor = dat.status==='processing' ? 'text-yellow-400 animate-pulse' : (dat.status==='failed'?'text-red-400':'text-emerald-400');
-                        
-                        // Safe text replacement for JSON compatibility in onclick
-                        const safeText = (dat.fullText || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;").replace(/\n/g, "<br>");
-                        
-                        l.innerHTML += `<tr class="border-b border-slate-700/50 hover:bg-slate-800/30 transition-colors"><td class="px-6 py-3"><div class="text-xs text-white font-bold">${email}</div><div class="text-[10px] text-slate-500">${time}</div></td><td class="px-6 py-3 font-bold text-xs uppercase ${statusColor}">${dat.status}</td><td class="px-6 py-3"><div class="text-xs text-slate-300 max-h-20 overflow-y-auto custom-scrollbar whitespace-pre-wrap">${safeText}</div></td></tr>`;
-                    });
-                }
-            });
-            
-            // --- FETCH USERS LIST ---
-            getRef('users').orderBy('joinedAt', 'desc').limit(20).onSnapshot(s => {
-                const ul = getEl('user-list-body'); 
-                if(ul) {
-                    ul.innerHTML = "";
-                    if(s.empty) { ul.innerHTML=`<tr><td colspan="3" class="px-6 py-8 text-center text-slate-600">No registered users found</td></tr>`; return; }
-                    s.forEach(doc => {
-                        const u = doc.data();
-                        const joinDate = u.joinedAt ? new Date(u.joinedAt.seconds*1000).toLocaleDateString() : '-';
-                        ul.innerHTML += `
-                            <tr class="border-b border-slate-700/50 hover:bg-slate-800/30">
-                                <td class="px-6 py-3 text-xs text-white font-bold">${u.email}</td>
-                                <td class="px-6 py-3 text-xs text-slate-400">${joinDate}</td>
-                                <td class="px-6 py-3 text-xs text-emerald-400 font-bold">${u.generationCount || 0}</td>
-                            </tr>`;
-                    });
-                }
-            });
+            if(hasLocal) { if(ind) ind.className='absolute top-2 right-2 w-2 h-2 bg-green-500 rounded-full'; if(badge){badge.classList.remove('hidden'); badge.innerText='⚡ Personal Key Active'; badge.className='text-green-400';} }
+            else if(hasSystem) { if(ind) ind.className='absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full animate-pulse'; if(badge){badge.classList.remove('hidden'); badge.innerText='⚡ Shared API Active'; badge.className='text-blue-400';} }
+            else { if(ind) ind.className='absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full'; if(badge) badge.classList.add('hidden'); }
         }
-        async function deleteSystemKey(id) { if(confirm("Delete?")) await getRef('system_keys').doc(id).delete(); }
-        async function saveAnnouncement() {
-            const txt = getEl('admin-announcement-input').value;
-            await getRef('system_config').doc('announcement').set({message: txt, active: true});
-            showToast("Announcement Posted", "success");
-        }
-        async function deleteAnnouncement() {
-            await getRef('system_config').doc('announcement').update({active: false});
-            getEl('admin-announcement-input').value = "";
-            showToast("Announcement Removed", "success");
-        }
+
+        function checkAuthAndStart() { if (state.currentUser) switchView('tool'); else if(document.getElementById('auth-modal')) document.getElementById('auth-modal').classList.remove('hidden'); }
+        function switchView(v){ ['landing-view','tool-view','admin-dashboard-view'].forEach(i=>{ const el=document.getElementById(i); if(el) el.classList.add('hidden','opacity-0'); }); const newV=document.getElementById(v+'-view'); if(newV) { newV.classList.remove('hidden'); setTimeout(()=>newV.classList.remove('opacity-0'),50); } }
+        function showToast(m,t="info"){ const b=getEl('toast-box'); if(!b) return; b.innerText=m; b.classList.remove('hidden'); setTimeout(()=>b.classList.add('hidden'), 4000); }
+        function toggleSettings(s){ const el=getEl('settings-modal'); if(el) el.classList.toggle('hidden', !s); }
+        function getEl(id){ return document.getElementById(id); }
 
         init();
     </script>

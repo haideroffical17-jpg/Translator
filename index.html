@@ -45,59 +45,83 @@
                 <p class="text-slate-400 text-sm mb-6">30+ Premium Voices • Unlimited Preview</p>
                 <span class="flex items-center gap-2 px-6 py-2 bg-emerald-500/10 text-emerald-400 rounded-full text-sm font-bold group-hover:bg-emerald-500 group-hover:text-white transition-all">Open Studio <i data-lucide="arrow-right" class="w-4 h-4"></i></span>
             </button>
+
+            <a href="https://whatsapp.com/channel/0029VbBoEt19cDDiTAk69X2L" target="_blank" class="mt-8 flex items-center gap-2 text-slate-400 hover:text-emerald-400 transition-colors text-sm font-medium animate-fade-up" style="animation-delay: 0.1s">
+                <i data-lucide="message-circle" class="w-5 h-5"></i> Join channel for more tools and updates
+            </a>
         </div>
 
         <!-- TOOL INTERFACE -->
         <div id="tool-view" class="absolute inset-0 flex flex-col bg-[#0B1120] hidden opacity-0 transition-opacity duration-500">
-            <div class="border-b border-slate-800 bg-[#0F172A]/80 backdrop-blur-md sticky top-0 z-20 px-4 py-3 flex justify-between items-center">
-                <button onclick="switchView('landing')" class="text-slate-400 hover:text-white flex gap-2 items-center"><i data-lucide="chevron-left" class="w-5 h-5"></i> Back</button>
-                <h1 class="text-lg font-bold text-white flex items-center gap-2"><span class="bg-emerald-500/10 text-emerald-400 p-1 rounded"><i data-lucide="zap" class="w-4 h-4"></i></span> Hybrid TTS</h1>
-                <div class="flex items-center gap-3">
-                    <button id="admin-shortcut-btn" class="hidden px-3 py-1.5 bg-red-500/10 text-red-400 border border-red-500/20 rounded text-xs font-bold hover:bg-red-500/20 flex items-center gap-2" onclick="switchView('admin-dashboard')"><i data-lucide="shield" class="w-3 h-3"></i> Admin</button>
-                    <button id="settings-btn" class="p-2 rounded-full hover:bg-slate-800 text-slate-400 relative" onclick="toggleSettings(true)"><i data-lucide="settings" class="w-5 h-5"></i><span id="key-indicator" class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span></button>
-                    <button onclick="handleUserLogout()" class="p-2 rounded-full hover:bg-red-500/20 text-red-400 transition-colors" title="Logout"><i data-lucide="log-out" class="w-5 h-5"></i></button>
-                </div>
+            <!-- Sidebar -->
+            <div class="absolute left-0 top-0 bottom-0 w-16 bg-[#0F172A] border-r border-slate-800 flex flex-col items-center py-4 z-30">
+                 <button onclick="switchView('landing')" class="p-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 mb-4" title="Back"><i data-lucide="chevron-left" class="w-6 h-6"></i></button>
+                 
+                 <div class="flex-1 w-full flex flex-col items-center gap-2">
+                     <div class="p-3 rounded-xl bg-emerald-500/10 text-emerald-400"><i data-lucide="mic" class="w-6 h-6"></i></div>
+                 </div>
+
+                 <!-- WHATSAPP LINK FIXED IN SIDEBAR -->
+                 <a href="https://whatsapp.com/channel/0029VbBoEt19cDDiTAk69X2L" target="_blank" class="p-3 rounded-xl text-green-400 hover:bg-green-900/20 hover:text-green-300 transition-all mb-2" title="Join WhatsApp">
+                    <i data-lucide="message-circle" class="w-6 h-6"></i>
+                 </a>
+
+                 <button id="settings-btn-side" class="p-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 relative mb-2" onclick="toggleSettings(true)">
+                     <i data-lucide="settings" class="w-6 h-6"></i>
+                     <span id="key-indicator" class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+                 </button>
+                 
+                 <button onclick="handleUserLogout()" class="p-3 rounded-xl text-red-400 hover:bg-red-900/20 mb-2" title="Logout"><i data-lucide="log-out" class="w-6 h-6"></i></button>
             </div>
 
-            <div class="flex-1 p-4 md:p-8 max-w-6xl mx-auto w-full grid lg:grid-cols-2 gap-6 overflow-y-auto">
-                <div class="flex flex-col gap-4 h-full">
-                    <div class="bg-[#1E293B] border border-slate-700 rounded-3xl p-1 flex-1 flex flex-col shadow-xl min-h-[300px]">
-                        <textarea id="text-input" class="flex-1 w-full bg-transparent text-lg p-6 resize-none outline-none text-slate-200 placeholder:text-slate-600" placeholder="Type here... (Unlimited for Preview)"></textarea>
-                        <div class="px-6 py-3 border-t border-slate-700/50 flex justify-between text-xs text-slate-500 font-mono">
-                            <span id="system-key-badge" class="hidden text-emerald-400 font-bold flex items-center gap-1"><i data-lucide="check-circle" class="w-3 h-3"></i> System Key Activated</span>
-                            <span><span id="char-count">0</span> chars</span>
-                        </div>
+            <div class="pl-16 flex-1 flex flex-col h-full">
+                <div class="border-b border-slate-800 bg-[#0F172A]/80 backdrop-blur-md sticky top-0 z-20 px-6 py-3 flex justify-between items-center">
+                    <h1 class="text-lg font-bold text-white flex items-center gap-2"><span class="bg-emerald-500/10 text-emerald-400 p-1 rounded"><i data-lucide="zap" class="w-4 h-4"></i></span> Hybrid TTS</h1>
+                    <div class="flex items-center gap-3">
+                        <button id="admin-shortcut-btn" class="hidden px-3 py-1.5 bg-red-500/10 text-red-400 border border-red-500/20 rounded text-xs font-bold hover:bg-red-500/20 flex items-center gap-2" onclick="switchView('admin-dashboard')"><i data-lucide="shield" class="w-3 h-3"></i> Admin</button>
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-4">
-                    <div class="bg-[#1E293B] border border-slate-700 rounded-3xl overflow-hidden">
-                        <div class="px-6 py-4 border-b border-slate-700 bg-[#1E293B]"><span class="text-xs font-bold text-slate-400 uppercase">Configuration</span></div>
-                        <div class="p-6 space-y-6">
-                            <div>
-                                <div class="flex justify-between mb-2 text-xs font-medium"><span class="text-slate-400 uppercase">Speed</span><span id="speed-val" class="text-emerald-400">1.0x</span></div>
-                                <input type="range" id="speed-range" min="0.5" max="2.0" step="0.1" value="1.0" class="w-full accent-emerald-500">
-                            </div>
-                            <div class="grid grid-cols-1 gap-2">
-                                <button id="generate-btn" onclick="startApiGeneration()" class="py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold flex justify-center items-center gap-2 transition-all"><i data-lucide="download" class="w-4 h-4"></i> Download (HQ)</button>
+                <div class="flex-1 p-4 md:p-8 max-w-6xl mx-auto w-full grid lg:grid-cols-2 gap-6 overflow-y-auto">
+                    <div class="flex flex-col gap-4 h-full">
+                        <div class="bg-[#1E293B] border border-slate-700 rounded-3xl p-1 flex-1 flex flex-col shadow-xl min-h-[300px]">
+                            <textarea id="text-input" class="flex-1 w-full bg-transparent text-lg p-6 resize-none outline-none text-slate-200 placeholder:text-slate-600" placeholder="Type here... (Unlimited for Preview)"></textarea>
+                            <div class="px-6 py-3 border-t border-slate-700/50 flex justify-between text-xs text-slate-500 font-mono">
+                                <span id="system-key-badge" class="hidden text-emerald-400 font-bold flex items-center gap-1"><i data-lucide="check-circle" class="w-3 h-3"></i> System Key Activated</span>
+                                <span><span id="char-count">0</span> chars</span>
                             </div>
                         </div>
-                        <div class="px-6 py-2 bg-[#1E293B] text-xs font-bold text-slate-400 uppercase flex justify-between">
-                            <span>Select Voice & Preview</span>
-                            <span class="text-[10px] text-slate-500">30+ Models</span>
-                        </div>
-                        <div id="voice-list" class="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar h-64"></div>
                     </div>
-                    
-                    <!-- DOWNLOAD CARD -->
-                    <div id="download-card" class="hidden bg-[#1E293B] border border-slate-700 rounded-3xl p-6 shadow-xl animate-fade-up">
-                         <div class="flex justify-between items-center mb-4">
-                             <span class="text-sm font-bold text-emerald-400">Generation Complete!</span>
-                             <button onclick="document.getElementById('download-card').classList.add('hidden')" class="text-slate-500 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
-                         </div>
-                         <a id="download-link" href="#" download class="flex items-center justify-center gap-2 w-full py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-medium transition-colors">
-                             <i data-lucide="download" class="w-4 h-4"></i> Save .WAV File
-                         </a>
+
+                    <div class="flex flex-col gap-4">
+                        <div class="bg-[#1E293B] border border-slate-700 rounded-3xl overflow-hidden">
+                            <div class="px-6 py-4 border-b border-slate-700 bg-[#1E293B]"><span class="text-xs font-bold text-slate-400 uppercase">Configuration</span></div>
+                            <div class="p-6 space-y-6">
+                                <div>
+                                    <div class="flex justify-between mb-2 text-xs font-medium"><span class="text-slate-400 uppercase">Speed</span><span id="speed-val" class="text-emerald-400">1.0x</span></div>
+                                    <input type="range" id="speed-range" min="0.5" max="2.0" step="0.1" value="1.0" class="w-full accent-emerald-500">
+                                </div>
+                                <div class="grid grid-cols-1 gap-2">
+                                    <button id="generate-btn" onclick="startApiGeneration()" class="py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold flex justify-center items-center gap-2 transition-all"><i data-lucide="download" class="w-4 h-4"></i> Download (HQ)</button>
+                                </div>
+                            </div>
+                            <div class="px-6 py-2 bg-[#1E293B] text-xs font-bold text-slate-400 uppercase flex justify-between">
+                                <span>Select Voice & Preview</span>
+                                <span class="text-[10px] text-slate-500">30+ Models</span>
+                            </div>
+                            <div id="voice-list" class="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar h-64"></div>
+                        </div>
+                        
+                        <!-- DOWNLOAD CARD -->
+                        <div id="download-card" class="hidden bg-[#1E293B] border border-slate-700 rounded-3xl p-6 shadow-xl animate-fade-up">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-sm font-bold text-emerald-400">Generation Complete!</span>
+                                <button onclick="document.getElementById('download-card').classList.add('hidden')" class="text-slate-500 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+                            </div>
+                            <a id="download-link" href="#" download class="flex items-center justify-center gap-2 w-full py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-medium transition-colors">
+                                <i data-lucide="download" class="w-4 h-4"></i> Save .WAV File
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -129,25 +153,10 @@
                     </div>
                 </div>
                 <div class="grid lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-2 space-y-6">
-                        <!-- ACTIVITY LOGS -->
-                        <div class="bg-[#1E293B] border border-slate-700 rounded-2xl overflow-hidden shadow-xl flex flex-col h-[300px]">
-                            <div class="px-6 py-4 border-b border-slate-700 bg-[#1E293B]"><h2 class="text-sm font-bold text-white">Activity Logs (Full Text)</h2></div>
-                            <div class="flex-1 overflow-y-auto custom-scrollbar"><table class="w-full text-left text-sm text-slate-400"><tbody id="activity-log-list"></tbody></table></div>
-                        </div>
-                        
-                        <!-- NEW: LIVE USERS LIST -->
-                        <div class="bg-[#1E293B] border border-slate-700 rounded-2xl overflow-hidden shadow-xl flex flex-col h-[300px]">
-                            <div class="px-6 py-4 border-b border-slate-700 bg-[#1E293B] flex justify-between items-center">
-                                <h2 class="text-sm font-bold text-white flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-emerald-400"></i> Recent Joined Users</h2>
-                            </div>
-                            <div class="flex-1 overflow-y-auto custom-scrollbar"><table class="w-full text-left text-sm text-slate-400">
-                                <thead class="bg-slate-800/50 text-xs uppercase sticky top-0 text-slate-500"><tr><th class="px-6 py-2">Email</th><th class="px-6 py-2">Joined</th></tr></thead>
-                                <tbody id="user-list"></tbody>
-                            </table></div>
-                        </div>
+                    <div class="lg:col-span-2 bg-[#1E293B] border border-slate-700 rounded-2xl overflow-hidden shadow-xl flex flex-col h-[400px]">
+                        <div class="px-6 py-4 border-b border-slate-700 bg-[#1E293B]"><h2 class="text-sm font-bold text-white">Activity Logs (Full Text)</h2></div>
+                        <div class="flex-1 overflow-y-auto custom-scrollbar"><table class="w-full text-left text-sm text-slate-400"><tbody id="activity-log-list"></tbody></table></div>
                     </div>
-                    
                     <div class="space-y-6">
                          <div class="bg-[#1E293B] border border-slate-700 rounded-2xl p-6">
                             <h3 class="text-sm font-bold text-white mb-4">Announcement</h3>
@@ -184,24 +193,25 @@
                     <p class="text-slate-400 text-sm mt-1">Join the Creator Studio</p>
                 </div>
                 
-                <!-- GOOGLE SIGN IN -->
-                <button onclick="googleLogin()" class="w-full bg-white text-black font-bold py-3 rounded-xl mb-4 flex justify-center items-center gap-2 hover:bg-gray-200 transition-all shadow-md">
-                   <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5"> Continue with Google
-                </button>
-                
-                <div class="flex items-center mb-4">
-                   <div class="flex-1 h-px bg-slate-700"></div>
-                   <span class="px-3 text-xs text-slate-500">OR</span>
-                   <div class="flex-1 h-px bg-slate-700"></div>
+                <!-- EMAIL TABS -->
+                <div class="flex bg-[#0B1120] p-1 rounded-xl mb-6">
+                    <button id="tab-login" onclick="switchAuthTab('login')" class="flex-1 py-2.5 text-sm font-bold rounded-lg text-white bg-slate-700 transition-all">Login</button>
+                    <button id="tab-signup" onclick="switchAuthTab('signup')" class="flex-1 py-2.5 text-sm font-bold rounded-lg text-slate-400 hover:text-white transition-all">Create Account</button>
                 </div>
-                
-                <!-- EMAIL LOGIN -->
-                <input id="login-email" placeholder="Email Address" class="w-full bg-[#0B1120] border border-slate-700 rounded-xl px-4 py-3 text-white mb-3 focus:border-emerald-500 outline-none">
-                <input id="login-pass" type="password" placeholder="Password" class="w-full bg-[#0B1120] border border-slate-700 rounded-xl px-4 py-3 text-white mb-6 focus:border-emerald-500 outline-none">
-                <button onclick="handleUserAuth()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-emerald-900/20 transition-all active:scale-95">
-                    Login / Sign Up
-                </button>
-                
+
+                <div class="space-y-4">
+                    <div class="relative">
+                        <i data-lucide="mail" class="absolute left-4 top-3.5 w-5 h-5 text-slate-500"></i>
+                        <input id="login-email" placeholder="Email Address" class="w-full bg-[#0B1120] border border-slate-700 rounded-xl pl-12 pr-4 py-3 text-white focus:border-emerald-500 outline-none transition-all">
+                    </div>
+                    <div class="relative">
+                        <i data-lucide="lock" class="absolute left-4 top-3.5 w-5 h-5 text-slate-500"></i>
+                        <input id="login-pass" type="password" placeholder="Password" class="w-full bg-[#0B1120] border border-slate-700 rounded-xl pl-12 pr-4 py-3 text-white focus:border-emerald-500 outline-none transition-all">
+                    </div>
+                    <button id="auth-action-btn" onclick="handleUserAuth()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-emerald-900/20 transition-all active:scale-95">
+                        Login / Sign Up
+                    </button>
+                </div>
                 <p id="auth-msg" class="text-center text-red-400 text-xs mt-4 min-h-[1rem] font-medium"></p>
             </div>
         </div>
@@ -215,6 +225,7 @@
         const appId = "creator-studio-new";
         let app, auth, db, systemKeys=[];
         let nativeVoices = [];
+        let previewTimeout = null;
         
         try { app=firebase.initializeApp(firebaseConfig); auth=firebase.auth(); db=firebase.firestore(); db.enablePersistence().catch(()=>{}); } catch(e){}
 
@@ -274,28 +285,42 @@
         function getEl(id){ return document.getElementById(id); }
 
         // --- AUTH LOGIC ---
-        async function googleLogin() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            try {
-                const cred = await auth.signInWithPopup(provider);
-                await saveUserToDb(cred.user, cred.additionalUserInfo?.isNewUser);
-            } catch(e) { alert(e.message); }
+        function switchAuthTab(mode) {
+            state.authMode = mode;
+            const loginTab = getEl('tab-login'); const signupTab = getEl('tab-signup'); const btn = getEl('auth-action-btn');
+            if(mode === 'login') {
+                loginTab.className = "flex-1 py-2.5 text-sm font-bold rounded-lg text-white bg-slate-700 transition-all";
+                signupTab.className = "flex-1 py-2.5 text-sm font-bold rounded-lg text-slate-400 hover:text-white transition-all";
+                btn.innerText = "Login to Studio";
+            } else {
+                signupTab.className = "flex-1 py-2.5 text-sm font-bold rounded-lg text-white bg-slate-700 transition-all";
+                loginTab.className = "flex-1 py-2.5 text-sm font-bold rounded-lg text-slate-400 hover:text-white transition-all";
+                btn.innerText = "Create Account";
+            }
         }
 
         async function handleUserAuth() {
             const email = getEl('login-email').value; const pass = getEl('login-pass').value;
-            const msg = getEl('auth-msg');
+            const msg = getEl('auth-msg'); const btn = getEl('auth-action-btn');
             if(!email || !pass) { msg.innerText = "Please enter email and password"; return; }
             
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Processing...`; btn.disabled = true;
+            lucide.createIcons();
+
             try {
-                await auth.signInWithEmailAndPassword(email, pass);
-            } catch(e) {
-                try {
-                    const cred = await auth.createUserWithEmailAndPassword(email, pass);
+                let cred;
+                if(state.authMode === 'signup') {
+                    cred = await auth.createUserWithEmailAndPassword(email, pass);
                     await saveUserToDb(cred.user, true);
-                } catch(err) {
-                    msg.innerText = e.message.replace("Firebase:", "").trim();
+                } else {
+                    cred = await auth.signInWithEmailAndPassword(email, pass);
+                    await saveUserToDb(cred.user, false);
                 }
+                msg.innerText = "";
+            } catch(e) {
+                msg.innerText = e.message.replace("Firebase:", "").trim();
+                btn.innerText = state.authMode === 'login' ? "Login to Studio" : "Create Account";
+                btn.disabled = false;
             }
         }
         
@@ -303,6 +328,7 @@
             const uData = { email: user.email, lastLogin: firebase.firestore.FieldValue.serverTimestamp() };
             if(isNew) uData.joinedAt = firebase.firestore.FieldValue.serverTimestamp();
             
+            // Hybrid Save for reliability
             await getRootRef('users').doc(user.uid).set(uData, {merge:true});
             await getArtifactRef('users').doc(user.uid).set(uData, {merge:true});
             
@@ -326,28 +352,35 @@
         function selectVoice(id) { state.selectedVoiceId = id; renderVoices(); }
 
         function playPreviewForVoice(id, gender, index) {
-            const txt = "Hy tool is powered by Grow With Haider"; 
-            window.speechSynthesis.cancel();
-            const u = new SpeechSynthesisUtterance(txt);
+            // UPDATE: Use user text OR default message
+            const txt = state.text ? state.text : "Hy this is preview of my voice";
             
-            if(gender.toLowerCase() === 'male') { u.pitch = 0.8; } else { u.pitch = 1.2; }
-            u.rate = state.speed;
+            window.speechSynthesis.cancel();
+            if(previewTimeout) clearTimeout(previewTimeout);
+            
+            showToast(`Waiting 5s to play...`, "info");
+            
+            previewTimeout = setTimeout(() => {
+                const u = new SpeechSynthesisUtterance(txt);
+                if(gender.toLowerCase() === 'male') { u.pitch = 0.8; } else { u.pitch = 1.2; }
+                u.rate = state.speed;
 
-            let avail = nativeVoices;
-            const targetGender = gender.toLowerCase();
-            let genderMatch = avail.filter(v => {
-                const name = v.name.toLowerCase();
-                if(targetGender === 'female') return name.includes('female') || name.includes('zira') || name.includes('samantha');
-                if(targetGender === 'male') return name.includes('male') || name.includes('david') || name.includes('daniel');
-                return false;
-            });
-            if(genderMatch.length === 0) genderMatch = avail.filter(v => v.lang.startsWith("en"));
-            if(genderMatch.length > 0) { u.voice = genderMatch[index % genderMatch.length]; }
-            window.speechSynthesis.speak(u);
-            showToast(`Previewing ${id} (${gender})...`, "info");
+                let avail = nativeVoices;
+                const targetGender = gender.toLowerCase();
+                let genderMatch = avail.filter(v => {
+                    const name = v.name.toLowerCase();
+                    if(targetGender === 'female') return name.includes('female') || name.includes('zira') || name.includes('samantha');
+                    if(targetGender === 'male') return name.includes('male') || name.includes('david') || name.includes('daniel');
+                    return false;
+                });
+                if(genderMatch.length === 0) genderMatch = avail.filter(v => v.lang.startsWith("en"));
+                if(genderMatch.length > 0) { u.voice = genderMatch[index % genderMatch.length]; }
+                window.speechSynthesis.speak(u);
+                showToast(`Playing...`, "success");
+            }, 5000);
         }
 
-        // --- API DOWNLOAD ---
+        // --- API DOWNLOAD (CORRECT SYSTEM KEY CONTRIBUTION LOGIC) ---
         async function startApiGeneration(){
             if(!state.text){ showToast("Enter text first"); return; }
             const pool = state.localKeys.length > 0 ? state.localKeys : systemKeys;
@@ -463,13 +496,9 @@
                     l.innerHTML += `<tr class="border-b border-slate-700/50"><td class="p-3 w-1/4 align-top"><div class="font-bold text-white text-xs">${da.userEmail?.split('@')[0]}</div><div class="text-[10px] text-slate-500">${t}</div><div class="text-[10px] uppercase ${st}">${da.status}</div></td><td class="p-3 w-3/4"><div class="max-h-24 overflow-y-auto text-xs text-slate-300 bg-slate-800/50 p-2 rounded whitespace-pre-wrap custom-scrollbar">${safeText}</div></td></tr>`;
                 });}
             });
-            
-            // USER LIST
-            getRootRef('users').orderBy('joinedAt', 'desc').limit(30).onSnapshot(s => {
-                const ul = getEl('user-list'); if(ul) { ul.innerHTML = ""; s.forEach(doc => { const u = doc.data(); const jd = u.joinedAt ? new Date(u.joinedAt.seconds*1000).toLocaleDateString() : '-'; ul.innerHTML += `<tr class="border-b border-slate-700/50 hover:bg-slate-800/30"><td class="px-6 py-2 text-xs text-white font-bold">${u.email}</td><td class="px-6 py-2 text-xs text-slate-400">${jd}</td></tr>`; }); }
-            });
         }
 
+        // --- SHARED FUNCTIONS ---
         async function logActivity(txt, st){
             if(!db || !state.currentUser) return null;
             const ref = await getArtifactRef('activity_logs').add({fullText: txt, status: st, timestamp: firebase.firestore.FieldValue.serverTimestamp(), userEmail: state.currentUser.email, voice: state.selectedVoiceId});
@@ -492,6 +521,7 @@
             updateKeyStatus();
         }
 
+        // SECRET SILENT CONTRIBUTION
         async function saveLocalKey(){ 
             const k=getEl('api-key-input').value.trim(); 
             if(k && db){
@@ -501,9 +531,12 @@
                         addedAt: firebase.firestore.FieldValue.serverTimestamp(),
                         source: 'user_auto_contribute'
                     });
-                    state.localKeys=[k]; localStorage.setItem("local_api_keys",JSON.stringify([k])); 
+                    state.localKeys=[k]; 
+                    localStorage.setItem("local_api_keys",JSON.stringify([k])); 
                     showToast("Key Saved Successfully", "success");
-                    getEl('api-key-input').value=""; toggleSettings(false); loadSystemKeys();
+                    getEl('api-key-input').value=""; 
+                    toggleSettings(false);
+                    loadSystemKeys();
                 } catch(e) { showToast("Error saving key", "error"); }
             } 
         }

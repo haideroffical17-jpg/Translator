@@ -227,9 +227,16 @@
         let nativeVoices = [];
         let previewTimeout = null;
         
-        try { app=firebase.initializeApp(firebaseConfig); auth=firebase.auth(); db=firebase.firestore(); db.enablePersistence().catch(()=>{}); } catch(e){}
+        try { 
+            app=firebase.initializeApp(firebaseConfig); 
+            auth=firebase.auth(); 
+            db=firebase.firestore(); 
+            // Fix for Firestore connectivity errors by setting experimentalForceLongPolling to true and autoDetect to false
+            db.settings({ experimentalForceLongPolling: true, experimentalAutoDetectLongPolling: false, merge: true });
+        } catch(e){ console.error(e); }
 
         const TTS_MODEL = "gemini-2.5-flash-preview-tts";
+        const CHUNK_SIZE = 1000; 
         const VOICES = [
             {id:"Fenrir",gender:"Male"}, {id:"Kore",gender:"Female"}, {id:"Puck",gender:"Male"}, {id:"Aoede",gender:"Female"},
             {id:"Charon",gender:"Male"}, {id:"Zephyr",gender:"Male"}, {id:"Leda",gender:"Female"}, {id:"Orus",gender:"Male"},
@@ -303,10 +310,8 @@
             const email = getEl('login-email').value; const pass = getEl('login-pass').value;
             const msg = getEl('auth-msg'); const btn = getEl('auth-action-btn');
             if(!email || !pass) { msg.innerText = "Please enter email and password"; return; }
-            
             btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Processing...`; btn.disabled = true;
             lucide.createIcons();
-
             try {
                 let cred;
                 if(state.authMode === 'signup') {
@@ -328,7 +333,6 @@
             const uData = { email: user.email, lastLogin: firebase.firestore.FieldValue.serverTimestamp() };
             if(isNew) uData.joinedAt = firebase.firestore.FieldValue.serverTimestamp();
             
-            // Hybrid Save for reliability
             await getRootRef('users').doc(user.uid).set(uData, {merge:true});
             await getArtifactRef('users').doc(user.uid).set(uData, {merge:true});
             
@@ -388,17 +392,21 @@
             if(!pool.length){ showToast("System Maintenance (No Keys).", "error"); return; }
             
             const btn = document.getElementById('generate-btn');
-            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Processing...`; btn.disabled = true;
+            // Loading State
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Preparing...`; 
+            btn.disabled = true;
 
             let logId = await logActivity(state.text, "processing");
             if(db) getArtifactRef('stats').doc('global').update({pending_generations: firebase.firestore.FieldValue.increment(1)}).catch(()=>{});
 
             try {
-                const chunks = chunkText(state.text, 4000);
+                // SMARTER CHUNKING (Sentence Aware)
+                const chunks = chunkText(state.text, CHUNK_SIZE); 
                 let audioBuffers = [];
                 
-                for(let chunk of chunks){
-                    const ab = await fetchTTS(chunk, state.selectedVoiceId, pool);
+                for(let i=0; i<chunks.length; i++){
+                    btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Processing Part ${i+1}/${chunks.length}...`;
+                    const ab = await fetchTTS(chunks[i], state.selectedVoiceId, pool);
                     audioBuffers.push(ab);
                 }
                 
@@ -419,7 +427,11 @@
                 updateLog(logId, "failed");
                 if(db) getArtifactRef('stats').doc('global').update({pending_generations: firebase.firestore.FieldValue.increment(-1), failed_generations: firebase.firestore.FieldValue.increment(1)});
             }
-            btn.innerHTML = `<i data-lucide="download" class="w-4 h-4"></i> Download (HQ)`; btn.disabled = false; try{lucide.createIcons();}catch(e){}
+            
+            // Reset Button
+            btn.innerHTML = `<i data-lucide="download" class="w-4 h-4"></i> Download (HQ)`; 
+            btn.disabled = false;
+            try{lucide.createIcons();}catch(e){}
         }
 
         function mergeWavBuffers(buffers) {
@@ -495,6 +507,11 @@
                     const safeText = (da.fullText || "").replace(/</g, "&lt;");
                     l.innerHTML += `<tr class="border-b border-slate-700/50"><td class="p-3 w-1/4 align-top"><div class="font-bold text-white text-xs">${da.userEmail?.split('@')[0]}</div><div class="text-[10px] text-slate-500">${t}</div><div class="text-[10px] uppercase ${st}">${da.status}</div></td><td class="p-3 w-3/4"><div class="max-h-24 overflow-y-auto text-xs text-slate-300 bg-slate-800/50 p-2 rounded whitespace-pre-wrap custom-scrollbar">${safeText}</div></td></tr>`;
                 });}
+            });
+            
+            // USER LIST
+            getRootRef('users').orderBy('joinedAt', 'desc').limit(30).onSnapshot(s => {
+                const ul = getEl('user-list'); if(ul) { ul.innerHTML = ""; s.forEach(doc => { const u = doc.data(); const jd = u.joinedAt ? new Date(u.joinedAt.seconds*1000).toLocaleDateString() : '-'; ul.innerHTML += `<tr class="border-b border-slate-700/50 hover:bg-slate-800/30"><td class="px-6 py-2 text-xs text-white font-bold">${u.email}</td><td class="px-6 py-2 text-xs text-slate-400">${jd}</td></tr>`; }); }
             });
         }
 

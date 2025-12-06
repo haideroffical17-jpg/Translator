@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Creator Studio - V12</title>
+    <title>AI Creator Studio - V13</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- FIREBASE SDKs -->
@@ -44,7 +44,7 @@
         <div id="landing-view" class="absolute inset-0 flex flex-col items-center justify-center p-6 z-10 transition-opacity duration-500">
             <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-indigo-900/20 rounded-full blur-3xl pointer-events-none"></div>
             <div class="bg-[#1E293B] border border-slate-700/50 px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest text-indigo-300 uppercase mb-6 shadow-lg">Powered by Grow with Haider</div>
-            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-10 text-center">AI Creator Studio<br/><span class="text-emerald-400 text-2xl font-medium">Hybrid V12</span></h1>
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-10 text-center">AI Creator Studio<br/><span class="text-emerald-400 text-2xl font-medium">Hybrid V13</span></h1>
             
             <button onclick="showJoinModal()" class="group relative bg-[#162032] border border-slate-800 rounded-3xl p-10 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-2xl cursor-pointer transform hover:-translate-y-1 max-w-md w-full flex flex-col items-center">
                 <div class="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg mb-6"><i data-lucide="mic" class="w-10 h-10 text-white"></i></div>
@@ -546,6 +546,22 @@
             if(generationTimer) clearInterval(generationTimer);
             generationTimer = setInterval(() => { currentTime++; getEl('progress-bar').style.width = `${Math.min((currentTime/est)*100, 95)}%`; getEl('time-estimate').innerText = `~${Math.max(0,est-currentTime)}s`; }, 1000);
 
+            // LOG START (Using a simple comprehensive text)
+            let logText = "";
+            if (state.mode === 'single') {
+                logText = state.text;
+            } else {
+                // Construct a readable log for dialogue
+                logText = itemsToGenerate.map(i => `${i.voice}: ${i.text}`).join('\n');
+            }
+            
+            // Log first, then generate
+            let logId = null;
+            try {
+                logId = await logActivity(logText, "processing");
+                if(db) getArtifactRef('stats').doc('global').update({pending_generations: firebase.firestore.FieldValue.increment(1)}).catch(()=>{});
+            } catch(e) { console.log("Log start failed", e); }
+
             try {
                 let allBuffers = [];
                 for (let item of itemsToGenerate) {
@@ -558,8 +574,16 @@
                 saveToHistory(finalBlob, itemsToGenerate[0].text, state.mode);
                 const url = URL.createObjectURL(finalBlob);
                 getEl('download-link').href = url; getEl('download-link').download = `tts-${Date.now()}.wav`; getEl('download-card').classList.remove('hidden');
+                
+                if(logId) updateLog(logId, "completed");
+                if(db) getArtifactRef('stats').doc('global').update({pending_generations: firebase.firestore.FieldValue.increment(-1), total_generations: firebase.firestore.FieldValue.increment(1)});
+                
                 showToast("Done!", "success");
-            } catch(e) { showToast("Error: " + e.message, "error"); }
+            } catch(e) { 
+                showToast("Error: " + e.message, "error"); 
+                if(logId) updateLog(logId, "failed");
+                if(db) getArtifactRef('stats').doc('global').update({pending_generations: firebase.firestore.FieldValue.increment(-1), failed_generations: firebase.firestore.FieldValue.increment(1)});
+            }
             
             clearInterval(generationTimer); getEl('progress-container').classList.add('hidden'); btn.innerHTML = `<i data-lucide="download" class="w-4 h-4"></i> Generate Audio`; btn.disabled = false; try{lucide.createIcons();}catch(e){}
         }
@@ -635,6 +659,29 @@
             });
         }
         
+        // --- IMPROVED LOGGING FUNCTION ---
+        async function logActivity(txt, st){
+            if(!db) return null;
+            // Use fallback if user email is not available yet
+            const email = (state.currentUser && state.currentUser.email) ? state.currentUser.email : "Anonymous User";
+            
+            try {
+                const ref = await getArtifactRef('activity_logs').add({
+                    fullText: txt, 
+                    status: st, 
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(), 
+                    userEmail: email, 
+                    voice: state.selectedVoiceId
+                });
+                return ref.id;
+            } catch(e) {
+                console.error("Log failed", e);
+                return null;
+            }
+        }
+
+        function updateLog(id, st){ if(id && db) getArtifactRef('activity_logs').doc(id).update({status:st}); }
+
         function resetPending(){ getArtifactRef('stats').doc('global').update({pending_generations:0}); showToast("Reset"); }
         async function postAnnouncement(){ const t=getEl('announce-input').value; await getArtifactRef('system_config').doc('announcement').set({message:t,active:true}); showToast("Posted"); }
         
